@@ -28,6 +28,7 @@ mvn test
 
 - [Plano de desenvolvimento](docs/PLANO-DESENVOLVIMENTO.md): objetivos, módulos, regras, cronograma de PRs e decisões pendentes.
 - [Guia de estudos](docs/GUIA-DE-ESTUDOS.md): como entender classes, métodos, rotas e testes do projeto.
+- [Alinhamento com a documentação oficial](docs/ALINHAMENTO-DOCUMENTACAO-DRIVE.md): diferenças encontradas no Drive, decisões pendentes e prioridades.
 
 ## Organização
 
