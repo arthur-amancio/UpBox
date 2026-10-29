@@ -1,24 +1,62 @@
 package com.upbox.model;
 
+import jakarta.persistence.*;
+import java.util.Locale;
+
 /**
- * Representa um produto do estoque.
+ * Produto cadastrado no estoque.
  *
- * Esta primeira versão ensina as regras de quantidade em Java.
- * Ainda não está ligada ao banco de dados nem às telas demonstrativas.
+ * A anotação @Entity informa ao JPA que os dados desta classe serão salvos
+ * na tabela "produtos" do banco de dados.
  */
+@Entity
+@Table(name = "produtos")
 public class Produto {
 
-    // Dados básicos do produto e seu saldo atual.
-    private final String codigo;
-    private final String nome;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    // O código é único para evitar dois cadastros do mesmo item.
+    @Column(nullable = false, unique = true, length = 40)
+    private String codigo;
+
+    @Column(nullable = false, length = 120)
+    private String nome;
+
+    @Column(length = 500)
+    private String descricao;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "categoria_id", nullable = false)
+    private Categoria categoria;
+
+    @Column(name = "quantidade_estoque", nullable = false)
     private int quantidade;
-    private final int estoqueMinimo;
+
+    @Column(name = "estoque_minimo", nullable = false)
+    private int estoqueMinimo;
+
+    @Column(nullable = false)
+    private boolean ativo = true;
+
+    // O JPA precisa deste construtor para reconstruir produtos do banco.
+    protected Produto() {
+    }
 
     /**
-     * Cria um produto, verificando os campos obrigatórios.
-     * Um produto novo pode ter saldo zero, mas nunca negativo.
+     * Construtor utilizado nos exercícios anteriores, sem persistência.
+     * Para cadastrar no banco, informe também uma categoria.
      */
     public Produto(String codigo, String nome, int quantidade, int estoqueMinimo) {
+        this(codigo, nome, null, null, quantidade, estoqueMinimo);
+    }
+
+    /**
+     * Prepara um produto real e verifica os dados essenciais.
+     */
+    public Produto(String codigo, String nome, String descricao,
+                   Categoria categoria, int quantidade, int estoqueMinimo) {
         if (codigo == null || codigo.isBlank()) {
             throw new IllegalArgumentException("O código é obrigatório.");
         }
@@ -29,10 +67,16 @@ public class Produto {
             throw new IllegalArgumentException("As quantidades não podem ser negativas.");
         }
 
-        this.codigo = codigo.trim();
+        this.codigo = codigo.trim().toUpperCase(Locale.ROOT);
         this.nome = nome.trim();
+        this.descricao = descricao == null ? "" : descricao.trim();
+        this.categoria = categoria;
         this.quantidade = quantidade;
         this.estoqueMinimo = estoqueMinimo;
+    }
+
+    public Long getId() {
+        return id;
     }
 
     public String getCodigo() {
@@ -43,6 +87,14 @@ public class Produto {
         return nome;
     }
 
+    public String getDescricao() {
+        return descricao;
+    }
+
+    public Categoria getCategoria() {
+        return categoria;
+    }
+
     public int getQuantidade() {
         return quantidade;
     }
@@ -51,20 +103,22 @@ public class Produto {
         return estoqueMinimo;
     }
 
-    /**
-     * Mostra o alerta quando o saldo é menor ou igual ao mínimo.
-     */
+    public boolean isAtivo() {
+        return ativo;
+    }
+
+    /** O alerta aparece também quando o saldo é exatamente o mínimo. */
     public boolean isEstoqueBaixo() {
         return quantidade <= estoqueMinimo;
     }
 
     /**
-     * Registra a entrada, somando a quantidade ao saldo.
+     * Entrada soma unidades ao saldo, protegendo contra valores inválidos.
      */
     public void registrarEntrada(int quantidade) {
         validarQuantidadeMovimentada(quantidade);
 
-        // Impede que uma soma muito grande ultrapasse o limite do tipo int.
+        // Um int tem um limite máximo. Esta verificação evita o estouro.
         if (this.quantidade > Integer.MAX_VALUE - quantidade) {
             throw new IllegalArgumentException("Quantidade acima do limite permitido.");
         }
@@ -73,7 +127,7 @@ public class Produto {
     }
 
     /**
-     * Registra a saída, sem deixar o estoque negativo.
+     * Saída subtrai unidades, mas nunca permite saldo negativo.
      */
     public void registrarSaida(int quantidade) {
         validarQuantidadeMovimentada(quantidade);
@@ -86,8 +140,12 @@ public class Produto {
     }
 
     /**
-     * Regra compartilhada por entrada e saída: movimentar pelo menos uma unidade.
+     * Desativa o produto sem apagar as movimentações antigas.
      */
+    public void desativar() {
+        this.ativo = false;
+    }
+
     private void validarQuantidadeMovimentada(int quantidade) {
         if (quantidade <= 0) {
             throw new IllegalArgumentException("A quantidade deve ser maior que zero.");
