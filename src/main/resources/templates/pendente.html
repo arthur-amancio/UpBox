@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" xmlns:th="http://www.thymeleaf.org">
+ <head th:replace="~{fragments/layout :: cabecalho('Módulo em desenvolvimento')}">
+ </head>
+ <body>
+  <th:block th:replace="~{fragments/layout :: estrutura(~{::section})}">
+   <section>
+    <div class="pagina-cabecalho">
+     <h2>
+      Módulo em desenvolvimento
+     </h2>
+    </div>
+    <div class="card">
+     <p>
+      Este módulo será conectado nas próximas entregas. Nenhum dado demonstrativo é apresentado.
+     </p>
+    </div>
+   </section>
+  </th:block>
+ </body>
+</html>

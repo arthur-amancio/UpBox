@@ -4,13 +4,11 @@ Projeto didático com **Java 17, Spring Boot, Thymeleaf, Spring Data JPA e Postg
 
 ## Estado atual
 
-O UpBox agora possui **entidades JPA, repositórios e serviços de estoque** no servidor, com testes automatizados.
-Porém, **as telas continuam demonstrativas**: login, usuários e movimentações feitos pela interface ainda usam
-dados fictícios no navegador (`localStorage`). Não existe autenticação real; não utilize dados reais.
+O login, logout, usuários, perfil e troca de senha são reais, com Spring Security, BCrypt e CSRF.
+Categorias, produtos, movimentações, dashboard e relatórios serão conectados nas próximas entregas;
+esses módulos ainda não apresentam dados enquanto aguardam integração.
 
-As classes do backend já representam `Produto`, `Categoria`, `Usuario` e `MovimentacaoEstoque`.
-O serviço de movimentações modifica o saldo e salva o histórico na mesma transação,
-mas ainda não possui um controller acessível ao navegador, por segurança.
+Leia [Entrega 1 — autenticação e administrador inicial](docs/ENTREGA-1-AUTENTICACAO.md).
 
 ## Executar no VS Code com PostgreSQL
 
@@ -54,9 +52,9 @@ mvn spring-boot:run
 - `src/main/java/com/upbox/model`: entidades de produtos, categorias, usuários e movimentações.
 - `src/main/java/com/upbox/repository`: operações com o banco de dados.
 - `src/main/java/com/upbox/service`: cadastro de produtos e movimentações transacionais.
-- `src/main/java/com/upbox/controller`: rotas das páginas existentes (ainda demonstrativas).
+- `src/main/java/com/upbox/controller`: rotas e formulários MVC.
 - `src/main/resources/templates`: páginas Thymeleaf.
-- `src/main/resources/static`: CSS, imagens e JS demonstrativo.
+- `src/main/resources/static`: CSS, imagens e interações visuais.
 - `src/test`: testes de domínio, das rotas e da persistência.
 
 ## Documentos da equipe
@@ -68,7 +66,4 @@ mvn spring-boot:run
 
 ## Próxima etapa
 
-Criar autenticação real e autorização de administrador/funcionário, substituir
-gradualmente os formulários simulados pelos formulários conectados aos serviços
-e testar a concorrência com PostgreSQL real. Não publicar o protótipo atual na internet
-nem permitir endpoints de escrita desprotegidos.
+Conectar categorias e produtos aos formulários, depois movimentações e relatórios.

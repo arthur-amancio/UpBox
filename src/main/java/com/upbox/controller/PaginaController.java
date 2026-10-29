@@ -3,15 +3,14 @@ package com.upbox.controller;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 
-// Cada método responde a uma rota (endereço) e devolve o nome do arquivo HTML
-// que está em src/main/resources/templates (sem o ".html").
-// Neste protótipo não há regra de negócio nem banco de dados: só navegação.
+import java.security.Principal;
+
+/** Navegação; os módulos conectados recebem controllers próprios. */
 @Controller
 public class PaginaController {
-
     @GetMapping("/")
-    public String inicio() {
-        return "index";
+    public String inicio(Principal p) {
+        return p == null ? "redirect:/login" : "redirect:/home";
     }
 
     @GetMapping("/login")
@@ -19,38 +18,24 @@ public class PaginaController {
         return "login";
     }
 
-    @GetMapping("/cadastro")
-    public String cadastro() {
-        return "cadastro";
-    }
-
     @GetMapping("/home")
     public String home() {
         return "home";
     }
 
-    @GetMapping("/dashboard")
-    public String dashboard() {
-        return "dashboard";
+    @GetMapping({"/dashboard", "/estoque", "/movimentacoes", "/relatorios"})
+    public String pendente() {
+        return "pendente";
     }
 
-    @GetMapping("/estoque")
-    public String estoque() {
-        return "estoque";
+    @GetMapping("/cadastro")
+    public String cadastro() {
+        return "redirect:/usuarios/novo";
     }
 
-    @GetMapping("/movimentacoes")
-    public String movimentacoes() {
-        return "movimentacoes";
-    }
-
-    @GetMapping("/relatorios")
-    public String relatorios() {
-        return "relatorios";
-    }
-
-    @GetMapping("/configuracoes")
-    public String configuracoes() {
-        return "configuracoes";
+    @GetMapping("/acesso-negado")
+    public String negado(jakarta.servlet.http.HttpServletResponse res) {
+        res.setStatus(403);
+        return "acesso-negado";
     }
 }

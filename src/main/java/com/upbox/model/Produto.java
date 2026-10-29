@@ -1,14 +1,21 @@
 package com.upbox.model;
 
 import jakarta.persistence.*;
+
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
 import java.util.Locale;
 
 /**
  * Produto cadastrado no estoque.
  *
- * A anotação @Entity informa ao JPA que os dados desta classe serão salvos
- * na tabela "produtos" do banco de dados.
+ * <p>A anotação @Entity informa ao JPA que os dados desta classe serão salvos na tabela "produtos"
+ * do banco de dados.
  */
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(name = "produtos")
 public class Produto {
@@ -40,23 +47,22 @@ public class Produto {
     @Column(nullable = false)
     private boolean ativo = true;
 
-    // O JPA precisa deste construtor para reconstruir produtos do banco.
-    protected Produto() {
-    }
-
     /**
-     * Construtor utilizado nos exercícios anteriores, sem persistência.
-     * Para cadastrar no banco, informe também uma categoria.
+     * Construtor utilizado nos exercícios anteriores, sem persistência. Para cadastrar no banco,
+     * informe também uma categoria.
      */
     public Produto(String codigo, String nome, int quantidade, int estoqueMinimo) {
         this(codigo, nome, null, null, quantidade, estoqueMinimo);
     }
 
-    /**
-     * Prepara um produto real e verifica os dados essenciais.
-     */
-    public Produto(String codigo, String nome, String descricao,
-                   Categoria categoria, int quantidade, int estoqueMinimo) {
+    /** Prepara um produto real e verifica os dados essenciais. */
+    public Produto(
+            String codigo,
+            String nome,
+            String descricao,
+            Categoria categoria,
+            int quantidade,
+            int estoqueMinimo) {
         if (codigo == null || codigo.isBlank()) {
             throw new IllegalArgumentException("O código é obrigatório.");
         }
@@ -75,46 +81,12 @@ public class Produto {
         this.estoqueMinimo = estoqueMinimo;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public String getCodigo() {
-        return codigo;
-    }
-
-    public String getNome() {
-        return nome;
-    }
-
-    public String getDescricao() {
-        return descricao;
-    }
-
-    public Categoria getCategoria() {
-        return categoria;
-    }
-
-    public int getQuantidade() {
-        return quantidade;
-    }
-
-    public int getEstoqueMinimo() {
-        return estoqueMinimo;
-    }
-
-    public boolean isAtivo() {
-        return ativo;
-    }
-
     /** O alerta aparece também quando o saldo é exatamente o mínimo. */
     public boolean isEstoqueBaixo() {
         return quantidade <= estoqueMinimo;
     }
 
-    /**
-     * Entrada soma unidades ao saldo, protegendo contra valores inválidos.
-     */
+    /** Entrada soma unidades ao saldo, protegendo contra valores inválidos. */
     public void registrarEntrada(int quantidade) {
         validarQuantidadeMovimentada(quantidade);
 
@@ -126,9 +98,7 @@ public class Produto {
         this.quantidade += quantidade;
     }
 
-    /**
-     * Saída subtrai unidades, mas nunca permite saldo negativo.
-     */
+    /** Saída subtrai unidades, mas nunca permite saldo negativo. */
     public void registrarSaida(int quantidade) {
         validarQuantidadeMovimentada(quantidade);
 
@@ -139,9 +109,7 @@ public class Produto {
         this.quantidade -= quantidade;
     }
 
-    /**
-     * Desativa o produto sem apagar as movimentações antigas.
-     */
+    /** Desativa o produto sem apagar as movimentações antigas. */
     public void desativar() {
         this.ativo = false;
     }

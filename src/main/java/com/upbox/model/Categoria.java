@@ -2,9 +2,13 @@ package com.upbox.model;
 
 import jakarta.persistence.*;
 
-/**
- * Agrupa produtos, como Papelaria, Limpeza ou Alimentos.
- */
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+/** Agrupa produtos, como Papelaria, Limpeza ou Alimentos. */
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(name = "categorias")
 public class Categoria {
@@ -22,31 +26,12 @@ public class Categoria {
     @Column(nullable = false)
     private boolean ativa = true;
 
-    protected Categoria() {
-    }
-
     public Categoria(String nome, String descricao) {
         if (nome == null || nome.isBlank()) {
             throw new IllegalArgumentException("O nome da categoria é obrigatório.");
         }
         this.nome = nome.trim();
         this.descricao = descricao == null ? "" : descricao.trim();
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getNome() {
-        return nome;
-    }
-
-    public String getDescricao() {
-        return descricao;
-    }
-
-    public boolean isAtiva() {
-        return ativa;
     }
 
     public void desativar() {

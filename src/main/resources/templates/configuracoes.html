@@ -1,8 +1,90 @@
 <!DOCTYPE html>
-<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/layout :: cabecalho('Configurações')}"></head>
-<!-- O conteúdo desta tela é montado por static/js/pages/configuracoes.js com dados demonstrativos -->
-<body data-pagina="configuracoes" data-titulo="Configurações">
-<th:block th:replace="~{fragments/layout :: scripts('configuracoes')}"></th:block>
-</body>
+<html lang="pt-br" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" xmlns:th="http://www.thymeleaf.org">
+ <head th:replace="~{fragments/layout :: cabecalho('Configurações')}">
+ </head>
+ <body>
+  <th:block th:replace="~{fragments/layout :: estrutura(~{::section})}">
+   <section>
+    <div class="pagina-cabecalho">
+     <h2>
+      Configurações
+     </h2>
+    </div>
+    <form class="form-card" method="post" th:action="@{/configuracoes/perfil}" th:object="${perfilForm}">
+     <h3>
+      Seu perfil
+     </h3>
+     <div class="campo">
+      <label for="nome">
+       Nome completo
+      </label>
+      <input maxlength="120" required="" th:field="*{nome}"/>
+     </div>
+     <div class="campo">
+      <label for="email">
+       E-mail
+      </label>
+      <input maxlength="150" required="" th:field="*{email}" type="email"/>
+     </div>
+     <button class="btn btn-primario">
+      Salvar perfil
+     </button>
+    </form>
+    <form class="form-card" method="post" th:action="@{/configuracoes/senha}">
+     <h3>
+      Alterar senha
+     </h3>
+     <div class="campo">
+      <label for="atual">
+       Senha atual
+      </label>
+      <input autocomplete="current-password" id="atual" name="atual" required="" type="password"/>
+     </div>
+     <div class="campo">
+      <label for="nova">
+       Nova senha
+      </label>
+      <input autocomplete="new-password" id="nova" minlength="8" name="nova" required="" type="password"/>
+     </div>
+     <div class="campo">
+      <label for="confirmacao">
+       Confirmar nova senha
+      </label>
+      <input autocomplete="new-password" id="confirmacao" name="confirmacao" required="" type="password"/>
+     </div>
+     <button class="btn btn-primario">
+      Alterar senha e sair
+     </button>
+    </form>
+    <div class="card">
+     <h3>
+      Aparência
+     </h3>
+     <button class="btn btn-secundario" id="alternarTema" type="button">
+      Alternar tema claro/escuro
+     </button>
+    </div>
+    <div class="card" id="manual">
+     <h3>
+      Manual de utilização
+     </h3>
+     <p>
+      1. O administrador cadastra categorias, produtos e usuários.
+     </p>
+     <p>
+      2. Em Movimentações, selecione produto, entrada ou saída e quantidade. Confira antes de confirmar.
+     </p>
+     <p>
+      3. Consulte o saldo, alertas e histórico. Uma saída nunca pode superar o saldo.
+     </p>
+     <p>
+      4. Consulte os relatórios. O administrador pode imprimir e escolher Salvar como PDF no navegador.
+     </p>
+     <p>
+      5. Use Sair para encerrar a sessão.
+     </p>
+    </div>
+   </section>
+  </th:block>
+ </body>
 </html>

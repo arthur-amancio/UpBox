@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" xmlns:th="http://www.thymeleaf.org">
+ <head th:replace="~{fragments/layout :: cabecalho('Acesso não permitido')}">
+ </head>
+ <body>
+  <th:block th:replace="~{fragments/layout :: estrutura(~{::section})}">
+   <section>
+    <div class="pagina-cabecalho">
+     <h2>
+      Acesso não permitido
+     </h2>
+    </div>
+    <p class="alerta alerta-erro">
+     Você não possui permissão para acessar esta funcionalidade.
+    </p>
+   </section>
+  </th:block>
+ </body>
+</html>

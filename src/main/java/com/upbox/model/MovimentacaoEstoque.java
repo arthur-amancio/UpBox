@@ -1,13 +1,20 @@
 package com.upbox.model;
 
 import jakarta.persistence.*;
+
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
 import java.time.LocalDateTime;
 
 /**
  * Registro permanente de uma entrada ou saída no estoque.
  *
- * Cada movimentação pertence a um produto e ao usuário responsável.
+ * <p>Cada movimentação pertence a um produto e ao usuário responsável.
  */
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(name = "movimentacoes_estoque")
 public class MovimentacaoEstoque {
@@ -37,12 +44,13 @@ public class MovimentacaoEstoque {
     @Column(length = 500)
     private String observacao;
 
-    protected MovimentacaoEstoque() {
-    }
-
-    public MovimentacaoEstoque(Produto produto, Usuario usuario,
-                              TipoMovimentacao tipo, int quantidade,
-                              LocalDateTime dataHora, String observacao) {
+    public MovimentacaoEstoque(
+            Produto produto,
+            Usuario usuario,
+            TipoMovimentacao tipo,
+            int quantidade,
+            LocalDateTime dataHora,
+            String observacao) {
         if (produto == null || usuario == null || tipo == null || dataHora == null) {
             throw new IllegalArgumentException("Movimentação sem informações obrigatórias.");
         }
@@ -56,30 +64,6 @@ public class MovimentacaoEstoque {
         this.quantidade = quantidade;
         this.dataHora = dataHora;
         this.observacao = observacao == null ? "" : observacao.trim();
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public Produto getProduto() {
-        return produto;
-    }
-
-    public Usuario getUsuario() {
-        return usuario;
-    }
-
-    public TipoMovimentacao getTipo() {
-        return tipo;
-    }
-
-    public int getQuantidade() {
-        return quantidade;
-    }
-
-    public LocalDateTime getDataHora() {
-        return dataHora;
     }
 
     public String getObservacao() {

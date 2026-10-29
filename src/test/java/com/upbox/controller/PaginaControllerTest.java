@@ -1,43 +1,212 @@
 package com.upbox.controller;
 
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+import com.upbox.model.*;
+import com.upbox.repository.*;
+import com.upbox.service.UsuarioService;
+
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.mock.web.MockHttpSession;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
-
-/**
- * Testa se as páginas existentes continuam acessíveis no protótipo.
- * A verificação de login será diferente quando houver autenticação real.
- */
-@WebMvcTest(PaginaController.class)
+/** Exercita a autenticação real e os formulários com o filtro de segurança habilitado. */
+@SpringBootTest
+@AutoConfigureMockMvc
+@ActiveProfiles("test")
 class PaginaControllerTest {
+    @Autowired MockMvc mvc;
+    @Autowired UsuarioRepository usuarios;
+    @Autowired RegistroOperacaoRepository registros;
+    @Autowired PasswordEncoder encoder;
+    @Autowired UsuarioService service;
+    Usuario admin, funcionario;
 
-    @Autowired
-    private MockMvc mockMvc;
+    @BeforeEach
+    void preparar() {
+        registros.deleteAll();
+        usuarios.deleteAll();
+        admin =
+                usuarios.save(
+                        new Usuario(
+                                "Administrador",
+                                "admin",
+                                "admin@example.com",
+                                encoder.encode("senha-teste-123"),
+                                PerfilAcesso.ADMINISTRADOR));
+        funcionario =
+                usuarios.save(
+                        new Usuario(
+                                "Funcionário",
+                                "funcionario",
+                                "func@example.com",
+                                encoder.encode("senha-teste-123"),
+                                PerfilAcesso.FUNCIONARIO));
+    }
+
+    MockHttpSession login(String nome) throws Exception {
+        return (MockHttpSession)
+                mvc.perform(
+                                post("/login")
+                                        .with(csrf())
+                                        .param("username", nome)
+                                        .param("password", "senha-teste-123"))
+                        .andExpect(status().is3xxRedirection())
+                        .andExpect(redirectedUrl("/home"))
+                        .andReturn()
+                        .getRequest()
+                        .getSession(false);
+    }
 
     @Test
-    void deveAbrirAsPaginasDoPrototipo() throws Exception {
-        // Cada rota deve devolver o arquivo HTML correspondente.
-        String[][] paginas = {
-            {"/", "index"},
-            {"/login", "login"},
-            {"/cadastro", "cadastro"},
-            {"/home", "home"},
-            {"/dashboard", "dashboard"},
-            {"/estoque", "estoque"},
-            {"/movimentacoes", "movimentacoes"},
-            {"/relatorios", "relatorios"},
-            {"/configuracoes", "configuracoes"}
-        };
+    void deveProtegerRotasEManterLoginPublico() throws Exception {
+        mvc.perform(get("/login")).andExpect(status().isOk());
+        for (String rota :
+                new String[] {
+                    "/home",
+                    "/estoque",
+                    "/dashboard",
+                    "/movimentacoes",
+                    "/relatorios",
+                    "/configuracoes",
+                    "/usuarios"
+                }) mvc.perform(get(rota)).andExpect(status().is3xxRedirection());
+        mvc.perform(post("/login").param("username", "admin").param("password", "senha-teste-123"))
+                .andExpect(status().isForbidden());
+    }
 
-        for (String[] pagina : paginas) {
-            mockMvc.perform(get(pagina[0]))
-                    .andExpect(status().isOk())
-                    .andExpect(view().name(pagina[1]));
-        }
+    @Test
+    void deveAutenticarPorNomeOuEmailSemDiferenciarCaixa() throws Exception {
+        var sessao = login("ADMIN@EXAMPLE.COM");
+        for (String rota :
+                new String[] {
+                    "/home",
+                    "/estoque",
+                    "/dashboard",
+                    "/movimentacoes",
+                    "/relatorios",
+                    "/configuracoes",
+                    "/usuarios",
+                    "/usuarios/novo",
+                    "/registros"
+                }) mvc.perform(get(rota).session(sessao)).andExpect(status().isOk());
+        login("ADMIN");
+        assertTrue(encoder.matches("senha-teste-123", admin.getSenhaHash()));
+        assertNotEquals("senha-teste-123", admin.getSenhaHash());
+    }
+
+    @Test
+    void deveRecusarSenhaIncorretaEUsuarioInativo() throws Exception {
+        mvc.perform(
+                        post("/login")
+                                .with(csrf())
+                                .param("username", "admin")
+                                .param("password", "errada"))
+                .andExpect(redirectedUrl("/login?erro"));
+        funcionario.desativar();
+        usuarios.saveAndFlush(funcionario);
+        mvc.perform(
+                        post("/login")
+                                .with(csrf())
+                                .param("username", "funcionario")
+                                .param("password", "senha-teste-123"))
+                .andExpect(redirectedUrl("/login?erro"));
+    }
+
+    @Test
+    void deveRevogarSessaoAposDesativacaoOuMudancaDePerfil() throws Exception {
+        var sessao = login("funcionario");
+        funcionario.desativar();
+        usuarios.saveAndFlush(funcionario);
+        mvc.perform(get("/home").session(sessao)).andExpect(redirectedUrl("/login?expirada"));
+        var outra = login("admin");
+        admin.atualizar(
+                admin.getNome(), admin.getUsuario(), admin.getEmail(), PerfilAcesso.FUNCIONARIO);
+        usuarios.saveAndFlush(admin);
+        mvc.perform(get("/usuarios").session(outra)).andExpect(redirectedUrl("/login?expirada"));
+    }
+
+    @Test
+    void funcionarioNaoPodeGerenciarUsuariosNemImprimir() throws Exception {
+        var sessao = login("funcionario");
+        for (String rota :
+                new String[] {
+                    "/usuarios", "/usuarios/novo", "/cadastro", "/registros", "/relatorios/imprimir"
+                }) mvc.perform(get(rota).session(sessao)).andExpect(status().isForbidden());
+        mvc.perform(post("/usuarios").session(sessao).with(csrf()))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void deveCadastrarUsuarioEImpedirDuplicidade() throws Exception {
+        var sessao = login("admin");
+        mvc.perform(
+                        post("/usuarios")
+                                .session(sessao)
+                                .with(csrf())
+                                .param("nome", "Novo")
+                                .param("usuario", "novo")
+                                .param("email", "novo@example.com")
+                                .param("perfil", "FUNCIONARIO")
+                                .param("senha", "senha-nova-123"))
+                .andExpect(redirectedUrl("/usuarios"));
+        var novo = usuarios.findByUsuarioIgnoreCaseOrEmailIgnoreCase("novo", "novo").get(0);
+        assertTrue(encoder.matches("senha-nova-123", novo.getSenhaHash()));
+        mvc.perform(
+                        post("/usuarios")
+                                .session(sessao)
+                                .with(csrf())
+                                .param("nome", "Outro")
+                                .param("usuario", "NOVO")
+                                .param("email", "outro@example.com")
+                                .param("perfil", "FUNCIONARIO")
+                                .param("senha", "senha-nova-123"))
+                .andExpect(status().isOk())
+                .andExpect(model().attributeHasErrors("form"));
+        assertEquals(3, usuarios.count());
+    }
+
+    @Test
+    void deveProtegerUltimoAdministradorEEncerrarSessao() throws Exception {
+        assertThrows(IllegalArgumentException.class, () -> service.alterarStatus(admin.getId()));
+        var sessao = login("admin");
+        mvc.perform(post("/logout").session(sessao)).andExpect(status().isForbidden());
+        mvc.perform(post("/logout").session(sessao).with(csrf()))
+                .andExpect(redirectedUrl("/login?logout"));
+        assertTrue(sessao.isInvalid());
+    }
+
+    @Test
+    void deveAlterarSenhaSomenteComSenhaAtualCorreta() throws Exception {
+        var s = login("funcionario");
+        mvc.perform(
+                        post("/configuracoes/senha")
+                                .session(s)
+                                .with(csrf())
+                                .param("atual", "errada")
+                                .param("nova", "nova-senha-123")
+                                .param("confirmacao", "nova-senha-123"))
+                .andExpect(redirectedUrl("/configuracoes"));
+        mvc.perform(
+                        post("/configuracoes/senha")
+                                .session(s)
+                                .with(csrf())
+                                .param("atual", "senha-teste-123")
+                                .param("nova", "nova-senha-123")
+                                .param("confirmacao", "nova-senha-123"))
+                .andExpect(redirectedUrl("/login?senhaAlterada"));
+        assertTrue(s.isInvalid());
+        assertTrue(
+                encoder.matches(
+                        "nova-senha-123",
+                        usuarios.findById(funcionario.getId()).orElseThrow().getSenhaHash()));
     }
 }

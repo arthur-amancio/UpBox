@@ -1457,3 +1457,10 @@ html[data-tema="escuro"] .chips span{color:var(--cor-primaria-clara-tom)}
  .so-impressao{display:block;margin-bottom:16px;font-size:.85rem}.card,.tabela-wrapper{box-shadow:none!important;break-inside:avoid}
 }
 @media(max-width:900px){.cfg-layout{flex-direction:column}.cfg-menu{flex:none;width:100%;display:flex;overflow-x:auto;gap:4px}.cfg-menu a{white-space:nowrap}.fluxo-seta{display:none}.inicio-card{padding:34px 22px}.home-bloco{padding:34px 6vw}}
+
+/* Formulários MVC reaproveitam os componentes do protótipo. */
+.form-card + .form-card,.card + .card { margin-top: 22px; }
+.form-grid input,.form-grid select,.form-grid textarea { max-width:100%; }
+.acoes-tabela form { margin:0; }
+.campo .erro-campo { color:var(--cor-erro); font-size:.82rem; }
+@media(max-width:600px){.barra-filtros > * { max-width:100%; min-width:0; }.form-card {padding:18px;}.pagina-cabecalho {flex-wrap:wrap;}}

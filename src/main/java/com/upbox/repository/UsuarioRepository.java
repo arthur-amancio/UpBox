@@ -1,8 +1,20 @@
 package com.upbox.repository;
 
-import com.upbox.model.Usuario;
-import org.springframework.data.jpa.repository.JpaRepository;
+import com.upbox.model.*;
 
-/** Acesso aos usuários. O login real ainda não foi implementado. */
+import jakarta.persistence.LockModeType;
+
+import org.springframework.data.jpa.repository.*;
+
+import java.util.*;
+
+/** Identificação sem diferenciar maiúsculas; bloqueio protege o último administrador. */
 public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
+    List<Usuario> findByUsuarioIgnoreCaseOrEmailIgnoreCase(String usuario, String email);
+
+    boolean existsByPerfilAndAtivoTrue(PerfilAcesso perfil);
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("select u from Usuario u order by u.id")
+    List<Usuario> listarComBloqueio();
 }

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" xmlns:th="http://www.thymeleaf.org">
+ <head th:replace="~{fragments/layout :: cabecalho('Usuários')}">
+ </head>
+ <body>
+  <th:block th:replace="~{fragments/layout :: estrutura(~{::section})}">
+   <section>
+    <div class="pagina-cabecalho">
+     <h2>
+      Usuários
+     </h2>
+    </div>
+    <a class="btn btn-primario" th:href="@{/usuarios/novo}">
+     Novo usuário
+    </a>
+    <div class="tabela-wrapper">
+     <table class="tabela">
+      <thead>
+       <tr>
+        <th>
+         Nome
+        </th>
+        <th>
+         Usuário
+        </th>
+        <th>
+         E-mail
+        </th>
+        <th>
+         Perfil
+        </th>
+        <th>
+         Situação
+        </th>
+        <th>
+         Ações
+        </th>
+       </tr>
+      </thead>
+      <tbody>
+       <tr th:each="u : ${usuarios}">
+        <td th:text="${u.nome}">
+        </td>
+        <td th:text="${u.usuario}">
+        </td>
+        <td th:text="${u.email}">
+        </td>
+        <td th:text="${u.perfil}">
+        </td>
+        <td th:text="${u.ativo ? 'Ativo' : 'Inativo'}">
+        </td>
+        <td>
+         <div class="acoes-tabela">
+          <a class="btn btn-secundario btn-sm" th:href="@{/usuarios/{id}/editar(id=${u.id})}">
+           Editar
+          </a>
+          <form data-confirmar="Alterar a situação deste usuário?" method="post" th:action="@{/usuarios/{id}/status(id=${u.id})}">
+           <button class="btn btn-secundario btn-sm" th:text="${u.ativo ? 'Desativar' : 'Ativar'}">
+           </button>
+          </form>
+         </div>
+        </td>
+       </tr>
+       <tr th:if="${#lists.isEmpty(usuarios)}">
+        <td colspan="6">
+         Nenhum usuário cadastrado.
+        </td>
+       </tr>
+      </tbody>
+     </table>
+    </div>
+   </section>
+  </th:block>
+ </body>
+</html>

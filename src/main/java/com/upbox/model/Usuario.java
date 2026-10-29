@@ -2,12 +2,18 @@ package com.upbox.model;
 
 import jakarta.persistence.*;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
 /**
  * Usuário interno do sistema.
  *
- * A senha será armazenada somente como hash (por exemplo, BCrypt).
- * Esta classe não realiza login; a autenticação será implementada depois.
+ * <p>A senha será armazenada somente como hash (por exemplo, BCrypt). A autenticação é
+ * responsabilidade do Spring Security, não desta entidade.
  */
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(name = "usuarios")
 public class Usuario {
@@ -35,19 +41,20 @@ public class Usuario {
     @Column(nullable = false)
     private boolean ativo = true;
 
-    protected Usuario() {
-    }
-
     /**
-     * Recebe uma senha que JÁ foi transformada em hash.
-     * Nunca envie a senha digitada em texto puro para este construtor.
+     * Recebe uma senha que JÁ foi transformada em hash. Nunca envie a senha digitada em texto puro
+     * para este construtor.
      */
-    public Usuario(String nome, String usuario, String email,
-                   String senhaHash, PerfilAcesso perfil) {
-        if (nome == null || nome.isBlank()
-                || usuario == null || usuario.isBlank()
-                || email == null || email.isBlank()
-                || senhaHash == null || senhaHash.isBlank()
+    public Usuario(
+            String nome, String usuario, String email, String senhaHash, PerfilAcesso perfil) {
+        if (nome == null
+                || nome.isBlank()
+                || usuario == null
+                || usuario.isBlank()
+                || email == null
+                || email.isBlank()
+                || senhaHash == null
+                || senhaHash.isBlank()
                 || perfil == null) {
             throw new IllegalArgumentException("Preencha os dados obrigatórios do usuário.");
         }
@@ -58,32 +65,20 @@ public class Usuario {
         this.perfil = perfil;
     }
 
-    public Long getId() {
-        return id;
+    /** Mudanças são validadas pelo serviço antes de chegar à entidade. */
+    public void atualizar(String nome, String usuario, String email, PerfilAcesso perfil) {
+        this.nome = nome.trim();
+        this.usuario = usuario.trim().toLowerCase(java.util.Locale.ROOT);
+        this.email = email.trim().toLowerCase(java.util.Locale.ROOT);
+        this.perfil = perfil;
     }
 
-    public String getNome() {
-        return nome;
+    public void alterarSenhaHash(String hash) {
+        this.senhaHash = hash;
     }
 
-    public String getUsuario() {
-        return usuario;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public String getSenhaHash() {
-        return senhaHash;
-    }
-
-    public PerfilAcesso getPerfil() {
-        return perfil;
-    }
-
-    public boolean isAtivo() {
-        return ativo;
+    public void ativar() {
+        this.ativo = true;
     }
 
     public void desativar() {

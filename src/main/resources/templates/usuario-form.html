@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" xmlns:th="http://www.thymeleaf.org">
+ <head th:replace="~{fragments/layout :: cabecalho('Dados do usuário')}">
+ </head>
+ <body>
+  <th:block th:replace="~{fragments/layout :: estrutura(~{::section})}">
+   <section>
+    <div class="pagina-cabecalho">
+     <h2>
+      Dados do usuário
+     </h2>
+    </div>
+    <form class="form-card" method="post" th:action="${id == null} ? @{/usuarios} : @{/usuarios/{id}(id=${id})}" th:object="${form}">
+     <div th:replace="~{fragments/layout :: erros}">
+     </div>
+     <div class="form-grid">
+      <div class="campo">
+       <label for="nome">
+        Nome completo
+       </label>
+       <input maxlength="120" required="" th:field="*{nome}"/>
+      </div>
+      <div class="campo">
+       <label for="usuario">
+        Nome de usuário
+       </label>
+       <input maxlength="80" required="" th:field="*{usuario}"/>
+      </div>
+      <div class="campo">
+       <label for="email">
+        E-mail
+       </label>
+       <input maxlength="150" required="" th:field="*{email}" type="email"/>
+      </div>
+      <div class="campo">
+       <label for="perfil">
+        Perfil
+       </label>
+       <select th:field="*{perfil}">
+        <option value="FUNCIONARIO">
+         Funcionário
+        </option>
+        <option value="ADMINISTRADOR">
+         Administrador
+        </option>
+       </select>
+      </div>
+      <div class="campo" th:if="${id == null}">
+       <label for="senha">
+        Senha inicial (mínimo 8 caracteres)
+       </label>
+       <input autocomplete="new-password" id="senha" minlength="8" name="senha" required="" type="password"/>
+      </div>
+     </div>
+     <div class="form-acoes">
+      <button class="btn btn-primario">
+       Salvar
+      </button>
+      <a class="btn btn-secundario" th:href="@{/usuarios}">
+       Cancelar
+      </a>
+     </div>
+    </form>
+   </section>
+  </th:block>
+ </body>
+</html>
