@@ -6,7 +6,8 @@ Projeto didático com **Java 17, Spring Boot, Thymeleaf, Spring Data JPA e Postg
 
 O login, logout, usuários, perfil e troca de senha são reais, com Spring Security, BCrypt e CSRF.
 Categorias e produtos usam formulários reais com pesquisa, filtros, preço e desativação.
-Movimentações, dashboard e relatórios serão conectados nas próximas entregas.
+Entradas, saídas e histórico também são reais, com responsável autenticado e proteção de saldo.
+Dashboard e relatórios serão conectados na próxima entrega.
 
 Leia [Entrega 1 — autenticação e administrador inicial](docs/ENTREGA-1-AUTENTICACAO.md).
 
@@ -66,6 +67,8 @@ mvn spring-boot:run
 
 ## Próxima etapa
 
-Conectar movimentações, dashboard e relatórios.
+Conectar dashboard e relatórios.
 
 Cadastros: [guia da entrega 2](docs/ENTREGA-2-CADASTROS.md).
+
+Movimentações e integração real: [guia da entrega 3](docs/ENTREGA-3-MOVIMENTACOES.md).

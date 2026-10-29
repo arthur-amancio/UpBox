@@ -44,7 +44,7 @@ class EstoquePersistenciaTest {
     }
 
     private Usuario criarUsuario() {
-        // O valor é fictício; ainda não há autenticação nesta etapa.
+        // Hash fictício apenas neste teste de serviço; não participa do login.
         return usuarios.save(
                 new Usuario(
                         "Funcionário Teste",
