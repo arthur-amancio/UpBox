@@ -1,8 +1,159 @@
 <!DOCTYPE html>
-<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/layout :: cabecalho('Estoque')}"></head>
-<!-- O conteúdo desta tela é montado por static/js/pages/estoque.js com dados demonstrativos -->
-<body data-pagina="estoque" data-titulo="Estoque">
-<th:block th:replace="~{fragments/layout :: scripts('estoque')}"></th:block>
-</body>
+<html lang="pt-br" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" xmlns:th="http://www.thymeleaf.org">
+ <head th:replace="~{fragments/layout :: cabecalho('Estoque')}">
+ </head>
+ <body>
+  <th:block th:replace="~{fragments/layout :: estrutura(~{::section})}">
+   <section>
+    <div class="pagina-cabecalho">
+     <h2>
+      Estoque
+     </h2>
+    </div>
+    <div class="acoes-cabecalho" sec:authorize="hasRole('ADMINISTRADOR')">
+     <a class="btn btn-primario" th:href="@{/produtos/novo}">
+      Cadastrar produto
+     </a>
+     <a class="btn btn-secundario" th:href="@{/categorias}">
+      Gerenciar categorias
+     </a>
+    </div>
+    <form class="barra-filtros" method="get" th:action="@{/estoque}">
+     <div class="campo">
+      <label for="busca">
+       Nome ou código
+      </label>
+      <input id="busca" name="busca" th:value="${busca}"/>
+     </div>
+     <div class="campo">
+      <label for="categoria">
+       Categoria
+      </label>
+      <select id="categoria" name="categoria">
+       <option value="">
+        Todas
+       </option>
+       <option th:each="c : ${categorias}" th:selected="${c.id == categoria}" th:text="${c.nome}" th:value="${c.id}">
+       </option>
+      </select>
+     </div>
+     <div class="campo">
+      <label for="ativo">
+       Atividade
+      </label>
+      <select id="ativo" name="ativo">
+       <option value="">
+        Todos
+       </option>
+       <option th:selected="${ativo == true}" value="true">
+        Ativos
+       </option>
+       <option th:selected="${ativo == false}" value="false">
+        Inativos
+       </option>
+      </select>
+     </div>
+     <div class="campo">
+      <label for="situacao">
+       Estoque
+      </label>
+      <select id="situacao" name="situacao">
+       <option value="">
+        Todos
+       </option>
+       <option th:selected="${situacao == 'BAIXO'}" value="BAIXO">
+        Estoque baixo
+       </option>
+       <option th:selected="${situacao == 'NORMAL'}" value="NORMAL">
+        Normal
+       </option>
+      </select>
+     </div>
+     <button class="btn btn-primario">
+      Pesquisar
+     </button>
+     <a class="btn btn-secundario" th:href="@{/estoque}">
+      Limpar
+     </a>
+    </form>
+    <div class="tabela-wrapper">
+     <table class="tabela">
+      <thead>
+       <tr>
+        <th>
+         Código
+        </th>
+        <th>
+         Produto
+        </th>
+        <th>
+         Categoria
+        </th>
+        <th>
+         Saldo
+        </th>
+        <th>
+         Mínimo
+        </th>
+        <th>
+         Preço
+        </th>
+        <th>
+         Situação
+        </th>
+        <th>
+         Ações
+        </th>
+       </tr>
+      </thead>
+      <tbody>
+       <tr th:each="p : ${produtos}">
+        <td th:text="${p.codigo}">
+        </td>
+        <td>
+         <b th:text="${p.nome}">
+         </b>
+         <div class="desc-produto" th:text="${p.descricao}">
+         </div>
+        </td>
+        <td th:text="${p.categoria.nome}">
+        </td>
+        <td th:text="${p.quantidade}">
+        </td>
+        <td th:text="${p.estoqueMinimo}">
+        </td>
+        <td th:text="${p.preco == null ? 'Preço pendente' : 'R$ ' + #numbers.formatDecimal(p.preco,1,'POINT',2,'COMMA')}">
+        </td>
+        <td>
+         <span th:class="${p.ativo ? (p.estoqueBaixo ? 'badge badge-baixo' : 'badge badge-normal') : 'badge badge-neutro'}" th:text="${!p.ativo ? 'Inativo' : (p.estoqueBaixo ? 'Estoque baixo' : 'Normal')}">
+         </span>
+        </td>
+        <td>
+         <div class="acoes-tabela">
+          <a class="btn btn-secundario btn-sm" th:href="@{/movimentacoes(produto=${p.id})}">
+           Histórico
+          </a>
+          <th:block sec:authorize="hasRole('ADMINISTRADOR')">
+           <a class="btn btn-secundario btn-sm" th:href="@{/produtos/{id}/editar(id=${p.id})}">
+            Editar
+           </a>
+           <form data-confirmar="Alterar a situação deste produto?" method="post" th:action="@{/produtos/{id}/status(id=${p.id})}">
+            <button class="btn btn-secundario btn-sm" th:text="${p.ativo ? 'Desativar' : 'Ativar'}">
+            </button>
+           </form>
+          </th:block>
+         </div>
+        </td>
+       </tr>
+       <tr th:if="${#lists.isEmpty(produtos)}">
+        <td class="tabela-vazia" colspan="8">
+         Nenhum produto foi encontrado.
+        </td>
+       </tr>
+      </tbody>
+     </table>
+    </div>
+   </section>
+  </th:block>
+ </body>
 </html>

@@ -34,6 +34,21 @@ public class Categoria {
         this.descricao = descricao == null ? "" : descricao.trim();
     }
 
+    /** Desativação mantém produtos e histórico vinculados. */
+    public void atualizar(String nome, String descricao) {
+        if (nome == null || nome.isBlank() || nome.trim().length() > 100)
+            throw new IllegalArgumentException(
+                    "Informe um nome de categoria com até 100 caracteres.");
+        if (descricao != null && descricao.length() > 300)
+            throw new IllegalArgumentException("Descrição deve ter até 300 caracteres.");
+        this.nome = nome.trim();
+        this.descricao = descricao == null ? "" : descricao.trim();
+    }
+
+    public void ativar() {
+        this.ativa = true;
+    }
+
     public void desativar() {
         this.ativa = false;
     }

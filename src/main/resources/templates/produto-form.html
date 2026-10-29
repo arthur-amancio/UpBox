@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" xmlns:th="http://www.thymeleaf.org">
+ <head th:replace="~{fragments/layout :: cabecalho('Dados do produto')}">
+ </head>
+ <body>
+  <th:block th:replace="~{fragments/layout :: estrutura(~{::section})}">
+   <section>
+    <div class="pagina-cabecalho">
+     <h2>
+      Dados do produto
+     </h2>
+    </div>
+    <form class="form-card" method="post" th:action="${id == null} ? @{/produtos} : @{/produtos/{id}(id=${id})}" th:object="${form}">
+     <div th:replace="~{fragments/layout :: erros}">
+     </div>
+     <div class="form-grid">
+      <div class="campo">
+       <label for="codigo">
+        Código único
+       </label>
+       <input maxlength="40" required="" th:field="*{codigo}"/>
+       <small class="erro-campo" th:errors="*{codigo}" th:if="${#fields.hasErrors('codigo')}">
+       </small>
+      </div>
+      <div class="campo">
+       <label for="nome">
+        Nome
+       </label>
+       <input maxlength="120" required="" th:field="*{nome}"/>
+       <small class="erro-campo" th:errors="*{nome}" th:if="${#fields.hasErrors('nome')}">
+       </small>
+      </div>
+      <div class="campo largura-total">
+       <label for="descricao">
+        Descrição
+       </label>
+       <textarea maxlength="500" th:field="*{descricao}"></textarea>
+       <small class="erro-campo" th:errors="*{descricao}" th:if="${#fields.hasErrors('descricao')}">
+       </small>
+      </div>
+      <div class="campo">
+       <label for="categoriaId">
+        Categoria
+       </label>
+       <select required="" th:field="*{categoriaId}">
+        <option value="">
+         Selecione
+        </option>
+        <option th:each="c : ${categorias}" th:text="${c.nome + (c.ativa ? '' : ' (inativa)')}" th:value="${c.id}">
+        </option>
+       </select>
+       <small class="erro-campo" th:errors="*{categoriaId}" th:if="${#fields.hasErrors('categoriaId')}">
+       </small>
+      </div>
+      <div class="campo">
+       <label for="estoqueMinimo">
+        Estoque mínimo
+       </label>
+       <input max="2147483647" min="0" required="" step="1" th:field="*{estoqueMinimo}" type="number"/>
+       <small class="erro-campo" th:errors="*{estoqueMinimo}" th:if="${#fields.hasErrors('estoqueMinimo')}">
+       </small>
+      </div>
+      <div class="campo">
+       <label for="preco">
+        Preço unitário (R$)
+       </label>
+       <input max="9999999999.99" min="0" required="" step="0.01" th:field="*{preco}" type="number"/>
+       <small class="erro-campo" th:errors="*{preco}" th:if="${#fields.hasErrors('preco')}">
+       </small>
+      </div>
+     </div>
+     <p class="nota" th:text="${id == null ? 'O saldo começa em zero. Registre uma entrada em Movimentações.' : 'Saldo atual: ' + saldo + '. Alterado somente por movimentações.'}">
+     </p>
+     <div class="form-acoes">
+      <button class="btn btn-primario">
+       Salvar
+      </button>
+      <a class="btn btn-secundario" th:href="@{/estoque}">
+       Cancelar
+      </a>
+     </div>
+    </form>
+   </section>
+  </th:block>
+ </body>
+</html>

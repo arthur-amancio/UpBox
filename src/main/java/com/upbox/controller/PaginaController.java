@@ -23,7 +23,7 @@ public class PaginaController {
         return "home";
     }
 
-    @GetMapping({"/dashboard", "/estoque", "/movimentacoes", "/relatorios"})
+    @GetMapping({"/dashboard", "/movimentacoes", "/relatorios"})
     public String pendente() {
         return "pendente";
     }

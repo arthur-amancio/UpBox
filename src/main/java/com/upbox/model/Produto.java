@@ -47,6 +47,11 @@ public class Produto {
     @Column(nullable = false)
     private boolean ativo = true;
 
+    // Nullable somente para compatibilidade com produtos antigos sem preço conhecido.
+    // Os cadastros e edições do serviço sempre exigem preço informado.
+    @Column(precision = 12, scale = 2)
+    private java.math.BigDecimal preco;
+
     /**
      * Construtor utilizado nos exercícios anteriores, sem persistência. Para cadastrar no banco,
      * informe também uma categoria.
@@ -79,6 +84,43 @@ public class Produto {
         this.categoria = categoria;
         this.quantidade = quantidade;
         this.estoqueMinimo = estoqueMinimo;
+    }
+
+    /** Edita dados cadastrais sem tocar na quantidade disponível. */
+    public void atualizarDados(
+            String codigo,
+            String nome,
+            String descricao,
+            Categoria categoria,
+            int estoqueMinimo,
+            java.math.BigDecimal preco) {
+        if (codigo == null
+                || codigo.isBlank()
+                || codigo.trim().length() > 40
+                || nome == null
+                || nome.isBlank()
+                || nome.trim().length() > 120
+                || categoria == null
+                || estoqueMinimo < 0)
+            throw new IllegalArgumentException("Revise código, nome, categoria e estoque mínimo.");
+        if (descricao != null && descricao.length() > 500)
+            throw new IllegalArgumentException("Descrição deve ter até 500 caracteres.");
+        if (preco == null
+                || preco.signum() < 0
+                || preco.scale() > 2
+                || preco.compareTo(new java.math.BigDecimal("9999999999.99")) > 0)
+            throw new IllegalArgumentException(
+                    "Informe preço não negativo, com até duas casas decimais.");
+        this.codigo = codigo.trim().toUpperCase(Locale.ROOT);
+        this.nome = nome.trim();
+        this.descricao = descricao == null ? "" : descricao.trim();
+        this.categoria = categoria;
+        this.estoqueMinimo = estoqueMinimo;
+        this.preco = preco;
+    }
+
+    public void ativar() {
+        this.ativo = true;
     }
 
     /** O alerta aparece também quando o saldo é exatamente o mínimo. */

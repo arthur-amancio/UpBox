@@ -7,65 +7,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.upbox.model.*;
 import com.upbox.repository.*;
-import com.upbox.service.UsuarioService;
 
 import org.junit.jupiter.api.*;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.mock.web.MockHttpSession;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.web.servlet.MockMvc;
 
 /** Exercita a autenticação real e os formulários com o filtro de segurança habilitado. */
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-class PaginaControllerTest {
-    @Autowired MockMvc mvc;
-    @Autowired UsuarioRepository usuarios;
-    @Autowired RegistroOperacaoRepository registros;
-    @Autowired PasswordEncoder encoder;
-    @Autowired UsuarioService service;
-    Usuario admin, funcionario;
-
-    @BeforeEach
-    void preparar() {
-        registros.deleteAll();
-        usuarios.deleteAll();
-        admin =
-                usuarios.save(
-                        new Usuario(
-                                "Administrador",
-                                "admin",
-                                "admin@example.com",
-                                encoder.encode("senha-teste-123"),
-                                PerfilAcesso.ADMINISTRADOR));
-        funcionario =
-                usuarios.save(
-                        new Usuario(
-                                "Funcionário",
-                                "funcionario",
-                                "func@example.com",
-                                encoder.encode("senha-teste-123"),
-                                PerfilAcesso.FUNCIONARIO));
-    }
-
-    MockHttpSession login(String nome) throws Exception {
-        return (MockHttpSession)
-                mvc.perform(
-                                post("/login")
-                                        .with(csrf())
-                                        .param("username", nome)
-                                        .param("password", "senha-teste-123"))
-                        .andExpect(status().is3xxRedirection())
-                        .andExpect(redirectedUrl("/home"))
-                        .andReturn()
-                        .getRequest()
-                        .getSession(false);
-    }
-
+class PaginaControllerTest extends CenarioMvc {
     @Test
     void deveProtegerRotasEManterLoginPublico() throws Exception {
         mvc.perform(get("/login")).andExpect(status().isOk());

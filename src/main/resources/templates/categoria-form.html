@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" xmlns:th="http://www.thymeleaf.org">
+ <head th:replace="~{fragments/layout :: cabecalho('Dados da categoria')}">
+ </head>
+ <body>
+  <th:block th:replace="~{fragments/layout :: estrutura(~{::section})}">
+   <section>
+    <div class="pagina-cabecalho">
+     <h2>
+      Dados da categoria
+     </h2>
+    </div>
+    <form class="form-card" method="post" th:action="${id == null} ? @{/categorias} : @{/categorias/{id}(id=${id})}" th:object="${form}">
+     <div th:replace="~{fragments/layout :: erros}">
+     </div>
+     <div class="campo">
+      <label for="nome">
+       Nome
+      </label>
+      <input maxlength="100" required="" th:field="*{nome}"/>
+      <small class="erro-campo" th:errors="*{nome}" th:if="${#fields.hasErrors('nome')}">
+      </small>
+     </div>
+     <div class="campo">
+      <label for="descricao">
+       Descrição
+      </label>
+      <textarea maxlength="300" th:field="*{descricao}"></textarea>
+      <small class="erro-campo" th:errors="*{descricao}" th:if="${#fields.hasErrors('descricao')}">
+      </small>
+     </div>
+     <div class="form-acoes">
+      <button class="btn btn-primario">
+       Salvar
+      </button>
+      <a class="btn btn-secundario" th:href="@{/categorias}">
+       Cancelar
+      </a>
+     </div>
+    </form>
+   </section>
+  </th:block>
+ </body>
+</html>

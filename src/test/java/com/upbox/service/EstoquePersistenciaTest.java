@@ -1,26 +1,27 @@
 package com.upbox.service;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import com.upbox.model.*;
 import com.upbox.repository.*;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.TestPropertySource;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Testa a gravação de produtos e movimentações.
  *
- * H2 é usado só nestes testes; o programa utiliza PostgreSQL.
- * Em cada teste, o Spring desfaz a transação para manter os dados isolados.
+ * <p>H2 é usado só nestes testes; o programa utiliza PostgreSQL. Em cada teste, o Spring desfaz a
+ * transação para manter os dados isolados.
  */
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.ANY)
 @TestPropertySource(properties = "spring.jpa.hibernate.ddl-auto=create-drop")
-@Import({ProdutoService.class, MovimentacaoEstoqueService.class})
+@Import({ProdutoService.class, MovimentacaoEstoqueService.class, AuditoriaService.class})
 class EstoquePersistenciaTest {
 
     @Autowired private CategoriaRepository categorias;
@@ -32,14 +33,25 @@ class EstoquePersistenciaTest {
 
     private Produto criarProduto(int saldo) {
         Categoria categoria = categorias.save(new Categoria("Papelaria", "Materiais"));
-        return produtoService.cadastrar("PRD-001", "Caderno", "96 folhas",
-                                        categoria.getId(), saldo, 3);
+        return produtoService.cadastrar(
+                "PRD-001",
+                "Caderno",
+                "96 folhas",
+                categoria.getId(),
+                saldo,
+                3,
+                new java.math.BigDecimal("12.50"));
     }
 
     private Usuario criarUsuario() {
         // O valor é fictício; ainda não há autenticação nesta etapa.
-        return usuarios.save(new Usuario("Funcionário Teste", "teste", "teste@exemplo.com",
-                                         "hash-ficticio-teste", PerfilAcesso.FUNCIONARIO));
+        return usuarios.save(
+                new Usuario(
+                        "Funcionário Teste",
+                        "teste",
+                        "teste@exemplo.com",
+                        "hash-ficticio-teste",
+                        PerfilAcesso.FUNCIONARIO));
     }
 
     @Test
@@ -57,8 +69,17 @@ class EstoquePersistenciaTest {
         criarProduto(10);
         Categoria outra = categorias.save(new Categoria("Limpeza", ""));
 
-        assertThrows(IllegalArgumentException.class,
-                () -> produtoService.cadastrar("prd-001", "Outro", "", outra.getId(), 0, 2));
+        assertThrows(
+                IllegalArgumentException.class,
+                () ->
+                        produtoService.cadastrar(
+                                "prd-001",
+                                "Outro",
+                                "",
+                                outra.getId(),
+                                0,
+                                2,
+                                new java.math.BigDecimal("12.50")));
     }
 
     @Test
@@ -66,8 +87,8 @@ class EstoquePersistenciaTest {
         Produto produto = criarProduto(10);
         Usuario usuario = criarUsuario();
 
-        movimentacaoService.registrar(produto.getId(), usuario.getId(),
-                                     TipoMovimentacao.ENTRADA, 5, "Compra");
+        movimentacaoService.registrar(
+                produto.getId(), usuario.getId(), TipoMovimentacao.ENTRADA, 5, "Compra");
 
         assertEquals(15, produtos.findById(produto.getId()).orElseThrow().getQuantidade());
         var historico = movimentacoes.findByProdutoIdOrderByDataHoraDesc(produto.getId());
@@ -81,9 +102,11 @@ class EstoquePersistenciaTest {
         Produto produto = criarProduto(3);
         Usuario usuario = criarUsuario();
 
-        assertThrows(IllegalArgumentException.class,
-                () -> movimentacaoService.registrar(produto.getId(), usuario.getId(),
-                                                    TipoMovimentacao.SAIDA, 4, ""));
+        assertThrows(
+                IllegalArgumentException.class,
+                () ->
+                        movimentacaoService.registrar(
+                                produto.getId(), usuario.getId(), TipoMovimentacao.SAIDA, 4, ""));
 
         assertEquals(3, produtos.findById(produto.getId()).orElseThrow().getQuantidade());
         assertTrue(movimentacoes.findByProdutoIdOrderByDataHoraDesc(produto.getId()).isEmpty());
@@ -95,9 +118,11 @@ class EstoquePersistenciaTest {
         Usuario usuario = criarUsuario();
         produto.desativar();
 
-        assertThrows(IllegalArgumentException.class,
-                () -> movimentacaoService.registrar(produto.getId(), usuario.getId(),
-                                                    TipoMovimentacao.ENTRADA, 1, ""));
+        assertThrows(
+                IllegalArgumentException.class,
+                () ->
+                        movimentacaoService.registrar(
+                                produto.getId(), usuario.getId(), TipoMovimentacao.ENTRADA, 1, ""));
     }
 
     @Test
@@ -106,8 +131,10 @@ class EstoquePersistenciaTest {
         Usuario usuario = criarUsuario();
         usuario.desativar();
 
-        assertThrows(IllegalArgumentException.class,
-                () -> movimentacaoService.registrar(produto.getId(), usuario.getId(),
-                                                    TipoMovimentacao.SAIDA, 1, ""));
+        assertThrows(
+                IllegalArgumentException.class,
+                () ->
+                        movimentacaoService.registrar(
+                                produto.getId(), usuario.getId(), TipoMovimentacao.SAIDA, 1, ""));
     }
 }

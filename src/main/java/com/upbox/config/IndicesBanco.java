@@ -19,12 +19,18 @@ public class IndicesBanco implements ApplicationRunner {
         String produto =
                 jdbc.execute((java.sql.Connection c) -> c.getMetaData().getDatabaseProductName());
         if (!"PostgreSQL".equals(produto)) return;
+        jdbc.execute(
+                "create unique index if not exists uk_categoria_nome_ci on categorias"
+                        + " (lower(trim(nome)))");
+        jdbc.execute(
+                "create unique index if not exists uk_produto_codigo_ci on produtos"
+                        + " (upper(trim(codigo)))");
         // Se houver duplicidades antigas, a inicialização falha sem apagar os registros.
         jdbc.execute(
                 "create unique index if not exists uk_usuario_login_ci on usuarios"
-                    + " (lower(trim(usuario)))");
+                        + " (lower(trim(usuario)))");
         jdbc.execute(
                 "create unique index if not exists uk_usuario_email_ci on usuarios"
-                    + " (lower(trim(email)))");
+                        + " (lower(trim(email)))");
     }
 }
