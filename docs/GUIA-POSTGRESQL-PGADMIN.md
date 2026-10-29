@@ -20,27 +20,15 @@ Se preferir usar o Query Tool conectado ao banco `postgres`, execute:
 CREATE DATABASE upbox;
 ```
 
-## 3. Guardar a senha no computador, sem publicá-la no Git
+## 3. Configuracao pronta para o PostgreSQL da escola
 
-Na **raiz do projeto** (pasta do `pom.xml`), copie:
+Nesta versao, `src/main/resources/application.properties` ja usa por padrao o banco `upbox`, o usuario PostgreSQL `postgres` e a senha escolar informada pelo responsavel. Portanto, **na escola nao precisa copiar nem editar outro arquivo para conectar ao banco**, caso o servidor use essas credenciais e a porta 5432.
 
-```powershell
-Copy-Item application-local.example.properties application-local.properties
-```
+A senha escolar foi mantida na configuracao versionada por pedido do responsavel, embora isso seja menos seguro: todos que possuem acesso ao repositorio privado podem le-la. Nao utilize essas credenciais em servidores acessiveis pela internet.
 
-Abra `application-local.properties` e substitua o texto `COLOQUE_A_SENHA_LOCAL_AQUI` pela senha do PostgreSQL da escola.
+Em computadores com outra configuracao, crie `application-local.properties` na raiz usando o exemplo `application-local.example.properties`, descomente os campos do banco e ajuste usuario/senha/porta. O arquivo local fica ignorado pelo Git.
 
-Exemplo de configuração local (senha fictícia):
-
-```properties
-spring.datasource.url=jdbc:postgresql://localhost:5432/upbox
-spring.datasource.username=postgres
-spring.datasource.password=MINHA_SENHA_LOCAL
-```
-
-O arquivo `application.properties` importa automaticamente o arquivo local, quando ele existe. `application-local.properties` está no `.gitignore`; assim a senha permanece salva **no seu computador** e não aparece no GitHub.
-
-**Importante:** se a senha real tiver sido colocada em um arquivo versionado, não execute `git add .` até corrigir isso. O GitHub guarda o histórico de commits.
+O **login do UpBox** e independente da senha de PostgreSQL. Para criar o primeiro administrador do sistema, siga o [guia de instalacao](INSTALACAO-ESCOLA.md).
 
 ## 4. Executar
 
