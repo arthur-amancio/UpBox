@@ -65,8 +65,9 @@ O `ddl-auto=update` permanece para desenvolvimento local, conforme solicitado. N
 | Autenticação | [#4](https://github.com/arthur-amancio/UpBox/pull/4) | `chore/preparacao-inicial-tcc` | [66c1d31](https://github.com/arthur-amancio/UpBox/commit/66c1d31) |
 | Cadastros | [#5](https://github.com/arthur-amancio/UpBox/pull/5) | `feat/autenticacao-usuarios` | [ac1a52b](https://github.com/arthur-amancio/UpBox/commit/ac1a52b) |
 | Movimentações | [#6](https://github.com/arthur-amancio/UpBox/pull/6) | `feat/categorias-produtos` | [71b8a83](https://github.com/arthur-amancio/UpBox/commit/71b8a83) |
+| Dashboard e relatórios | [#7](https://github.com/arthur-amancio/UpBox/pull/7) | `feat/movimentacoes-estoque` | [14791b1](https://github.com/arthur-amancio/UpBox/commit/14791b1) |
 
-A última entrega usa `feat/dashboard-relatorios`, baseada em `feat/movimentacoes-estoque`; seu PR e commit são acrescentados ao publicar. Nenhum histórico compartilhado foi reescrito.
+A última entrega usa `feat/dashboard-relatorios`, baseada em `feat/movimentacoes-estoque`. Todos os PRs foram publicados sem merge automático. Nenhum histórico compartilhado foi reescrito.
 
 ## 7. Executar no computador
 
