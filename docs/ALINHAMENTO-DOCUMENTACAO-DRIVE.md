@@ -92,3 +92,7 @@ As quatro entidades originais e os serviços de produto/movimentação foram rea
 A coluna preço preserva ausência somente no legado sem valor conhecido: a tela mostra pendência e exige preenchimento ao editar. Não se atribui zero como preço fictício. A impressão nativa permite Salvar como PDF; não afirmamos salvamento sem confirmação do navegador.
 
 Os documentos originais no Drive foram consultados em leitura e não foram alterados. Eventuais atualizações formais de diagramas/dicionários no Drive continuam dependendo dos autores.
+
+## 9. Comparação para a apresentação do TCC
+
+A [matriz de requisitos](MATRIZ-REQUISITOS-TCC.md) compara os 20 casos de uso, modelagem, dicionário, análise OO e as imagens oficiais dos diagramas de classes e casos de uso, consultados novamente em leitura. As divergências documentais foram registradas sem reescrever os originais nem desfazer decisões confirmadas pelo responsável.

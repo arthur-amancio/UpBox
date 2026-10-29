@@ -44,3 +44,13 @@ Os guias `ENTREGA-1` a `ENTREGA-4`, o guia de estudos, o guia pgAdmin e o relat�
 Estão fora deste MVP: multiempresa, QR, compras/vendas, notas fiscais, integrações externas e geração de PDF por biblioteca. O PDF usa impressão do navegador. Antes de outro ambiente além do desenvolvimento/TCC, planejar configurações de implantação e migrações versionadas; o `ddl-auto=update` foi mantido para o uso local solicitado.
 
 A equipe precisa revisar os PRs, preencher preços reais de eventuais registros antigos e atualizar formalmente os diagramas/dicionários do Drive com autorização dos autores. Essas ações não são simuladas pelo sistema.
+
+## Continuação — revisão e preparação do TCC
+
+| Entrega | Branch | Base | Conteúdo |
+| --- | --- | --- | --- |
+| 5 | `fix/revisao-tecnica-mvp` | `feat/dashboard-relatorios` | Correção da concorrência de senha/desativação, erros amigáveis e testes de regressão |
+| 6 | `feat/usabilidade-acessibilidade` | `fix/revisao-tecnica-mvp` | Menu/teclado, navegação de produto, prévia, filtros e impressão |
+| 7 | `docs/preparacao-tcc` | `feat/usabilidade-acessibilidade` | Testes adicionais, jornada real, capturas, instalação, apresentação e matriz oficial |
+
+Não houve refatoração geral, merge nem alteração direta da main. A versão completa da revisão está na branch da entrega 7 enquanto a cadeia não for integrada. Consulte o relatório da revisão para commits, PRs e evidências.

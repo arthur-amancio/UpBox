@@ -154,4 +154,49 @@ class RelatorioMvcTest extends CenarioMvc {
                                                 org.hamcrest.Matchers.containsString(
                                                         "exportado em PDF com sucesso"))));
     }
+
+    @Test
+    void indicadoresRecentesDevemRespeitarOsSeteDiasDoDashboard() {
+        var c = categorias.save(new Categoria("Teste", ""));
+        var p = produto("P1", c, 3, 3);
+        var hoje = java.time.LocalDate.now(java.time.ZoneId.of("America/Sao_Paulo"));
+        movimentacoes.save(
+                new MovimentacaoEstoque(
+                        p, funcionario, TipoMovimentacao.ENTRADA, 2, hoje.atStartOfDay(), "Hoje"));
+        movimentacoes.save(
+                new MovimentacaoEstoque(
+                        p,
+                        funcionario,
+                        TipoMovimentacao.ENTRADA,
+                        3,
+                        hoje.minusDays(6).atStartOfDay(),
+                        "Primeiro dia incluído"));
+        movimentacoes.save(
+                new MovimentacaoEstoque(
+                        p,
+                        funcionario,
+                        TipoMovimentacao.ENTRADA,
+                        100,
+                        hoje.minusDays(7).atTime(23, 59, 59),
+                        "Fora do período"));
+        movimentacoes.save(
+                new MovimentacaoEstoque(
+                        p,
+                        funcionario,
+                        TipoMovimentacao.SAIDA,
+                        1,
+                        hoje.atTime(23, 59, 59),
+                        "Último dia incluído"));
+        movimentacoes.save(
+                new MovimentacaoEstoque(
+                        p,
+                        funcionario,
+                        TipoMovimentacao.SAIDA,
+                        80,
+                        hoje.plusDays(1).atStartOfDay(),
+                        "Futuro"));
+        var resumo = dashboard.consultar();
+        assertEquals(5, resumo.getEntradasRecentes());
+        assertEquals(1, resumo.getSaidasRecentes());
+    }
 }

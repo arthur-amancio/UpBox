@@ -223,4 +223,55 @@ class PostgresIT {
             org.mockito.Mockito.reset(encoder);
         }
     }
+
+    @Test
+    void desativacoesSimultaneasDevemPreservarUmAdministrador() throws Exception {
+        var a =
+                usuarios.save(
+                        new Usuario(
+                                "Admin A",
+                                "admin.a",
+                                "a@example.com",
+                                "hash-ficticio",
+                                PerfilAcesso.ADMINISTRADOR));
+        var b =
+                usuarios.save(
+                        new Usuario(
+                                "Admin B",
+                                "admin.b",
+                                "b@example.com",
+                                "hash-ficticio",
+                                PerfilAcesso.ADMINISTRADOR));
+        var inicio = new CountDownLatch(1);
+        var pool = Executors.newFixedThreadPool(2);
+        try {
+            java.util.function.Function<Long, Callable<Boolean>> desativar =
+                    id ->
+                            () -> {
+                                if (!inicio.await(10, TimeUnit.SECONDS))
+                                    throw new IllegalStateException("Sincronização falhou.");
+                                try {
+                                    usuarioService.alterarStatus(id);
+                                    return true;
+                                } catch (IllegalArgumentException ex) {
+                                    assertEquals(
+                                            "Mantenha pelo menos um administrador ativo.",
+                                            ex.getMessage());
+                                    return false;
+                                }
+                            };
+            var primeiro = pool.submit(desativar.apply(a.getId()));
+            var segundo = pool.submit(desativar.apply(b.getId()));
+            inicio.countDown();
+            assertNotEquals(primeiro.get(15, TimeUnit.SECONDS), segundo.get(15, TimeUnit.SECONDS));
+            assertEquals(
+                    1,
+                    usuarios.findAll().stream()
+                            .filter(u -> u.isAtivo() && u.getPerfil() == PerfilAcesso.ADMINISTRADOR)
+                            .count());
+        } finally {
+            inicio.countDown();
+            pool.shutdownNow();
+        }
+    }
 }

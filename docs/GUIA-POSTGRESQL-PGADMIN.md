@@ -68,3 +68,7 @@ Para uma demonstração, cadastre pela interface, registre uma entrada de 10 e u
 Para integração real, crie outro banco **exclusivo e descartável chamado `upbox_test`**. O perfil `mvn -Ppostgres-it verify` recria/apaga suas tabelas; a URL é verificada antes de iniciar o JPA. Configure as variáveis locais conforme [Entrega 3](ENTREGA-3-MOVIMENTACOES.md). Nunca aponte testes para o banco de uso da escola.
 
 O PostgreSQL 16.4 foi utilizado nesta entrega para verificar a aplicação, persistência após reinício, índices de unicidade, duas saídas simultâneas e rollback por falhas no histórico/auditoria. A CI também executa integração PostgreSQL.
+
+## 7. Instalação e solução de problemas na escola
+
+O [guia de instalação](INSTALACAO-ESCOLA.md) detalha configuração local sem sobrescrever arquivo existente, administrador inicial, consultas com colunas próprias para apresentação, erros de conexão/porta e instruções simples de backup/restauração pelo pgAdmin. As verificações presenciais que ainda faltam estão registradas na entrega 7.

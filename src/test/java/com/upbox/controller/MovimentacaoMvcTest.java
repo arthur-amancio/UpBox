@@ -132,4 +132,34 @@ class MovimentacaoMvcTest extends CenarioMvc {
                                 .param("fim", "2026-10-29"))
                 .andExpect(status().isBadRequest());
     }
+
+    @Test
+    void historicoDevePermanecerAposDesativarProdutoEUsuario() throws Exception {
+        var p = produto();
+        movimentacaoService.registrar(
+                p.getId(), funcionario.getId(), TipoMovimentacao.ENTRADA, 2, "Compra");
+        movimentacaoService.registrar(
+                p.getId(), funcionario.getId(), TipoMovimentacao.SAIDA, 9, "Consumo");
+        produtoService.alterarStatus(p.getId());
+        service.alterarStatus(funcionario.getId());
+        var sessao = login("admin");
+        mvc.perform(get("/movimentacoes").session(sessao).param("produto", p.getId().toString()))
+                .andExpect(status().isOk())
+                .andExpect(model().attribute("movimentacoes", org.hamcrest.Matchers.hasSize(2)))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Funcionário")));
+        mvc.perform(
+                        get("/relatorios")
+                                .session(sessao)
+                                .param("relatorio", "HISTORICO")
+                                .param("produto", p.getId().toString()))
+                .andExpect(status().isOk())
+                .andExpect(
+                        model().attribute(
+                                        "resultado",
+                                        org.hamcrest.Matchers.hasProperty(
+                                                "movimentacoes",
+                                                org.hamcrest.Matchers.hasSize(2))));
+        assertEquals(3, produtos.findById(p.getId()).orElseThrow().getQuantidade());
+        assertEquals(2, movimentacoes.count());
+    }
 }

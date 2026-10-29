@@ -53,3 +53,7 @@ Abra a raiz do projeto, confira `java -version` e `mvn -version`, configure o ar
 No pgAdmin, abra o banco `upbox` → Schemas → public → Tables. Veja `categorias`, `produtos`, `usuarios`, `movimentacoes_estoque` e `registros_operacoes`. Explique as chaves `categoria_id`, `produto_id` e `usuario_id`. Não exponha `senha_hash` em apresentações e não edite saldo manualmente para simular o sistema.
 
 Cada integrante deve explicar uma regra, mostrar seu teste e percorrer a chamada do controller até o banco. Testes H2 verificam comportamentos rápidos; os testes PostgreSQL comprovam bloqueio e rollback com o banco real.
+
+## Ensaio da apresentação
+
+Use o [roteiro de oito minutos](APRESENTACAO-TCC.md), o [guia da escola](INSTALACAO-ESCOLA.md) e a [matriz de requisitos](MATRIZ-REQUISITOS-TCC.md). A [jornada real com capturas](ENTREGA-7-PREPARACAO-TCC.md) mostra o fluxo verificado no navegador e a persistência após reiniciar.

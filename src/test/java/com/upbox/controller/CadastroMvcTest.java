@@ -128,4 +128,59 @@ class CadastroMvcTest extends CenarioMvc {
         mvc.perform(post("/categorias").session(s).with(csrf()).param("nome", "Teste"))
                 .andExpect(status().isForbidden());
     }
+
+    @Test
+    void categoriaInativaMantemVinculoExistenteMasRecusaNovosProdutos() throws Exception {
+        var sessao = login("admin");
+        var c = categorias.save(new Categoria("Papelaria", ""));
+        mvc.perform(produto("/produtos", sessao, c.getId())).andExpect(redirectedUrl("/estoque"));
+        var p = produtos.findAll().get(0);
+        c.desativar();
+        categorias.saveAndFlush(c);
+        mvc.perform(produto("/produtos/" + p.getId(), sessao, c.getId()))
+                .andExpect(redirectedUrl("/estoque"));
+        mvc.perform(
+                        produto("/produtos", sessao, c.getId())
+                                .with(
+                                        r -> {
+                                            r.setParameter("codigo", "OUTRO");
+                                            return r;
+                                        }))
+                .andExpect(model().attributeHasErrors("form"));
+        // A categoria inativa não impede movimentar um produto já associado e ainda ativo.
+        mvc.perform(
+                        post("/movimentacoes")
+                                .session(sessao)
+                                .with(csrf())
+                                .param("produtoId", p.getId().toString())
+                                .param("tipo", "ENTRADA")
+                                .param("quantidade", "3"))
+                .andExpect(redirectedUrl("/movimentacoes?produto=" + p.getId()));
+        assertEquals(1, produtos.count());
+        assertEquals(3, produtos.findById(p.getId()).orElseThrow().getQuantidade());
+    }
+
+    @Test
+    void precoAusenteNoLegadoDeveSerInformadoSemAlterarSaldo() throws Exception {
+        var c = categorias.save(new Categoria("Papelaria", ""));
+        var antigo = produtos.saveAndFlush(new Produto("PRD-001", "Caderno", "Legado", c, 5, 3));
+        var sessao = login("admin");
+        mvc.perform(get("/estoque").session(sessao))
+                .andExpect(
+                        content().string(org.hamcrest.Matchers.containsString("Preço pendente")));
+        mvc.perform(
+                        produto("/produtos/" + antigo.getId(), sessao, c.getId())
+                                .with(
+                                        r -> {
+                                            r.setParameter("preco", "");
+                                            return r;
+                                        }))
+                .andExpect(model().attributeHasFieldErrors("form", "preco"));
+        assertNull(produtos.findById(antigo.getId()).orElseThrow().getPreco());
+        mvc.perform(produto("/produtos/" + antigo.getId(), sessao, c.getId()))
+                .andExpect(redirectedUrl("/estoque"));
+        var atualizado = produtos.findById(antigo.getId()).orElseThrow();
+        assertEquals(5, atualizado.getQuantidade());
+        assertEquals(0, new java.math.BigDecimal("12.50").compareTo(atualizado.getPreco()));
+    }
 }

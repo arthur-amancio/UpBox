@@ -22,10 +22,12 @@ Instale **JDK 17**, **Maven** e **PostgreSQL**. pgAdmin é opcional para adminis
 3. Na raiz do projeto, copie o arquivo de exemplo:
 
    ```powershell
-   Copy-Item application-local.example.properties application-local.properties
+   if (!(Test-Path application-local.properties)) {
+       Copy-Item application-local.example.properties application-local.properties
+   }
    ```
 
-4. Configure usuário, porta e senha do PostgreSQL no arquivo local. Ele é carregado automaticamente, fica salvo no computador e está no `.gitignore`.
+4. Preserve uma configuração local já funcional. Configure usuário, porta e senha do PostgreSQL no arquivo local. Ele é carregado automaticamente, fica salvo no computador e está no `.gitignore`.
 5. Para criar o primeiro administrador, configure `upbox.admin-inicial.*` nesse mesmo arquivo, incluindo uma senha local de pelo menos 8 caracteres, e defina `habilitado=true`.
 6. Execute:
 
@@ -70,4 +72,25 @@ Esse perfil recria as tabelas do banco de teste e verifica concorrência, rollba
 - [Relatório final e inventário das mudanças](docs/RELATORIO-FINAL-MVP.md)
 - [Alinhamento com a documentação oficial](docs/ALINHAMENTO-DOCUMENTACAO-DRIVE.md)
 
-O trabalho está em PRs encadeados, sem merge automático. Para executar todas as entregas antes da integração, use a branch `feat/dashboard-relatorios`; a `main` não foi modificada.
+O trabalho está em PRs encadeados, sem merge automático. Para executar todas as entregas antes da integração, use a branch `docs/preparacao-tcc`; a `main` não foi modificada.
+
+## Revisão e apresentação do TCC
+
+A revisão técnica corrigiu a disputa entre troca de senha e desativação, tratou falhas de banco e melhorou a navegação por teclado, a prévia informativa de saldo e os filtros. Não houve troca de arquitetura ou de identidade visual.
+
+- [Entrega 5 — revisão técnica e evidências das correções](docs/ENTREGA-5-REVISAO-TECNICA.md)
+- [Entrega 6 — interface e teclado](docs/ENTREGA-6-INTERFACE.md)
+- [Entrega 7 — jornada real, capturas e pendências](docs/ENTREGA-7-PREPARACAO-TCC.md)
+- [Instalação na escola, erros comuns e backup](docs/INSTALACAO-ESCOLA.md)
+- [Roteiro de apresentação de 8 minutos](docs/APRESENTACAO-TCC.md)
+- [Matriz com o TCC oficial](docs/MATRIZ-REQUISITOS-TCC.md)
+- [Relatório desta revisão](docs/RELATORIO-REVISAO-TCC.md)
+
+Para obter a revisão completa antes dos merges:
+
+```powershell
+git fetch origin
+git switch docs/preparacao-tcc
+```
+
+O [relatório do MVP](docs/RELATORIO-FINAL-MVP.md) permanece como histórico das entregas 1–4. As entregas 5–7 e o relatório de revisão registram os resultados atuais.
