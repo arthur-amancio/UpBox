@@ -7,6 +7,7 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 
 /** Mensagens compreensíveis sem devolver SQL ou detalhes internos ao navegador. */
 @ControllerAdvice
+@lombok.extern.slf4j.Slf4j
 public class ErroControllerAdvice {
     @ExceptionHandler({
         DataIntegrityViolationException.class,
@@ -22,9 +23,20 @@ public class ErroControllerAdvice {
         else if (ex instanceof DataIntegrityViolationException)
             mensagem =
                     "Os dados conflitam com um registro existente ou ultrapassam os limites"
-                        + " permitidos.";
+                            + " permitidos.";
         else if (ex instanceof IllegalArgumentException) mensagem = ex.getMessage();
         m.addAttribute("erro", mensagem);
+        return "erro";
+    }
+
+    /** Falhas de conexão não são erros de preenchimento e não devem expor SQL. */
+    @ExceptionHandler(DataAccessException.class)
+    @ResponseStatus(org.springframework.http.HttpStatus.SERVICE_UNAVAILABLE)
+    public String bancoIndisponivel(DataAccessException ex, Model m) {
+        // Não registra parâmetros, mensagens SQL ou dados do usuário.
+        log.error("Falha de acesso ao banco. Tipo: {}", ex.getClass().getSimpleName());
+        m.addAttribute(
+                "erro", "Não foi possível acessar o banco de dados. Tente novamente em instantes.");
         return "erro";
     }
 }

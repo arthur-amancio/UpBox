@@ -55,12 +55,12 @@ class PostgresIT {
     void preparar() {
         jdbc.execute(
                 "alter table movimentacoes_estoque drop constraint if exists"
-                    + " falha_historico_teste");
+                        + " falha_historico_teste");
         jdbc.execute(
                 "alter table registros_operacoes drop constraint if exists falha_auditoria_teste");
         jdbc.execute(
                 "truncate table movimentacoes_estoque, produtos, categorias, usuarios,"
-                    + " registros_operacoes restart identity cascade");
+                        + " registros_operacoes restart identity cascade");
         var c = categorias.save(new Categoria("Papelaria", ""));
         produto =
                 produtoService.cadastrar(
@@ -112,7 +112,7 @@ class PostgresIT {
     void deveDesfazerOperacaoSeHistoricoFalhar() {
         jdbc.execute(
                 "alter table movimentacoes_estoque add constraint falha_historico_teste check"
-                    + " (observacao <> 'FORCAR_FALHA')");
+                        + " (observacao <> 'FORCAR_FALHA')");
         try {
             assertThrows(
                     org.springframework.dao.DataIntegrityViolationException.class,
@@ -134,7 +134,7 @@ class PostgresIT {
     void deveDesfazerSaldoEHistoricoJaGravadosSeAuditoriaFalhar() {
         jdbc.execute(
                 "alter table registros_operacoes add constraint falha_auditoria_teste check (acao"
-                    + " not like 'Movimentação%')");
+                        + " not like 'Movimentação%')");
         try {
             assertThrows(
                     org.springframework.dao.DataIntegrityViolationException.class,
@@ -159,7 +159,7 @@ class PostgresIT {
                 () ->
                         jdbc.update(
                                 "insert into categorias (nome,descricao,ativa) values"
-                                    + " ('PAPELARIA','',true)"));
+                                        + " ('PAPELARIA','',true)"));
         assertThrows(
                 org.springframework.dao.DataIntegrityViolationException.class,
                 () ->
@@ -168,5 +168,59 @@ class PostgresIT {
                                     + " (codigo,nome,categoria_id,quantidade_estoque,estoque_minimo,ativo,preco)"
                                     + " values ('p01','Outro',?,0,0,true,1)",
                                 produto.getCategoria().getId()));
+    }
+
+    @org.springframework.boot.test.mock.mockito.SpyBean
+    org.springframework.security.crypto.password.PasswordEncoder encoder;
+
+    @Autowired UsuarioService usuarioService;
+
+    @Test
+    void trocaDeSenhaConcorrenteNaoPodeReativarUsuarioDesativado() throws Exception {
+        usuario.alterarSenhaHash(encoder.encode("senha-atual-teste"));
+        usuarios.saveAndFlush(usuario);
+        var senha = new SenhaForm();
+        senha.setAtual("senha-atual-teste");
+        senha.setNova("nova-senha-teste");
+        senha.setConfirmacao("nova-senha-teste");
+        var senhaConferida = new CountDownLatch(1);
+        var continuar = new CountDownLatch(1);
+        // Pausa somente a comparação de senha; transações e bloqueios usam PostgreSQL real.
+        org.mockito.Mockito.doAnswer(
+                        invocacao -> {
+                            senhaConferida.countDown();
+                            if (!continuar.await(10, TimeUnit.SECONDS))
+                                throw new IllegalStateException("Tempo de espera excedido.");
+                            return invocacao.callRealMethod();
+                        })
+                .when(encoder)
+                .matches(
+                        org.mockito.ArgumentMatchers.eq("senha-atual-teste"),
+                        org.mockito.ArgumentMatchers.anyString());
+        var pool = Executors.newFixedThreadPool(2);
+        try {
+            var troca = pool.submit(() -> usuarioService.alterarSenha(usuario.getId(), senha));
+            assertTrue(senhaConferida.await(10, TimeUnit.SECONDS));
+            var desativacao = pool.submit(() -> usuarioService.alterarStatus(usuario.getId()));
+            try {
+                // Sem bloqueio, a desativação termina enquanto a senha ainda lê uma cópia antiga.
+                desativacao.get(1, TimeUnit.SECONDS);
+            } catch (TimeoutException esperado) {
+                // Com bloqueio, a desativação espera a troca de senha terminar.
+            } finally {
+                continuar.countDown();
+            }
+            troca.get(15, TimeUnit.SECONDS);
+            desativacao.get(15, TimeUnit.SECONDS);
+            var atual = usuarios.findById(usuario.getId()).orElseThrow();
+            assertFalse(
+                    atual.isAtivo(),
+                    "A troca de senha não pode desfazer a desativação concorrente.");
+            assertTrue(encoder.matches("nova-senha-teste", atual.getSenhaHash()));
+        } finally {
+            continuar.countDown();
+            pool.shutdownNow();
+            org.mockito.Mockito.reset(encoder);
+        }
     }
 }

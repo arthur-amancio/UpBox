@@ -69,7 +69,12 @@ public class UsuarioService {
     }
 
     public void alterarSenha(Long id, SenhaForm f) {
-        Usuario u = buscar(id);
+        // Sem esse bloqueio, o JPA pode salvar uma cópia antiga e desfazer uma desativação.
+        Usuario u =
+                usuarios.buscarComBloqueio(id)
+                        .filter(Usuario::isAtivo)
+                        .orElseThrow(
+                                () -> new IllegalArgumentException("Usuário inválido ou inativo."));
         if (!encoder.matches(f.getAtual(), u.getSenhaHash()))
             throw new IllegalArgumentException("A senha atual está incorreta.");
         if (!Objects.equals(f.getNova(), f.getConfirmacao()))

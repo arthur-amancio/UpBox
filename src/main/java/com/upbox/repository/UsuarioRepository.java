@@ -19,4 +19,10 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select u from Usuario u order by u.id")
     List<Usuario> listarComBloqueio();
+
+    /** A troca de senha também precisa esperar alterações concorrentes da conta. */
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("select u from Usuario u where u.id = :id")
+    java.util.Optional<Usuario> buscarComBloqueio(
+            @org.springframework.data.repository.query.Param("id") Long id);
 }

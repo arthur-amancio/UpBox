@@ -16,7 +16,11 @@ public class DadosComunsController {
     private final UsuarioRepository usuarios;
 
     @ModelAttribute
-    public void usuarioAtual(Principal principal, Model model) {
+    public void usuarioAtual(
+            Principal principal, Model model, jakarta.servlet.http.HttpServletRequest request) {
+        // A página de erro precisa funcionar mesmo quando o banco estiver indisponível.
+        if (request.getDispatcherType() == jakarta.servlet.DispatcherType.ERROR
+                || request.getServletPath().equals("/error")) return;
         if (principal != null)
             usuarios.findById(Long.valueOf(principal.getName()))
                     .ifPresent(
