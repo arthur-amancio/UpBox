@@ -11,8 +11,8 @@ Transformar o protótipo UpBox em um sistema web de controle de estoque simples,
 ## 2. Diagnóstico do código recebido
 
 - Existem páginas de login, cadastro, home, dashboard, estoque, movimentações, relatórios e configurações.
-- O Java serve as páginas pelo \`PaginaController\`, mas não processa dados de estoque.
-- A lógica de produtos, categorias, movimentações e usuários fica em \`static/js\`, com dados fictícios gravados no \`localStorage\` do navegador.
+- O Java serve as páginas pelo `PaginaController`, mas não processa dados de estoque.
+- A lógica de produtos, categorias, movimentações e usuários fica em `static/js`, com dados fictícios gravados no `localStorage` do navegador.
 - Login, papéis e senhas são **demonstrativos**; senhas e verificações existem no JavaScript, portanto **não protegem dados reais**.
 - Há CSS e identidade visual aproveitáveis. O arquivo JavaScript do protótipo é condensado e pouco didático.
 - Não havia testes automatizados nem banco de dados configurado.
@@ -48,11 +48,11 @@ Transformar o protótipo UpBox em um sistema web de controle de estoque simples,
 Fluxo: formulário Thymeleaf -> Controller -> Service (validação/regra) -> Repository (JPA) -> banco.
 
 Pacotes, quando necessários:
-- \`controller/\`: rotas HTTP e ligação com as telas.
-- \`model/\`: classes que representam produtos, categorias, usuários e movimentações.
-- \`repository/\`: acesso aos registros do banco.
-- \`service/\`: operações que precisam de validações, transações ou coordenação.
-- \`config/\`: configurações de segurança quando a etapa exigir.
+- `controller/`: rotas HTTP e ligação com as telas.
+- `model/`: classes que representam produtos, categorias, usuários e movimentações.
+- `repository/`: acesso aos registros do banco.
+- `service/`: operações que precisam de validações, transações ou coordenação.
+- `config/`: configurações de segurança quando a etapa exigir.
 
 **Evitar:** frontend separado, APIs REST desnecessárias, bibliotecas para tudo, arquitetura hexagonal, microsserviços, DTO/mappers genéricos e interfaces criadas sem necessidade.
 
@@ -61,7 +61,7 @@ Pacotes, quando necessários:
 ### PR 1 — Planejamento, primeira regra Java e testes (este PR)
 
 - Documentar o estado atual e como estudar o código.
-- Criar a classe simples \`Produto\` para **exercitar as regras de entrada/saída em Java**, ainda sem persistência.
+- Criar a classe simples `Produto` para **exercitar as regras de entrada/saída em Java**, ainda sem persistência.
 - Criar testes unitários dessas regras e testes de navegação das rotas existentes.
 - Manter telas e lógica demonstrativa intactas. **Não alegar que o estoque real já funciona.**
 
