@@ -71,6 +71,12 @@ As datas são as previstas pelo documento (não prova de entrega ou agendamento 
 4. Substituir demonstrações JavaScript por formulários/consultas reais por módulo, com testes e comentários pedagógicos em português.
 5. Revisar a documentação de funcionalidades a cada PR concluído. Não declarar pronta uma função apenas por sua tela existir.
 
-## 6. Identidade visual preservada
+## 6. Comparação com o ZIP do Drive
+
+A pasta `Sistema` contém o arquivo `UpBox_Spring_Prototipo.zip`, atualizado em 29/10/2026. Sua estrutura e tamanhos coincidem com os arquivos do protótipo na `main`. Também foram comparados os hashes Git de `pom.xml`, `README.md`, `PaginaController.java`, `dados.js`, `style.css` e `.gitignore`: todos são idênticos aos da `main`.
+
+Assim, **não há evidência de alterações nesses arquivos que precisem ser importadas do ZIP**. Os arquivos restantes não foram comparados byte a byte. Continuar versionando pelo GitHub, sem substituir a branch pela pasta compactada.
+
+## 7. Identidade visual preservada
 
 O [briefing](https://docs.google.com/document/d/1LB-slWI3NFevn5WNa8eMUg2kMKnTa-Kg/edit) define laranja principal `#E39A3C`, laranja claro `#F2B15E`, laranja escuro `#A6631A`, fundo `#FAF7F2`, preto amarronzado `#241A10` e fonte Plus Jakarta Sans. Preservar identidade e telas, corrigindo apenas problemas reais de uso/responsividade.
