@@ -1,68 +1,74 @@
 # UpBox — sistema de gerenciamento de estoque (TCC)
 
-Projeto acadêmico com **Java 17, Spring Boot e Thymeleaf**.
+Projeto didático com **Java 17, Spring Boot, Thymeleaf, Spring Data JPA e PostgreSQL**.
 
 ## Estado atual
 
-O UpBox possui um **protótipo visual navegável**. Login, usuários, produtos, categorias e movimentações ainda usam dados demonstrativos salvos no navegador (`localStorage`). **Não existe autenticação real nem banco de dados nesta versão. Não utilize dados reais.**
+O UpBox agora possui **entidades JPA, repositórios e serviços de estoque** no servidor, com testes automatizados.
+Porém, **as telas continuam demonstrativas**: login, usuários e movimentações feitos pela interface ainda usam
+dados fictícios no navegador (`localStorage`). Não existe autenticação real; não utilize dados reais.
 
-A evolução para um sistema funcional será feita em etapas, com testes, revisão e comentários em português para apoiar os estudos do grupo.
+As classes do backend já representam `Produto`, `Categoria`, `Usuario` e `MovimentacaoEstoque`.
+O serviço de movimentações modifica o saldo e salva o histórico na mesma transação,
+mas ainda não possui um controller acessível ao navegador, por segurança.
 
-## Como executar
+## Executar no VS Code com PostgreSQL
 
-Requisitos: JDK 17 e Maven 3.6.3 ou superior, disponíveis no PATH.
+Requisitos: **JDK 17**, **Maven**, **PostgreSQL instalado e em execução** e opcionalmente **pgAdmin** para administrar o banco.
 
-```sh
-mvn spring-boot:run
-```
+1. Abra o pgAdmin, conecte ao servidor PostgreSQL e crie o banco de dados `upbox`.
+2. Na pasta do projeto (onde está o `pom.xml`), copie o exemplo local:
 
-Abra http://localhost:8080. Contas *apenas demonstrativas*: `administrador.demo` e `funcionario.demo`, senha `demo123`.
+   ```powershell
+   Copy-Item application-local.example.properties application-local.properties
+   ```
 
-Para rodar os testes:
+3. Edite `application-local.properties` e **coloque a senha da instalação da escola**, além de usuário/porta se forem diferentes.
+   O arquivo fica salvo no PC, é carregado automaticamente pelo Spring Boot e está no `.gitignore`.
+4. Execute:
 
-```sh
-mvn clean test
-```
+   ```powershell
+   mvn clean test
+   mvn spring-boot:run
+   ```
 
-## Documentação para a equipe
+5. Abra http://localhost:8080 e confira as tabelas em **pgAdmin → Databases → upbox → Schemas → public → Tables**.
 
-- [Plano de desenvolvimento](docs/PLANO-DESENVOLVIMENTO.md): objetivos, módulos, regras, cronograma de PRs e decisões pendentes.
-- [Guia de estudos](docs/GUIA-DE-ESTUDOS.md): como entender classes, métodos, rotas e testes do projeto.
-- [Alinhamento com a documentação oficial](docs/ALINHAMENTO-DOCUMENTACAO-DRIVE.md): diferenças encontradas no Drive, decisões pendentes e prioridades.
+**Atenção:** pgAdmin é um administrador gráfico; ele não substitui o servidor PostgreSQL.
 
-## Organização
+Leia as instruções completas em [Guia PostgreSQL e pgAdmin](docs/GUIA-POSTGRESQL-PGADMIN.md).
 
-- `src/main/java/com/upbox/controller`: rotas web.
-- `src/main/java/com/upbox/model`: regras de domínio, iniciadas pela classe didática `Produto` (ainda não conectada às telas).
-- `src/main/resources/templates`: páginas Thymeleaf.
-- `src/main/resources/static`: CSS, JavaScript e imagens do protótipo.
-- `src/test`: testes automatizados.
+O arquivo `application.properties` fica versionado **sem senha de verdade**.
+É possível guardar a senha permanentemente no `application-local.properties` do computador,
+sem expor a credencial no histórico do GitHub.
 
-Os pacotes `service`, `repository` e `config` serão criados quando houver operações, persistência e segurança que precisem deles. As dependências atuais são Spring MVC, Thymeleaf e testes; não é necessário instalar banco para executar esta etapa.
-
-## Executar no VS Code
-
-1. Instale o JDK 17, Maven e as extensões **Extension Pack for Java** e **Spring Boot Extension Pack**.
-2. Abra a pasta que contém `pom.xml` e aguarde a importação do Maven.
-3. No terminal integrado, confira `java -version` e `mvn -version`: ambos devem usar Java 17. Se necessário, ajuste `JAVA_HOME` para o JDK e reabra o VS Code.
-4. Execute `mvn clean test` e depois `mvn spring-boot:run`, ou execute `UpboxApplication` pelo botão Run do editor.
-5. Abra http://localhost:8080. Para encerrar pelo terminal, use `Ctrl+C`.
-
-O servidor escuta apenas em `127.0.0.1` por padrão, pois este protótipo não possui autenticação real. Se a porta estiver ocupada, no PowerShell use:
+O servidor escuta apenas em `127.0.0.1` por padrão. Para alterar a porta:
 
 ```powershell
 $env:SERVER_PORT = '8081'
 mvn spring-boot:run
 ```
 
-Nesse caso, abra http://localhost:8081. A variável vale para o terminal atual; `Remove-Item Env:SERVER_PORT` restaura a porta padrão nas próximas execuções.
+## Arquivos principais
 
-## Configuração local
+- `src/main/java/com/upbox/model`: entidades de produtos, categorias, usuários e movimentações.
+- `src/main/java/com/upbox/repository`: operações com o banco de dados.
+- `src/main/java/com/upbox/service`: cadastro de produtos e movimentações transacionais.
+- `src/main/java/com/upbox/controller`: rotas das páginas existentes (ainda demonstrativas).
+- `src/main/resources/templates`: páginas Thymeleaf.
+- `src/main/resources/static`: CSS, imagens e JS demonstrativo.
+- `src/test`: testes de domínio, das rotas e da persistência.
 
-O arquivo `.env.example` documenta `SERVER_ADDRESS` e `SERVER_PORT`. **Spring Boot não lê `.env` automaticamente**: configure as variáveis no terminal, como no exemplo acima. Não há credenciais de banco nesta etapa.
+## Documentos da equipe
 
-Para ajustes exclusivos da sua máquina, também é possível criar `src/main/resources/application-local.properties` (ignorado pelo Git) e executar `mvn spring-boot:run "-Dspring-boot.run.profiles=local"`. Não salve senhas em arquivos versionados. `.env`, logs e `target/` também são ignorados.
+- [Plano de desenvolvimento](docs/PLANO-DESENVOLVIMENTO.md)
+- [Guia de estudos](docs/GUIA-DE-ESTUDOS.md)
+- [Alinhamento com o Drive](docs/ALINHAMENTO-DOCUMENTACAO-DRIVE.md)
+- [Guia PostgreSQL e pgAdmin](docs/GUIA-POSTGRESQL-PGADMIN.md)
 
-## Antes do cadastro real de produtos
+## Próxima etapa
 
-Confirme as decisões de banco, perfis, criação de contas, preço e desativação descritas em `docs/ALINHAMENTO-DOCUMENTACAO-DRIVE.md`. A próxima etapa deve implementar autenticação e permissões no servidor, persistência com código único e validações, e só então ligar os formulários ao backend. A classe `Produto` atual é didática e não salva registros. Até lá, todas as telas continuam sendo demonstrações com dados no navegador.
+Criar autenticação real e autorização de administrador/funcionário, substituir
+gradualmente os formulários simulados pelos formulários conectados aos serviços
+e testar a concorrência com PostgreSQL real. Não publicar o protótipo atual na internet
+nem permitir endpoints de escrita desprotegidos.
