@@ -15,27 +15,34 @@
     <artifactId>upbox-sistema</artifactId>
     <version>1.0.0</version>
     <name>upbox-sistema</name>
-    <description>UpBox - protótipo visual e navegável (TCC)</description>
+    <description>UpBox - sistema de gerenciamento de estoque (TCC)</description>
 
     <properties>
         <java.version>17</java.version>
     </properties>
 
     <dependencies>
-        <!-- Spring Web: controllers e servidor embutido (Tomcat) -->
+        <!-- Spring Web: cria os controllers e inicializa o servidor web. -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
-        <!-- Thymeleaf: páginas HTML da pasta templates -->
+        <!-- Thymeleaf: exibe as páginas HTML da pasta templates. -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-thymeleaf</artifactId>
         </dependency>
 
-        <!-- Nesta etapa NÃO há banco de dados. Na etapa funcional serão
-             adicionados: Spring Data JPA e o driver MySQL (mysql-connector-j). -->
+        <!-- Bibliotecas de teste: JUnit 5, testes do Spring e MockMvc. -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- O driver do banco e o Spring Data JPA serão adicionados
+             quando o grupo confirmar se usará PostgreSQL ou MySQL. -->
     </dependencies>
 
     <build>

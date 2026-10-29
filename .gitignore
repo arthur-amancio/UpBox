@@ -2,3 +2,11 @@ target/
 .idea/
 *.iml
 .vscode/
+*.log
+
+# Arquivos locais que podem conter configurações e senhas.
+.env
+.env.*
+!.env.example
+src/main/resources/application-local.properties
+src/main/resources/application-prod.properties

@@ -1,10 +1,38 @@
-# UpBox - protótipo visual (Spring Boot + Thymeleaf)
+# UpBox — sistema de gerenciamento de estoque (TCC)
 
-Requisitos: Java 17 e Maven (ou uma IDE como IntelliJ/Eclipse/VS Code).
+Projeto acadêmico com **Java 17, Spring Boot e Thymeleaf**.
 
-Executar: `mvn spring-boot:run` (ou execute a classe `UpboxApplication`) e abra http://localhost:8080
+## Estado atual
 
-Contas de demonstração (senha `demo123`): `administrador.demo` e `funcionario.demo`.
+O UpBox possui um **protótipo visual navegável**. Login, usuários, produtos, categorias e movimentações ainda usam dados demonstrativos salvos no navegador (\`localStorage\`). **Não existe autenticação real nem banco de dados nesta versão. Não utilize dados reais.**
 
-Estrutura: `controller/PaginaController` (rotas) · `templates` (HTML Thymeleaf) · `static` (CSS, JS, imagens).
-Os dados são demonstrativos e ficam no navegador; não há banco de dados nem autenticação real nesta etapa.
+A evolução para um sistema funcional será feita em etapas, com testes, revisão e comentários em português para apoiar os estudos do grupo.
+
+## Como executar
+
+Requisitos: Java 17 e Maven.
+
+\`\`\`sh
+mvn spring-boot:run
+\`\`\`
+
+Abra http://localhost:8080. Contas *apenas demonstrativas*: \`administrador.demo\` e \`funcionario.demo\`, senha \`demo123\`.
+
+Para rodar os testes:
+
+\`\`\`sh
+mvn test
+\`\`\`
+
+## Documentação para a equipe
+
+- [Plano de desenvolvimento](docs/PLANO-DESENVOLVIMENTO.md): objetivos, módulos, regras, cronograma de PRs e decisões pendentes.
+- [Guia de estudos](docs/GUIA-DE-ESTUDOS.md): como entender classes, métodos, rotas e testes do projeto.
+
+## Organização
+
+- \`src/main/java/com/upbox/controller\`: rotas web.
+- \`src/main/java/com/upbox/model\`: regras de domínio, iniciadas pela classe didática \`Produto\` (ainda não conectada às telas).
+- \`src/main/resources/templates\`: páginas Thymeleaf.
+- \`src/main/resources/static\`: CSS, JavaScript e imagens do protótipo.
+- \`src/test\`: testes automatizados.
