@@ -61,8 +61,9 @@ As verificações de interface abrangeram 320×568, 390×844 e 1365×900, Tab/Sh
 | --- | --- | --- | --- | --- |
 | 5 — revisão técnica | `fix/revisao-tecnica-mvp` | `feat/dashboard-relatorios` | [#8](https://github.com/arthur-amancio/UpBox/pull/8) | [6e1e586](https://github.com/arthur-amancio/UpBox/commit/6e1e586) |
 | 6 — interface | `feat/usabilidade-acessibilidade` | `fix/revisao-tecnica-mvp` | [#9](https://github.com/arthur-amancio/UpBox/pull/9) | [8f7f30c](https://github.com/arthur-amancio/UpBox/commit/8f7f30c) |
+| 7 — preparação TCC | `docs/preparacao-tcc` | `feat/usabilidade-acessibilidade` | [#10](https://github.com/arthur-amancio/UpBox/pull/10) | [aa8eaa2](https://github.com/arthur-amancio/UpBox/commit/aa8eaa2) |
 
-A entrega 7 usa `docs/preparacao-tcc`, baseada em `feat/usabilidade-acessibilidade`; seus links são registrados após publicar. Não houve merge, alteração direta da main ou reescrita de histórico compartilhado.
+A entrega 7 usa `docs/preparacao-tcc`, baseada em `feat/usabilidade-acessibilidade`. Os três PRs foram publicados sem merge. Não houve alteração direta da main ou reescrita de histórico compartilhado.
 
 ## 6. Executar a versão mais recente
 
