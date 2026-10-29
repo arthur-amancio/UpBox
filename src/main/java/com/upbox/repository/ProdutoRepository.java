@@ -16,6 +16,9 @@ public interface ProdutoRepository extends JpaRepository<Produto, Long> {
 
     boolean existsByCodigo(String codigo);
 
+    @Query("select coalesce(sum(p.quantidade), 0) from Produto p where p.ativo = true")
+    long somarUnidadesAtivas();
+
     Optional<Produto> findByCodigo(String codigo);
 
     /** Fetch join carrega a categoria antes de sair da transação (open-in-view=false). */

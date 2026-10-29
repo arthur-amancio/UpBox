@@ -1,6 +1,6 @@
 # UpBox — alinhamento entre Drive, requisitos e código
 
-> Revisão documental em 29/10/2026. Fonte: [pasta do UpBox no Google Drive](https://drive.google.com/drive/folders/1HduDoOHXHC-WpA0TgFztmEgA7RVMQC1D). **Não altera os documentos do grupo.** As decisões listadas abaixo ainda precisam de validação dos integrantes/orientador.
+> Revisão documental em 29/10/2026. Fonte: [pasta do UpBox no Google Drive](https://drive.google.com/drive/folders/1HduDoOHXHC-WpA0TgFztmEgA7RVMQC1D). **Não altera os documentos do grupo.** As divergências do levantamento inicial estão preservadas abaixo; as decisões implementadas estão registradas na seção 8.
 
 ## 1. Documentos principais consultados
 
@@ -29,7 +29,7 @@ Os [20 casos de uso](https://docs.google.com/document/d/1tCJB16n6O56-aCwrKiSbyWM
 
 Este conjunto é a **referência funcional preferencial**, sem tornar o conteúdo imutável; alterações exigem atualização coerente na documentação e no código.
 
-## 3. Divergências / decisões a resolver
+## 3. Divergências identificadas no levantamento inicial
 
 | ID | Evidência | Diferença ou risco | Ação proposta |
 | --- | --- | --- | --- |
@@ -80,3 +80,15 @@ Assim, **não há evidência de alterações nesses arquivos que precisem ser im
 ## 7. Identidade visual preservada
 
 O [briefing](https://docs.google.com/document/d/1LB-slWI3NFevn5WNa8eMUg2kMKnTa-Kg/edit) define laranja principal `#E39A3C`, laranja claro `#F2B15E`, laranja escuro `#A6631A`, fundo `#FAF7F2`, preto amarronzado `#241A10` e fonte Plus Jakarta Sans. Preservar identidade e telas, corrigindo apenas problemas reais de uso/responsividade.
+
+## 8. Decisões implementadas no MVP
+
+O responsável confirmou PostgreSQL, cadastro de usuários restrito ao administrador e perfis `ADMINISTRADOR`/`FUNCIONARIO`. Também confirmou **preço obrigatório** em novos produtos/edições e consulta de relatórios aos dois perfis, com opção de impressão/PDF exclusiva do administrador.
+
+Produtos e categorias usam desativação lógica para preservar histórico. Saldo inicial pela interface é zero; depois muda por movimentações. Categorias inativas deixam de aceitar novas associações, mantendo vínculos existentes. QR e multiempresa permanecem fora do MVP.
+
+As quatro entidades originais e os serviços de produto/movimentação foram reaproveitados. Auditoria simples foi acrescentada para cumprir os registros de operações. Perfil, troca de senha e todos os módulos visíveis usam backend real. Não existe mais autenticação nem estoque por `localStorage`.
+
+A coluna preço preserva ausência somente no legado sem valor conhecido: a tela mostra pendência e exige preenchimento ao editar. Não se atribui zero como preço fictício. A impressão nativa permite Salvar como PDF; não afirmamos salvamento sem confirmação do navegador.
+
+Os documentos originais no Drive foram consultados em leitura e não foram alterados. Eventuais atualizações formais de diagramas/dicionários no Drive continuam dependendo dos autores.

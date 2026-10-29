@@ -1459,8 +1459,26 @@ html[data-tema="escuro"] .chips span{color:var(--cor-primaria-clara-tom)}
 @media(max-width:900px){.cfg-layout{flex-direction:column}.cfg-menu{flex:none;width:100%;display:flex;overflow-x:auto;gap:4px}.cfg-menu a{white-space:nowrap}.fluxo-seta{display:none}.inicio-card{padding:34px 22px}.home-bloco{padding:34px 6vw}}
 
 /* Formulários MVC reaproveitam os componentes do protótipo. */
-.form-card + .form-card,.card + .card { margin-top: 22px; }
+.form-card + .form-card,section > .card + .card { margin-top: 22px; }
 .form-grid input,.form-grid select,.form-grid textarea { max-width:100%; }
 .acoes-tabela form { margin:0; }
 .campo .erro-campo { color:var(--cor-erro); font-size:.82rem; }
 @media(max-width:600px){.barra-filtros > * { max-width:100%; min-width:0; }.form-card {padding:18px;}.pagina-cabecalho {flex-wrap:wrap;}}
+
+.acoes-cabecalho {display:flex; flex-wrap:wrap; gap:10px; margin-bottom:18px;}
+.barra-filtros {align-items:flex-end;}
+.barra-filtros .campo {margin-bottom:0;}
+.cabecalho-relatorio {margin:18px 0;}
+.tabela td:first-child {white-space:nowrap;}
+@media print {
+ @page {size:A4 landscape; margin:12mm;}
+ .tabela-wrapper {overflow:visible!important;}
+ .tabela {width:100%!important; min-width:0!important; font-size:9pt;}
+ .tabela th,.tabela td {padding:6px!important; white-space:normal!important;}
+ .tabela-wrapper,.card {break-inside:auto;}
+ tr {break-inside:avoid;} thead {display:table-header-group;}
+ .cabecalho-relatorio {margin:0 0 12px; padding:0; border:0;}
+}
+
+/* Cinco indicadores se ajustam à largura disponível sem desalinhamento entre cards. */
+.grid-cards .card {flex-basis:180px;}

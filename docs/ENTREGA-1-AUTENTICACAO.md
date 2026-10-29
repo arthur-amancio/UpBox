@@ -9,7 +9,7 @@ O login agora é feito pelo servidor, com Spring Security e sessão HTTP. O nave
 3. Configure a conexão e a senha do PostgreSQL nesse arquivo ignorado pelo Git.
 4. Configure os campos `upbox.admin-inicial.*`, incluindo senha de no mínimo 8 caracteres (até 72 bytes), e defina `habilitado=true`.
 5. Execute `mvn clean test` e `mvn spring-boot:run`; acesse http://localhost:8080.
-6. Depois da primeira criação, remova a senha inicial e defina `habilitado=false`. O sistema não substitui um administrador ativo existente.
+6. Depois da primeira criação, remova a senha inicial e defina `habilitado=false`. O sistema não substitui um administrador existente, inclusive inativo.
 
 Não há conta demo ou cadastro público. O administrador abre Usuários para cadastrar colegas. Ambos os perfis podem atualizar nome/e-mail e trocar sua própria senha informando a senha atual. A troca encerra a sessão. Não é permitido desativar ou rebaixar o último administrador ativo.
 

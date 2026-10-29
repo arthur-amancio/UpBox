@@ -13,6 +13,17 @@ import java.util.List;
 public interface MovimentacaoEstoqueRepository extends JpaRepository<MovimentacaoEstoque, Long> {
     List<MovimentacaoEstoque> findByProdutoIdOrderByDataHoraDesc(Long produtoId);
 
+    @EntityGraph(attributePaths = {"produto", "produto.categoria", "usuario"})
+    List<MovimentacaoEstoque> findTop10ByOrderByDataHoraDescIdDesc();
+
+    @Query(
+            "select coalesce(sum(m.quantidade), 0) from MovimentacaoEstoque m "
+                    + "where m.tipo = :tipo and m.dataHora >= :inicio and m.dataHora < :fim")
+    long somarQuantidade(
+            @Param("tipo") TipoMovimentacao tipo,
+            @Param("inicio") LocalDateTime inicio,
+            @Param("fim") LocalDateTime fim);
+
     /** Os fetch joins deixam os dados necessários prontos para o HTML. */
     @Query(
             "select m from MovimentacaoEstoque m join fetch m.produto p join fetch p.categoria c"

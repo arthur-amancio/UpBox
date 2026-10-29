@@ -1,5 +1,11 @@
 /* Apenas interações visuais. Login, permissões e dados são tratados pelo servidor. */
 document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.sidebar a').forEach(function (link) {
+        if (link.pathname === window.location.pathname) {
+            link.classList.add('ativo');
+            link.setAttribute('aria-current', 'page');
+        }
+    });
     var sidebar = document.getElementById('sidebar');
     var overlay = document.getElementById('overlaySidebar');
     var botao = document.getElementById('btnHamburguer');

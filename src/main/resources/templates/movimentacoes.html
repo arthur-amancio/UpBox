@@ -129,54 +129,7 @@
       Limpar
      </a>
     </form>
-    <div class="tabela-wrapper">
-     <table class="tabela">
-      <thead>
-       <tr>
-        <th>
-         Data/hora
-        </th>
-        <th>
-         Produto
-        </th>
-        <th>
-         Tipo
-        </th>
-        <th>
-         Quantidade
-        </th>
-        <th>
-         Responsável
-        </th>
-        <th>
-         Observação
-        </th>
-       </tr>
-      </thead>
-      <tbody>
-       <tr th:each="m : ${movimentacoes}">
-        <td th:text="${#temporals.format(m.dataHora,'dd/MM/yyyy HH:mm:ss')}">
-        </td>
-        <td th:text="${m.produto.codigo + ' — ' + m.produto.nome}">
-        </td>
-        <td>
-         <span th:class="${m.tipo.name() == 'ENTRADA' ? 'badge badge-entrada' : 'badge badge-saida'}" th:text="${m.tipo.name() == 'ENTRADA' ? 'Entrada' : 'Saída'}">
-         </span>
-        </td>
-        <td th:text="${m.quantidade}">
-        </td>
-        <td th:text="${m.usuario.nome}">
-        </td>
-        <td th:text="${m.observacao}">
-        </td>
-       </tr>
-       <tr th:if="${#lists.isEmpty(movimentacoes)}">
-        <td class="tabela-vazia" colspan="6">
-         Nenhuma movimentação foi encontrada.
-        </td>
-       </tr>
-      </tbody>
-     </table>
+    <div class="tabela-wrapper" th:replace="~{fragments/tabelas :: movimentacoes(${movimentacoes})}">
     </div>
    </section>
   </th:block>

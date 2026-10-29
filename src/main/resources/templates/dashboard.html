@@ -1,8 +1,102 @@
 <!DOCTYPE html>
-<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/layout :: cabecalho('Dashboard')}"></head>
-<!-- O conteúdo desta tela é montado por static/js/pages/dashboard.js com dados demonstrativos -->
-<body data-pagina="dashboard" data-titulo="Dashboard">
-<th:block th:replace="~{fragments/layout :: scripts('dashboard')}"></th:block>
-</body>
+<html lang="pt-br" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" xmlns:th="http://www.thymeleaf.org">
+ <head th:replace="~{fragments/layout :: cabecalho('Dashboard')}">
+ </head>
+ <body>
+  <th:block th:replace="~{fragments/layout :: estrutura(~{::section})}">
+   <section>
+    <div class="pagina-cabecalho">
+     <h2>
+      Dashboard
+     </h2>
+    </div>
+    <p class="nota">
+     Resumo do banco de dados. Unidades disponíveis e alertas consideram produtos ativos. Entradas e saídas incluem hoje e os seis dias anteriores, no horário de São Paulo.
+    </p>
+    <div class="grid-cards">
+     <div class="card card-stat">
+      <div class="icone icone-azul">
+       ▣
+      </div>
+      <div>
+       <div class="valor" th:text="${resumo.totalProdutos}">
+       </div>
+       <div class="rotulo">
+        Produtos cadastrados
+       </div>
+      </div>
+     </div>
+     <div class="card card-stat">
+      <div class="icone icone-verde">
+       ▦
+      </div>
+      <div>
+       <div class="valor" th:text="${resumo.unidadesDisponiveis}">
+       </div>
+       <div class="rotulo">
+        Unidades disponíveis
+       </div>
+      </div>
+     </div>
+     <div class="card card-stat">
+      <div class="icone icone-amarelo">
+       !
+      </div>
+      <div>
+       <div class="valor" th:text="${#lists.size(resumo.estoqueBaixo)}">
+       </div>
+       <div class="rotulo">
+        Produtos com estoque baixo
+       </div>
+      </div>
+     </div>
+     <div class="card card-stat">
+      <div class="icone icone-verde">
+       ↑
+      </div>
+      <div>
+       <div class="valor" th:text="${resumo.entradasRecentes}">
+       </div>
+       <div class="rotulo">
+        Unidades de entrada — 7 dias
+       </div>
+      </div>
+     </div>
+     <div class="card card-stat">
+      <div class="icone icone-vermelho">
+       ↓
+      </div>
+      <div>
+       <div class="valor" th:text="${resumo.saidasRecentes}">
+       </div>
+       <div class="rotulo">
+        Unidades de saída — 7 dias
+       </div>
+      </div>
+     </div>
+    </div>
+    <div class="card">
+     <h3>
+      Reposição de estoque
+     </h3>
+     <div class="lista-alerta">
+      <a class="item-alerta" th:each="p : ${resumo.estoqueBaixo}" th:href="@{/movimentacoes(produto=${p.id})}">
+       <strong th:text="${p.codigo + ' — ' + p.nome}">
+       </strong>
+       <span th:text="${p.quantidade + ' / mínimo ' + p.estoqueMinimo}">
+       </span>
+      </a>
+      <p th:if="${#lists.isEmpty(resumo.estoqueBaixo)}">
+       Nenhum produto ativo com estoque baixo.
+      </p>
+     </div>
+    </div>
+    <h3>
+     Últimas movimentações
+    </h3>
+    <div th:replace="~{fragments/tabelas :: movimentacoes(${resumo.ultimasMovimentacoes})}">
+    </div>
+   </section>
+  </th:block>
+ </body>
 </html>

@@ -14,6 +14,8 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
 
     boolean existsByPerfilAndAtivoTrue(PerfilAcesso perfil);
 
+    boolean existsByPerfil(PerfilAcesso perfil);
+
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select u from Usuario u order by u.id")
     List<Usuario> listarComBloqueio();

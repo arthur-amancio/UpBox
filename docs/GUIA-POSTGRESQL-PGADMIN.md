@@ -53,11 +53,18 @@ Ao iniciar pela primeira vez, o JPA pode criar as tabelas `categorias`, `produto
 
 **Atenção:** `spring.jpa.hibernate.ddl-auto=update` é uma facilidade **apenas para desenvolvimento local e TCC**. Não use em produção sem migrations.
 
-## 5. Estado do sistema nesta etapa
+## 5. Usar e conferir os registros
 
-- **Implementado no backend:** entidades, repositórios, cadastro de produto por serviço e movimentações transacionais com saldo protegido.
-- **Ainda não implementado:** login real, autorização no servidor e formulários conectados ao PostgreSQL.
-- **A interface continua demonstrativa**: seus dados ficam no `localStorage`. O sistema não deve ser publicado na internet com dados reais nesta etapa.
-- O `MovimentacaoEstoqueService` é interno; futuramente o usuário responsável deverá vir da sessão autenticada (nunca de um campo enviado pelo navegador).
+O backend e os formulários estão conectados: login, usuários, categorias, produtos, movimentações, dashboard e relatórios. Crie o primeiro administrador conforme [Entrega 1](ENTREGA-1-AUTENTICACAO.md).
 
-**Os testes H2 exercitam as entidades e serviços**, mas a conexão final ainda precisa ser verificada com um PostgreSQL local. Uma etapa posterior deve acrescentar testes de integração com PostgreSQL para validar os bloqueios sob concorrência.
+No pgAdmin, abra `upbox > Schemas > public > Tables`, atualize a lista e use **View/Edit Data > All Rows**. Existem `categorias`, `produtos`, `usuarios`, `movimentacoes_estoque` e `registros_operacoes`. Confira o saldo em `produtos.quantidade_estoque`; cada movimentação aponta para produto e usuário pelas chaves estrangeiras.
+
+Para uma demonstração, cadastre pela interface, registre uma entrada de 10 e uma saída de 7, reinicie o servidor e confira o saldo 3. Não altere o saldo pelo pgAdmin para simular movimentações: isso pula regras e histórico. Nunca publique consultas ou capturas com dados sensíveis.
+
+## 6. H2 e PostgreSQL nos testes
+
+`mvn clean test` executa testes rápidos com H2 no escopo de teste. A aplicação utiliza PostgreSQL.
+
+Para integração real, crie outro banco **exclusivo e descartável chamado `upbox_test`**. O perfil `mvn -Ppostgres-it verify` recria/apaga suas tabelas; a URL é verificada antes de iniciar o JPA. Configure as variáveis locais conforme [Entrega 3](ENTREGA-3-MOVIMENTACOES.md). Nunca aponte testes para o banco de uso da escola.
+
+O PostgreSQL 16.4 foi utilizado nesta entrega para verificar a aplicação, persistência após reinício, índices de unicidade, duas saídas simultâneas e rollback por falhas no histórico/auditoria. A CI também executa integração PostgreSQL.

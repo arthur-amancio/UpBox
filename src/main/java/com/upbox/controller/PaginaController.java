@@ -23,11 +23,6 @@ public class PaginaController {
         return "home";
     }
 
-    @GetMapping({"/dashboard", "/relatorios"})
-    public String pendente() {
-        return "pendente";
-    }
-
     @GetMapping("/cadastro")
     public String cadastro() {
         return "redirect:/usuarios/novo";

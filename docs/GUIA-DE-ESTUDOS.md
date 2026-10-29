@@ -1,51 +1,55 @@
-# Guia de estudos — entendendo o código do UpBox
+# Guia de estudos — entendendo o UpBox funcional
 
-## Onde fica cada parte?
+## O caminho de um formulário
 
-- `src/main/java/com/upbox/UpboxApplication.java`: inicia o servidor Spring Boot.
-- `src/main/java/com/upbox/controller/PaginaController.java`: recebe endereços como `/estoque` e escolhe a página HTML.
-- `src/main/resources/templates/`: telas HTML usando Thymeleaf.
-- `src/main/resources/static/css/`: aparência visual.
-- `src/main/resources/static/js/`: **atualmente** dados e comportamentos demonstrativos.
-- `src/main/java/com/upbox/model/Produto.java`: primeiro exemplo das regras de estoque escritas em Java. Ainda não está conectado às páginas nem ao banco.
-- `src/test/`: testes para verificar o comportamento esperado.
+Navegador → Controller → Service → Repository → PostgreSQL. O resultado volta como HTML Thymeleaf. O JavaScript não autentica pessoas nem calcula saldos.
 
-## Conceitos para estudar em sequência
+- **Entity:** classe persistida em uma tabela, marcada com `@Entity`. Exemplo: `Produto` representa `produtos`.
+- **Repository:** interface do Spring Data que consulta e salva entidades, como `findById`. Não decide se uma saída é permitida.
+- **Service:** aplica as regras. `MovimentacaoEstoqueService` verifica produto ativo, quantidade e usuário, altera saldo e grava histórico.
+- **Controller:** recebe o endereço HTTP e o formulário, apresenta erros e escolhe o HTML. Após sucesso, redireciona para evitar repetir a operação ao atualizar a página.
+- **Formulário Java:** `ProdutoForm` contém apenas campos que a tela pode alterar. Não tem quantidade, pois editar cadastro não deve mudar saldo.
+- **Thymeleaf:** preenche HTML no servidor; `th:text` escapa dados e `th:action` em formulários POST integra o token CSRF.
 
-1. **Classe:** a receita para construir um objeto, como `Produto`.
-2. **Atributo:** informação guardada no objeto, como `quantidade`.
-3. **Construtor:** prepara um novo objeto e valida seus valores iniciais.
-4. **Método:** comportamento do objeto, como `registrarSaida`.
-5. **Encapsulamento:** a tela não pode alterar o saldo diretamente; chama um método com validação.
-6. **Controller:** recebe a requisição do navegador e encaminha o trabalho.
-7. **Testes:** descrevem situações que devem funcionar e situações que devem ser recusadas.
-8. **Repository/JPA:** serão introduzidos quando o grupo definir o banco de dados.
+## Anotações e relacionamentos
 
-## Exercício prático: uma saída de estoque
+`@Id` identifica a entidade e `@GeneratedValue` deixa o banco gerar o número. `@ManyToOne` significa que vários produtos pertencem a uma categoria; várias movimentações pertencem a um produto e um usuário. `@JoinColumn` aponta a coluna da chave estrangeira. Não apagamos esses registros ao desativar uma conta ou produto.
 
-Suponha um produto com 10 unidades e mínimo de 3.
+`fetch=LAZY` adia a leitura de um relacionamento. As consultas de tela usam `join fetch` ou `@EntityGraph` para carregar o que será exibido antes de terminar a transação, mantendo `open-in-view=false`.
 
-- Registrar saída de 4: saldo final = 6; situação normal.
-- Registrar saída de 3: saldo final = 3; estoque baixo.
-- Registrar saída de 4: operação recusada porque só existem 3 unidades.
-- Registrar saída de 0: operação recusada porque a quantidade precisa ser positiva.
+`@Enumerated(EnumType.STRING)` salva nomes como `ENTRADA` e `FUNCIONARIO`, em vez da posição numérica do enum.
 
-Essas situações fazem parte dos testes em `ProdutoTest.java`.
+`@Transactional` agrupa as gravações. Exemplo: uma saída muda saldo e cria histórico; se o histórico ou a auditoria falhar, o banco desfaz tudo. O bloqueio `PESSIMISTIC_WRITE` faz operações concorrentes esperarem o mesmo produto; não basta conferir o saldo apenas no JavaScript.
 
-## Rodando o projeto
+## Lombok com encapsulamento
 
-Com Java 17 e Maven instalados, abra a raiz do projeto:
+As entidades usam `@Getter` e construtor JPA protegido por `@NoArgsConstructor`. Elas não possuem setters livres para saldo, nem `equals`, `hashCode` ou `toString` que percorrem relacionamentos.
 
-```sh
-mvn spring-boot:run
-```
+Formulários simples usam `@Data`. Senhas não aparecem em `toString`. `@RequiredArgsConstructor` injeta dependências `final` sem repetir construtores triviais. Métodos de negócio continuam escritos em Java convencional.
 
-Acesse `http://localhost:8080`. **A interface atual ainda é demonstrativa**.
+## Como o login funciona
 
-Para executar os testes:
+O Spring Security recebe usuário/e-mail e senha. Busca a conta no PostgreSQL, compara a senha com BCrypt e recusa conta inativa. A sessão HTTP guarda um principal identificado pelo ID da conta. A cada requisição, o servidor verifica atividade, perfil e hash atual para revogar sessões desatualizadas.
 
-```sh
-mvn test
-```
+O funcionário não ganha acesso administrativo ao esconder/mostrar um botão: as rotas também são protegidas no servidor. O logout exige POST e CSRF. O administrador inicial é criado por configuração local, sem credenciais no Git.
 
-O objetivo é que cada integrante consiga responder: o que este método faz, por que a validação existe, como demonstrar o erro e como o teste comprova a regra.
+## Roteiro para demonstrar ao professor
+
+1. Entre como administrador e crie um funcionário.
+2. Cadastre a categoria Papelaria e o produto Caderno, código `PRD-001`, preço `12.50`, mínimo `3`.
+3. Mostre saldo inicial zero e o formulário de edição sem campo para mudar saldo.
+4. Registre entrada de 10: saldo 10.
+5. Registre saída de 7: saldo 3 e alerta de estoque baixo.
+6. Tente saída de 4 e quantidade zero: a operação deve ser recusada, sem novo histórico.
+7. Mostre responsável/data no histórico e filtre pelo produto e pelo dia.
+8. Abra dashboard e relatórios. Prepare impressão e escolha Salvar como PDF no navegador.
+9. Reinicie o programa: dados permanecem no PostgreSQL.
+10. Entre como funcionário; consulte estoque e tente uma rota administrativa para demonstrar o bloqueio.
+
+## VS Code e pgAdmin
+
+Abra a raiz do projeto, confira `java -version` e `mvn -version`, configure o arquivo local e execute `mvn clean test` e `mvn spring-boot:run`. Consulte o [guia PostgreSQL](GUIA-POSTGRESQL-PGADMIN.md).
+
+No pgAdmin, abra o banco `upbox` → Schemas → public → Tables. Veja `categorias`, `produtos`, `usuarios`, `movimentacoes_estoque` e `registros_operacoes`. Explique as chaves `categoria_id`, `produto_id` e `usuario_id`. Não exponha `senha_hash` em apresentações e não edite saldo manualmente para simular o sistema.
+
+Cada integrante deve explicar uma regra, mostrar seu teste e percorrer a chamada do controller até o banco. Testes H2 verificam comportamentos rápidos; os testes PostgreSQL comprovam bloqueio e rollback com o banco real.

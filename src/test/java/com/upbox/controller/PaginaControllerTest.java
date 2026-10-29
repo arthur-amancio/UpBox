@@ -161,4 +161,35 @@ class PaginaControllerTest extends CenarioMvc {
                         "nova-senha-123",
                         usuarios.findById(funcionario.getId()).orElseThrow().getSenhaHash()));
     }
+
+    @org.springframework.beans.factory.annotation.Autowired jakarta.validation.Validator validator;
+
+    @Test
+    void administradorInicialNaoPodeRecriarContaExistenteInativa() {
+        admin.desativar();
+        usuarios.saveAndFlush(admin);
+        var env =
+                new org.springframework.mock.env.MockEnvironment()
+                        .withProperty("upbox.admin-inicial.habilitado", "true")
+                        .withProperty("upbox.admin-inicial.nome", "Outra conta")
+                        .withProperty("upbox.admin-inicial.usuario", "outro.admin")
+                        .withProperty("upbox.admin-inicial.email", "outro@example.com")
+                        .withProperty("upbox.admin-inicial.senha", "senha-ficticia-teste");
+        var inicial = new com.upbox.config.AdministradorInicial(env, usuarios, service, validator);
+        inicial.run(new org.springframework.boot.DefaultApplicationArguments());
+        assertEquals(2, usuarios.count());
+        assertFalse(usuarios.findById(admin.getId()).orElseThrow().isAtivo());
+    }
+
+    @Test
+    void deveRecusarSenhaEmBrancoEAcimaDoLimiteDoBcrypt() {
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> com.upbox.service.UsuarioService.validarSenha("        "));
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> com.upbox.service.UsuarioService.validarSenha("á".repeat(37)));
+        assertDoesNotThrow(
+                () -> com.upbox.service.UsuarioService.validarSenha("senha-ficticia-teste"));
+    }
 }

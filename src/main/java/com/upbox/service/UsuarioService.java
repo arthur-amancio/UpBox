@@ -108,6 +108,7 @@ public class UsuarioService {
 
     public static void validarSenha(String senha) {
         if (senha == null
+                || senha.isBlank()
                 || senha.length() < 8
                 || senha.getBytes(StandardCharsets.UTF_8).length > 72)
             throw new IllegalArgumentException(

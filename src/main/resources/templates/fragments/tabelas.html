@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+ <body>
+  <div class="tabela-wrapper" th:fragment="movimentacoes(lista)">
+   <table class="tabela">
+    <thead>
+     <tr>
+      <th>
+       Data/hora
+      </th>
+      <th>
+       Produto
+      </th>
+      <th>
+       Categoria
+      </th>
+      <th>
+       Tipo
+      </th>
+      <th>
+       Quantidade
+      </th>
+      <th>
+       Responsável
+      </th>
+      <th>
+       Observação
+      </th>
+     </tr>
+    </thead>
+    <tbody>
+     <tr th:each="m : ${lista}">
+      <td th:text="${#temporals.format(m.dataHora,'dd/MM/yyyy HH:mm:ss')}">
+      </td>
+      <td th:text="${m.produto.codigo + ' — ' + m.produto.nome}">
+      </td>
+      <td th:text="${m.produto.categoria.nome}">
+      </td>
+      <td>
+       <span th:class="${m.tipo.name() == 'ENTRADA' ? 'badge badge-entrada' : 'badge badge-saida'}" th:text="${m.tipo.name() == 'ENTRADA' ? 'Entrada' : 'Saída'}">
+       </span>
+      </td>
+      <td th:text="${m.quantidade}">
+      </td>
+      <td th:text="${m.usuario.nome}">
+      </td>
+      <td th:text="${m.observacao}">
+      </td>
+     </tr>
+     <tr th:if="${#lists.isEmpty(lista)}">
+      <td class="tabela-vazia" colspan="7">
+       Nenhuma movimentação foi encontrada.
+      </td>
+     </tr>
+    </tbody>
+   </table>
+  </div>
+  <div class="tabela-wrapper" th:fragment="produtos(lista)">
+   <table class="tabela">
+    <thead>
+     <tr>
+      <th>
+       Código
+      </th>
+      <th>
+       Produto
+      </th>
+      <th>
+       Categoria
+      </th>
+      <th>
+       Saldo
+      </th>
+      <th>
+       Mínimo
+      </th>
+      <th>
+       Preço atual
+      </th>
+      <th>
+       Situação
+      </th>
+     </tr>
+    </thead>
+    <tbody>
+     <tr th:each="p : ${lista}">
+      <td th:text="${p.codigo}">
+      </td>
+      <td th:text="${p.nome}">
+      </td>
+      <td th:text="${p.categoria.nome}">
+      </td>
+      <td th:text="${p.quantidade}">
+      </td>
+      <td th:text="${p.estoqueMinimo}">
+      </td>
+      <td th:text="${p.preco == null ? 'Preço pendente' : 'R$ ' + #numbers.formatDecimal(p.preco,1,'POINT',2,'COMMA')}">
+      </td>
+      <td th:text="${!p.ativo ? 'Inativo' : (p.estoqueBaixo ? 'Estoque baixo' : 'Normal')}">
+      </td>
+     </tr>
+     <tr th:if="${#lists.isEmpty(lista)}">
+      <td class="tabela-vazia" colspan="7">
+       Nenhum produto foi encontrado.
+      </td>
+     </tr>
+    </tbody>
+   </table>
+  </div>
+ </body>
+</html>

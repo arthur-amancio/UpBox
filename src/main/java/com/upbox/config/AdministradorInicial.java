@@ -25,7 +25,7 @@ public class AdministradorInicial implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) {
         if (!env.getProperty("upbox.admin-inicial.habilitado", Boolean.class, false)
-                || usuarios.existsByPerfilAndAtivoTrue(PerfilAcesso.ADMINISTRADOR)) return;
+                || usuarios.existsByPerfil(PerfilAcesso.ADMINISTRADOR)) return;
         UsuarioForm f = new UsuarioForm();
         f.setNome(env.getProperty("upbox.admin-inicial.nome"));
         f.setUsuario(env.getProperty("upbox.admin-inicial.usuario"));

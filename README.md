@@ -1,74 +1,73 @@
-# UpBox — sistema de gerenciamento de estoque (TCC)
+# UpBox — sistema de gerenciamento de estoque
 
-Projeto didático com **Java 17, Spring Boot, Thymeleaf, Spring Data JPA e PostgreSQL**.
+TCC didático em **Java 17, Spring Boot, Spring MVC, Spring Data JPA, PostgreSQL e Thymeleaf**. Interface original preservada, com formulários reais, Lombok e JavaScript apenas para interações visuais.
 
-## Estado atual
+## Funcionalidades
 
-O login, logout, usuários, perfil e troca de senha são reais, com Spring Security, BCrypt e CSRF.
-Categorias e produtos usam formulários reais com pesquisa, filtros, preço e desativação.
-Entradas, saídas e histórico também são reais, com responsável autenticado e proteção de saldo.
-Dashboard e relatórios serão conectados na próxima entrega.
+- Login por usuário ou e-mail, BCrypt, sessão, logout e CSRF.
+- Administrador gerencia usuários, perfis, categorias e produtos; funcionário consulta e registra movimentações.
+- Perfil, troca de senha, ativação/desativação e auditoria das ações principais.
+- Produtos com código único, categoria, descrição, preço, mínimo, pesquisa e filtros.
+- Entradas, saídas e histórico com responsável autenticado; transação e bloqueio protegem o saldo.
+- Dashboard com indicadores reais e seis relatórios filtráveis. Administrador prepara impressão/Salvar como PDF pelo navegador.
 
-Leia [Entrega 1 — autenticação e administrador inicial](docs/ENTREGA-1-AUTENTICACAO.md).
+Não há contas demo ou cadastro público. Produtos começam com saldo zero; o saldo muda por movimentação. Não existe exclusão física de produtos, categorias ou usuários pela interface.
 
-## Executar no VS Code com PostgreSQL
+## Executar no VS Code
 
-Requisitos: **JDK 17**, **Maven**, **PostgreSQL instalado e em execução** e opcionalmente **pgAdmin** para administrar o banco.
+Instale **JDK 17**, **Maven** e **PostgreSQL**. pgAdmin é opcional para administrar o servidor. Docker não é necessário.
 
-1. Abra o pgAdmin, conecte ao servidor PostgreSQL e crie o banco de dados `upbox`.
-2. Na pasta do projeto (onde está o `pom.xml`), copie o exemplo local:
+1. Abra a pasta do `pom.xml` no VS Code.
+2. No pgAdmin, crie o banco `upbox`.
+3. Na raiz do projeto, copie o arquivo de exemplo:
 
    ```powershell
    Copy-Item application-local.example.properties application-local.properties
    ```
 
-3. Edite `application-local.properties` e **coloque a senha da instalação da escola**, além de usuário/porta se forem diferentes.
-   O arquivo fica salvo no PC, é carregado automaticamente pelo Spring Boot e está no `.gitignore`.
-4. Execute:
+4. Configure usuário, porta e senha do PostgreSQL no arquivo local. Ele é carregado automaticamente, fica salvo no computador e está no `.gitignore`.
+5. Para criar o primeiro administrador, configure `upbox.admin-inicial.*` nesse mesmo arquivo, incluindo uma senha local de pelo menos 8 caracteres, e defina `habilitado=true`.
+6. Execute:
 
    ```powershell
    mvn clean test
    mvn spring-boot:run
    ```
 
-5. Abra http://localhost:8080 e confira as tabelas em **pgAdmin → Databases → upbox → Schemas → public → Tables**.
+7. Acesse http://localhost:8080. Depois da primeira criação, remova a senha inicial e defina `habilitado=false`. Uma conta de administrador existente nunca é substituída, mesmo que esteja inativa.
+8. Cadastre categoria e produto; registre uma entrada e uma saída. Consulte o dashboard e o histórico.
 
-**Atenção:** pgAdmin é um administrador gráfico; ele não substitui o servidor PostgreSQL.
+A aplicação usa `127.0.0.1:8080` por padrão. `SERVER_PORT`, `SERVER_ADDRESS` e `DB_*` continuam disponíveis; `ddl-auto=update` é somente para desenvolvimento local.
 
-Leia as instruções completas em [Guia PostgreSQL e pgAdmin](docs/GUIA-POSTGRESQL-PGADMIN.md).
-
-O arquivo `application.properties` fica versionado **sem senha de verdade**.
-É possível guardar a senha permanentemente no `application-local.properties` do computador,
-sem expor a credencial no histórico do GitHub.
-
-O servidor escuta apenas em `127.0.0.1` por padrão. Para alterar a porta:
+## Testes
 
 ```powershell
-$env:SERVER_PORT = '8081'
-mvn spring-boot:run
+mvn clean test
 ```
 
-## Arquivos principais
+Os testes rápidos usam H2 apenas no escopo de teste. Para PostgreSQL real, crie o banco **exclusivo e descartável `upbox_test`** e siga o [guia da entrega 3](docs/ENTREGA-3-MOVIMENTACOES.md):
 
-- `src/main/java/com/upbox/model`: entidades de produtos, categorias, usuários e movimentações.
-- `src/main/java/com/upbox/repository`: operações com o banco de dados.
-- `src/main/java/com/upbox/service`: cadastro de produtos e movimentações transacionais.
-- `src/main/java/com/upbox/controller`: rotas e formulários MVC.
-- `src/main/resources/templates`: páginas Thymeleaf.
-- `src/main/resources/static`: CSS, imagens e interações visuais.
-- `src/test`: testes de domínio, das rotas e da persistência.
+```powershell
+$env:UPBOX_TEST_DB_URL = 'jdbc:postgresql://localhost:5432/upbox_test'
+$env:UPBOX_TEST_DB_USER = 'postgres'
+$env:UPBOX_TEST_DB_PASSWORD = 'SUA_SENHA_LOCAL'
+mvn -Ppostgres-it verify
+Remove-Item Env:UPBOX_TEST_DB_PASSWORD
+```
 
-## Documentos da equipe
+Esse perfil recria as tabelas do banco de teste e verifica concorrência, rollback e unicidade. Ele rejeita outro nome de banco antes de iniciar o JPA. A CI executa testes rápidos e integração PostgreSQL.
 
-- [Plano de desenvolvimento](docs/PLANO-DESENVOLVIMENTO.md)
-- [Guia de estudos](docs/GUIA-DE-ESTUDOS.md)
-- [Alinhamento com o Drive](docs/ALINHAMENTO-DOCUMENTACAO-DRIVE.md)
-- [Guia PostgreSQL e pgAdmin](docs/GUIA-POSTGRESQL-PGADMIN.md)
+## Organização e guias
 
-## Próxima etapa
+`model` contém entidades/formulários; `repository` acessa o banco; `service` aplica regras; `controller` atende rotas MVC; `config` configura segurança; `templates` apresenta HTML; `static` contém CSS, logo e interações visuais.
 
-Conectar dashboard e relatórios.
+- [Guia de estudos e roteiro da apresentação](docs/GUIA-DE-ESTUDOS.md)
+- [PostgreSQL e pgAdmin](docs/GUIA-POSTGRESQL-PGADMIN.md)
+- [Autenticação e administrador inicial](docs/ENTREGA-1-AUTENTICACAO.md)
+- [Categorias, produtos e preço](docs/ENTREGA-2-CADASTROS.md)
+- [Movimentações e testes reais](docs/ENTREGA-3-MOVIMENTACOES.md)
+- [Dashboard e relatórios](docs/ENTREGA-4-RELATORIOS.md)
+- [Relatório final e inventário das mudanças](docs/RELATORIO-FINAL-MVP.md)
+- [Alinhamento com a documentação oficial](docs/ALINHAMENTO-DOCUMENTACAO-DRIVE.md)
 
-Cadastros: [guia da entrega 2](docs/ENTREGA-2-CADASTROS.md).
-
-Movimentações e integração real: [guia da entrega 3](docs/ENTREGA-3-MOVIMENTACOES.md).
+O trabalho está em PRs encadeados, sem merge automático. Para executar todas as entregas antes da integração, use a branch `feat/dashboard-relatorios`; a `main` não foi modificada.
