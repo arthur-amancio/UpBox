@@ -13,13 +13,36 @@ TCC didático em **Java 17, Spring Boot, Spring MVC, Spring Data JPA, PostgreSQL
 
 Não há contas demo ou cadastro público. Produtos começam com saldo zero; o saldo muda por movimentação. Não existe exclusão física de produtos, categorias ou usuários pela interface.
 
-## Executar no VS Code
+## Executar a partir da main no computador da escola
 
-Instale **JDK 17**, **Maven** e **PostgreSQL**. pgAdmin é opcional para administrar o servidor. Docker não é necessário.
+Instale **JDK 17**, **Maven** e o servidor **PostgreSQL**. O **pgAdmin III** e um programa para administrar o PostgreSQL; nao substitui o banco. Docker nao e necessario.
 
-1. Abra a pasta do `pom.xml` no VS Code.
-2. No pgAdmin, crie o banco `upbox`.
-3. Na raiz do projeto, copie o arquivo de exemplo:
+1. Clone o projeto e abra a pasta do `pom.xml` no VS Code:
+
+   ```powershell
+   git clone https://github.com/arthur-amancio/UpBox.git
+   cd UpBox
+   ```
+
+   Repositorio privado: cada integrante precisa ter permissao de acesso no GitHub.
+
+2. Abra o pgAdmin III e conecte-se ao PostgreSQL local usando o usuario `postgres`. Se o banco `upbox` ainda nao existir, conecte ao banco administrativo `postgres` e execute no Query Tool:
+
+   ```sql
+   CREATE DATABASE upbox;
+   ```
+
+   Se o banco ja existir, nao execute esse comando novamente. O JPA cria/atualiza as tabelas dentro de `upbox` na primeira inicializacao.
+
+3. A conexao **ja esta configurada** no `src/main/resources/application.properties` para o ambiente da escola:
+   - servidor: `localhost:5432`
+   - banco: `upbox`
+   - usuario: `postgres`
+   - senha: a senha padrao escolar informada pelo responsavel, incluida no arquivo
+
+   Nao e necessario copiar arquivo local para conectar ao PostgreSQL escolar. **Atencao:** por decisao do responsavel, essa credencial conhecida esta versionada no repositorio privado. Ela nao deve ser reutilizada fora do laboratorio nem em ambiente de producao. Se a instalacao usar outra senha, use `DB_PASSWORD` ou o arquivo local ignorado pelo Git.
+
+4. **A senha do PostgreSQL NAO e a senha de login do UpBox.** Para criar a primeira conta administradora, na raiz do projeto crie o arquivo local, apenas se ainda nao existir:
 
    ```powershell
    if (!(Test-Path application-local.properties)) {
@@ -27,19 +50,20 @@ Instale **JDK 17**, **Maven** e **PostgreSQL**. pgAdmin é opcional para adminis
    }
    ```
 
-4. Preserve uma configuração local já funcional. Configure usuário, porta e senha do PostgreSQL no arquivo local. Ele é carregado automaticamente, fica salvo no computador e está no `.gitignore`.
-5. Para criar o primeiro administrador, configure `upbox.admin-inicial.*` nesse mesmo arquivo, incluindo uma senha local de pelo menos 8 caracteres, e defina `habilitado=true`.
-6. Execute:
+   Edite `application-local.properties`: defina um e-mail valido, usuario e senha proprio para o administrador, descomente `upbox.admin-inicial.senha` e altere `upbox.admin-inicial.habilitado=true`. A senha deve possuir pelo menos 8 caracteres e nao pode ser a senha do banco. Depois da criacao do usuario, remova a senha de administrador inicial do arquivo e defina `habilitado=false`. **Preserve** um arquivo local que ja esteja funcionando.
+
+5. Inicie:
 
    ```powershell
    mvn clean test
    mvn spring-boot:run
    ```
 
-7. Acesse http://localhost:8080. Depois da primeira criação, remova a senha inicial e defina `habilitado=false`. Uma conta de administrador existente nunca é substituída, mesmo que esteja inativa.
-8. Cadastre categoria e produto; registre uma entrada e uma saída. Consulte o dashboard e o histórico.
+6. Acesse **http://localhost:8080** e entre com o administrador que acabou de criar. Cadastre categoria/produto, faca entradas e saidas e confira o dashboard e os relatorios.
 
-A aplicação usa `127.0.0.1:8080` por padrão. `SERVER_PORT`, `SERVER_ADDRESS` e `DB_*` continuam disponíveis; `ddl-auto=update` é somente para desenvolvimento local.
+A aplicacao usa `127.0.0.1:8080` por padrao. `DB_URL`, `DB_USER`, `DB_PASSWORD`, `SERVER_PORT` e `SERVER_ADDRESS` permitem configurar outro ambiente. `ddl-auto=update` e somente para desenvolvimento local.
+
+Leia [Instalacao na escola](docs/INSTALACAO-ESCOLA.md) para instrucao detalhada de pgAdmin III e solucao de problemas.
 
 ## Testes
 
@@ -72,7 +96,7 @@ Esse perfil recria as tabelas do banco de teste e verifica concorrência, rollba
 - [Relatório final e inventário das mudanças](docs/RELATORIO-FINAL-MVP.md)
 - [Alinhamento com a documentação oficial](docs/ALINHAMENTO-DOCUMENTACAO-DRIVE.md)
 
-O trabalho está em PRs encadeados, sem merge automático. Para executar todas as entregas antes da integração, use a branch `docs/preparacao-tcc`; a `main` não foi modificada.
+A versao integrada e distribuida pela branch **main**. Os PRs de desenvolvimento continuam disponiveis como historico no GitHub.
 
 ## Revisão e apresentação do TCC
 
@@ -86,11 +110,4 @@ A revisão técnica corrigiu a disputa entre troca de senha e desativação, tra
 - [Matriz com o TCC oficial](docs/MATRIZ-REQUISITOS-TCC.md)
 - [Relatório desta revisão](docs/RELATORIO-REVISAO-TCC.md)
 
-Para obter a revisão completa antes dos merges:
-
-```powershell
-git fetch origin
-git switch docs/preparacao-tcc
-```
-
-O [relatório do MVP](docs/RELATORIO-FINAL-MVP.md) permanece como histórico das entregas 1–4. As entregas 5–7 e o relatório de revisão registram os resultados atuais.
+Para receber a versao mais recente, use `git switch main` e `git pull origin main`.
