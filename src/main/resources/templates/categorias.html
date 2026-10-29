@@ -18,7 +18,7 @@
       Voltar ao estoque
      </a>
     </div>
-    <div class="tabela-wrapper">
+    <div aria-label="Tabela de categorias" class="tabela-wrapper" role="region" tabindex="0">
      <table class="tabela">
       <thead>
        <tr>
@@ -49,7 +49,7 @@
           <a class="btn btn-secundario btn-sm" th:href="@{/categorias/{id}/editar(id=${c.id})}">
            Editar
           </a>
-          <form data-confirmar="Alterar a situação desta categoria? Os produtos e o histórico serão preservados." method="post" th:action="@{/categorias/{id}/status(id=${c.id})}">
+          <form method="post" th:action="@{/categorias/{id}/status(id=${c.id})}" th:attr="data-confirmar=${c.ativa ? 'Desativar a categoria ' + c.nome + '? Os produtos e o histórico serão preservados.' : 'Ativar a categoria ' + c.nome + '?'}">
            <button class="btn btn-secundario btn-sm" th:text="${c.ativa ? 'Desativar' : 'Ativar'}">
            </button>
           </form>

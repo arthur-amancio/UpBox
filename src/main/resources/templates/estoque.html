@@ -76,7 +76,7 @@
       Limpar
      </a>
     </form>
-    <div class="tabela-wrapper">
+    <div aria-label="Tabela de produtos" class="tabela-wrapper" role="region" tabindex="0">
      <table class="tabela">
       <thead>
        <tr>
@@ -130,14 +130,17 @@
         </td>
         <td>
          <div class="acoes-tabela">
-          <a class="btn btn-secundario btn-sm" th:href="@{/movimentacoes(produto=${p.id})}">
+          <a class="btn btn-secundario btn-sm" th:href="@{/movimentacoes(produto=${p.id})} + '#registrar-movimentacao'" th:if="${p.ativo}">
+           Movimentar
+          </a>
+          <a class="btn btn-secundario btn-sm" th:href="@{/movimentacoes(produto=${p.id})} + '#historico'">
            Histórico
           </a>
           <th:block sec:authorize="hasRole('ADMINISTRADOR')">
            <a class="btn btn-secundario btn-sm" th:href="@{/produtos/{id}/editar(id=${p.id})}">
             Editar
            </a>
-           <form data-confirmar="Alterar a situação deste produto?" method="post" th:action="@{/produtos/{id}/status(id=${p.id})}">
+           <form method="post" th:action="@{/produtos/{id}/status(id=${p.id})}" th:attr="data-confirmar=${p.ativo ? 'Desativar o produto ' + p.nome + '? O histórico será preservado.' : 'Ativar o produto ' + p.nome + '?'}">
             <button class="btn btn-secundario btn-sm" th:text="${p.ativo ? 'Desativar' : 'Ativar'}">
             </button>
            </form>
@@ -148,6 +151,9 @@
        <tr th:if="${#lists.isEmpty(produtos)}">
         <td class="tabela-vazia" colspan="8">
          Nenhum produto foi encontrado.
+         <p class="nota">
+          Ajuste os filtros ou a pesquisa. Os produtos inativos podem ser consultados pelo filtro Atividade.
+         </p>
         </td>
        </tr>
       </tbody>

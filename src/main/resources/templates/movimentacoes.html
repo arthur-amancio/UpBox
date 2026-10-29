@@ -10,10 +10,13 @@
       Movimentações
      </h2>
     </div>
-    <form class="form-card" data-confirmar="Confirma esta movimentação? Confira produto, tipo e quantidade." method="post" th:action="@{/movimentacoes}" th:object="${form}">
+    <form class="form-card" data-confirmar="Confirma esta movimentação? Confira produto, tipo e quantidade." id="registrar-movimentacao" method="post" th:action="@{/movimentacoes}" th:object="${form}">
      <h3>
       Registrar entrada ou saída
      </h3>
+     <p class="alerta alerta-info" th:if="${#lists.isEmpty(produtosAtivos)}">
+      Não há produtos ativos disponíveis para movimentação. Consulte o estoque.
+     </p>
      <div th:replace="~{fragments/layout :: erros}">
      </div>
      <div class="form-grid">
@@ -21,11 +24,11 @@
        <label for="produtoId">
         Produto ativo
        </label>
-       <select required="" th:field="*{produtoId}">
+       <select aria-describedby="previaEstoque" required="" th:field="*{produtoId}">
         <option value="">
          Selecione
         </option>
-        <option th:each="p : ${produtosAtivos}" th:text="${p.codigo + ' — ' + p.nome + ' (saldo: ' + p.quantidade + ')'}" th:value="${p.id}">
+        <option th:attr="data-saldo=${p.quantidade}" th:each="p : ${produtosAtivos}" th:text="${p.codigo + ' — ' + p.nome + ' (saldo: ' + p.quantidade + ')'}" th:value="${p.id}">
         </option>
        </select>
        <small class="erro-campo" th:errors="*{produtoId}">
@@ -35,7 +38,7 @@
        <label for="tipo">
         Tipo
        </label>
-       <select required="" th:field="*{tipo}">
+       <select aria-describedby="previaEstoque" required="" th:field="*{tipo}">
         <option value="ENTRADA">
          Entrada
         </option>
@@ -48,7 +51,7 @@
        <label for="quantidade">
         Quantidade
        </label>
-       <input max="2147483647" min="1" required="" step="1" th:field="*{quantidade}" type="number"/>
+       <input aria-describedby="previaEstoque" max="2147483647" min="1" required="" step="1" th:field="*{quantidade}" type="number"/>
        <small class="erro-campo" th:errors="*{quantidade}">
        </small>
       </div>
@@ -62,11 +65,17 @@
      <p class="nota">
       O responsável é o usuário autenticado. A saída exige saldo suficiente.
      </p>
+     <p aria-live="polite" class="previa" id="previaEstoque" role="status">
+      Selecione um produto para consultar o saldo disponível.
+     </p>
+     <p class="nota">
+      A prévia é informativa. O servidor confere o saldo atualizado antes de salvar.
+     </p>
      <button class="btn btn-primario">
       Registrar movimentação
      </button>
     </form>
-    <h3>
+    <h3 id="historico">
      Histórico
     </h3>
     <form class="barra-filtros" method="get" th:action="@{/movimentacoes}" th:object="${filtro}">

@@ -1482,3 +1482,30 @@ html[data-tema="escuro"] .chips span{color:var(--cor-primaria-clara-tom)}
 
 /* Cinco indicadores se ajustam à largura disponível sem desalinhamento entre cards. */
 .grid-cards .card {flex-basis:180px;}
+
+/* Ajustes pontuais de teclado e telas pequenas; identidade visual preservada. */
+:root {--cor-foco:#8B4C0F;}
+html[data-tema="escuro"] {--cor-foco:#F2B15E;}
+a:focus-visible,button:focus-visible,.campo input:focus-visible,.campo select:focus-visible,
+.campo textarea:focus-visible,.barra-filtros input:focus-visible,.barra-filtros select:focus-visible,
+.tabela-wrapper:focus-visible {outline:3px solid var(--cor-foco); outline-offset:3px;}
+.atalho-conteudo {position:fixed;top:12px;left:12px;z-index:2000;transform:translateY(-200%);padding:12px 18px;border-radius:10px;background:#241A10;color:#fff;}
+.atalho-conteudo:focus {transform:none;}
+.fechar-menu {display:none;}
+.header-usuario {min-width:0;max-width:55%;}
+.header-usuario > div {min-width:0;}
+.nome-usuario {overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+@media(max-width:900px) {
+ .menu-aberto {overflow:hidden;}
+ .fechar-menu {display:block;align-self:flex-end;background:none;color:#fff;border:1px solid #8A7A65;border-radius:8px;margin:8px 12px 0;padding:8px 12px;cursor:pointer;}
+ .btn-sm {min-height:40px;}
+}
+@media print {
+ .atalho-conteudo,.fechar-menu {display:none!important;}
+ .card,.tabela-wrapper,.tabela th,.tabela td {background:#fff!important;color:#241A10!important;}
+}
+.sidebar {overflow-y:auto;}
+.sidebar > nav {flex:1;}
+@media print {
+ html[data-tema="escuro"] {color-scheme:light;--cor-texto:#241A10;--cor-texto-suave:#4A3B2C;--cor-secundaria:#241A10;--cor-fundo:#fff;--cor-superficie:#fff;--cor-borda:#ddd;--th-fundo:#fff;}
+}

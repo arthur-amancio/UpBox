@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
  <body>
-  <div class="tabela-wrapper" th:fragment="movimentacoes(lista)">
+  <div aria-label="Tabela de movimentações" class="tabela-wrapper" role="region" tabindex="0" th:fragment="movimentacoes(lista)">
    <table class="tabela">
     <thead>
      <tr>
@@ -55,7 +55,7 @@
     </tbody>
    </table>
   </div>
-  <div class="tabela-wrapper" th:fragment="produtos(lista)">
+  <div aria-label="Tabela de produtos" class="tabela-wrapper" role="region" tabindex="0" th:fragment="produtos(lista)">
    <table class="tabela">
     <thead>
      <tr>

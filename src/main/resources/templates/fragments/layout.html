@@ -13,8 +13,14 @@
  </head>
  <body>
   <th:block th:fragment="estrutura(conteudo)">
+   <a class="atalho-conteudo" href="#conteudo-principal">
+    Pular para o conteúdo
+   </a>
    <div class="app-shell">
-    <aside class="sidebar" id="sidebar">
+    <aside aria-label="Menu lateral" class="sidebar" id="sidebar">
+     <button aria-label="Fechar menu" class="fechar-menu" id="fecharMenu" type="button">
+      ✕
+     </button>
      <div class="sidebar-logo">
       <img alt="Logo UpBox" th:src="@{/images/upbox-logo.png}"/>
       <span class="marca-nome">
@@ -24,33 +30,35 @@
        Box
       </span>
      </div>
-     <ul class="sidebar-menu">
-      <li>
-       <a th:href="@{/home}">
-        ⌂ Home
-       </a>
-      </li>
-      <li>
-       <a th:href="@{/dashboard}">
-        ▦ Dashboard
-       </a>
-      </li>
-      <li>
-       <a th:href="@{/estoque}">
-        ▣ Estoque
-       </a>
-      </li>
-      <li>
-       <a th:href="@{/movimentacoes}">
-        ⇄ Movimentações
-       </a>
-      </li>
-      <li>
-       <a th:href="@{/relatorios}">
-        ▤ Relatórios
-       </a>
-      </li>
-     </ul>
+     <nav aria-label="Menu principal">
+      <ul class="sidebar-menu">
+       <li>
+        <a th:href="@{/home}">
+         ⌂ Home
+        </a>
+       </li>
+       <li>
+        <a th:href="@{/dashboard}">
+         ▦ Dashboard
+        </a>
+       </li>
+       <li>
+        <a th:href="@{/estoque}">
+         ▣ Estoque
+        </a>
+       </li>
+       <li>
+        <a th:href="@{/movimentacoes}">
+         ⇄ Movimentações
+        </a>
+       </li>
+       <li>
+        <a th:href="@{/relatorios}">
+         ▤ Relatórios
+        </a>
+       </li>
+      </ul>
+     </nav>
      <div class="sidebar-config">
       <a th:href="@{/configuracoes}">
        ⚙ Configurações
@@ -73,7 +81,7 @@
     <div class="conteudo">
      <header class="header">
       <div class="header-titulo">
-       <button aria-expanded="false" aria-label="Abrir menu" class="hamburguer" id="btnHamburguer" type="button">
+       <button aria-controls="sidebar" aria-expanded="false" aria-label="Abrir menu" class="hamburguer" id="btnHamburguer" type="button">
         ☰
        </button>
        <h1>
@@ -82,14 +90,14 @@
       </div>
       <div class="header-usuario">
        <div>
-        <div class="nome-usuario" th:text="${nomeAtual}">
+        <div class="nome-usuario" th:text="${nomeAtual}" th:title="${nomeAtual}">
         </div>
         <div class="cargo-usuario" th:text="${perfilAtual}">
         </div>
        </div>
       </div>
      </header>
-     <main class="pagina">
+     <main class="pagina" id="conteudo-principal" tabindex="-1">
       <div class="alerta alerta-sucesso" role="status" th:if="${sucesso}" th:text="${sucesso}">
       </div>
       <div class="alerta alerta-erro" role="alert" th:if="${erro}" th:text="${erro}">

@@ -10,7 +10,7 @@
       Relatórios
      </h2>
     </div>
-    <form class="barra-filtros" method="get" th:action="@{/relatorios}" th:object="${filtro}">
+    <form aria-describedby="ajudaFiltros" class="barra-filtros" id="filtrosRelatorio" method="get" th:action="@{/relatorios}" th:object="${filtro}">
      <div class="campo">
       <label for="relatorio">
        Relatório
@@ -48,7 +48,7 @@
       <label for="tipo">
        Tipo de movimentação
       </label>
-      <select th:field="*{tipo}">
+      <select th:disabled="${relatorio.name() != 'HISTORICO'}" th:field="*{tipo}">
        <option value="">
         Todos
        </option>
@@ -64,13 +64,13 @@
       <label for="inicio">
        Data inicial
       </label>
-      <input max="9999-12-31" min="0001-01-01" th:field="*{inicio}" type="date"/>
+      <input max="9999-12-31" min="0001-01-01" th:disabled="${!relatorio.movimentacoes}" th:field="*{inicio}" type="date"/>
      </div>
      <div class="campo">
       <label for="fim">
        Data final
       </label>
-      <input max="9999-12-31" min="0001-01-01" th:field="*{fim}" type="date"/>
+      <input max="9999-12-31" min="0001-01-01" th:disabled="${!relatorio.movimentacoes}" th:field="*{fim}" type="date"/>
      </div>
      <button class="btn btn-primario">
       Consultar
@@ -82,7 +82,7 @@
       Limpar
      </a>
     </form>
-    <p class="nota nao-imprimir">
+    <p class="nota nao-imprimir" id="ajudaFiltros">
      Produto e categoria filtram todos os relatórios. Período e tipo de movimentação aplicam-se ao histórico; Entradas e Saídas fixam o respectivo tipo. Estoque atual e estoque baixo consideram produtos ativos. Produtos cadastrados inclui inativos.
     </p>
     <p class="nota nao-imprimir" sec:authorize="hasRole('FUNCIONARIO')">
