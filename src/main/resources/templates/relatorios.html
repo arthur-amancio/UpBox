@@ -1,8 +1,134 @@
 <!DOCTYPE html>
-<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/layout :: cabecalho('Relatórios')}"></head>
-<!-- O conteúdo desta tela é montado por static/js/pages/relatorios.js com dados demonstrativos -->
-<body data-pagina="relatorios" data-titulo="Relatórios">
-<th:block th:replace="~{fragments/layout :: scripts('relatorios')}"></th:block>
-</body>
+<html lang="pt-br" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" xmlns:th="http://www.thymeleaf.org">
+ <head th:replace="~{fragments/layout :: cabecalho('Relatórios')}">
+ </head>
+ <body>
+  <th:block th:replace="~{fragments/layout :: estrutura(~{::section})}">
+   <section>
+    <div class="pagina-cabecalho">
+     <h2>
+      Relatórios
+     </h2>
+    </div>
+    <form aria-describedby="ajudaFiltros" class="barra-filtros" id="filtrosRelatorio" method="get" th:action="@{/relatorios}" th:object="${filtro}">
+     <div class="campo">
+      <label for="relatorio">
+       Relatório
+      </label>
+      <select id="relatorio" name="relatorio">
+       <option th:each="t : ${tipos}" th:selected="${t == relatorio}" th:text="${t.titulo}" th:value="${t}">
+       </option>
+      </select>
+     </div>
+     <div class="campo">
+      <label for="produto">
+       Produto
+      </label>
+      <select th:field="*{produto}">
+       <option value="">
+        Todos
+       </option>
+       <option th:each="p : ${todosProdutos}" th:text="${p.codigo + ' — ' + p.nome}" th:value="${p.id}">
+       </option>
+      </select>
+     </div>
+     <div class="campo">
+      <label for="categoria">
+       Categoria
+      </label>
+      <select th:field="*{categoria}">
+       <option value="">
+        Todas
+       </option>
+       <option th:each="c : ${categorias}" th:text="${c.nome}" th:value="${c.id}">
+       </option>
+      </select>
+     </div>
+     <div class="campo">
+      <label for="tipo">
+       Tipo de movimentação
+      </label>
+      <select th:disabled="${relatorio.name() != 'HISTORICO'}" th:field="*{tipo}">
+       <option value="">
+        Todos
+       </option>
+       <option value="ENTRADA">
+        Entrada
+       </option>
+       <option value="SAIDA">
+        Saída
+       </option>
+      </select>
+     </div>
+     <div class="campo">
+      <label for="inicio">
+       Data inicial
+      </label>
+      <input max="9999-12-31" min="0001-01-01" th:disabled="${!relatorio.movimentacoes}" th:field="*{inicio}" type="date"/>
+     </div>
+     <div class="campo">
+      <label for="fim">
+       Data final
+      </label>
+      <input max="9999-12-31" min="0001-01-01" th:disabled="${!relatorio.movimentacoes}" th:field="*{fim}" type="date"/>
+     </div>
+     <button class="btn btn-primario">
+      Consultar
+     </button>
+     <button class="btn btn-secundario" sec:authorize="hasRole('ADMINISTRADOR')" th:formaction="@{/relatorios/imprimir}">
+      Preparar impressão/PDF
+     </button>
+     <a class="btn btn-secundario" th:href="@{/relatorios}">
+      Limpar
+     </a>
+    </form>
+    <p class="nota nao-imprimir" id="ajudaFiltros">
+     Produto e categoria filtram todos os relatórios. Período e tipo de movimentação aplicam-se ao histórico; Entradas e Saídas fixam o respectivo tipo. Estoque atual e estoque baixo consideram produtos ativos. Produtos cadastrados inclui inativos.
+    </p>
+    <p class="nota nao-imprimir" sec:authorize="hasRole('FUNCIONARIO')">
+     A opção de impressão/PDF do sistema está disponível para o administrador.
+    </p>
+    <div class="card cabecalho-relatorio">
+     <h3 th:text="${resultado.tipo.titulo}">
+     </h3>
+     <p th:text="${'Consultado em ' + #temporals.format(geradoEm,'dd/MM/yyyy HH:mm:ss') + ' por ' + nomeAtual}">
+     </p>
+     <p>
+      Produto:
+      <span th:if="${filtro.produto == null}">
+       Todos
+      </span>
+      <span th:each="p : ${todosProdutos}" th:if="${p.id == filtro.produto}" th:text="${p.codigo + ' — ' + p.nome}">
+      </span>
+      | Categoria:
+      <span th:if="${filtro.categoria == null}">
+       Todas
+      </span>
+      <span th:each="c : ${categorias}" th:if="${c.id == filtro.categoria}" th:text="${c.nome}">
+      </span>
+     </p>
+     <p th:if="${resultado.tipo.movimentacoes}" th:text="${'Período: ' + (filtro.inicio == null ? 'sem limite inicial' : #temporals.format(filtro.inicio,'dd/MM/yyyy')) + ' a ' + (filtro.fim == null ? 'sem limite final' : #temporals.format(filtro.fim,'dd/MM/yyyy')) + ' | Tipo: ' + (filtro.tipo == null ? 'Todos' : filtro.tipo)}">
+     </p>
+     <p th:text="${'Registros: ' + (resultado.tipo.movimentacoes ? #lists.size(resultado.movimentacoes) : #lists.size(resultado.produtos)) + ' | Total de unidades: ' + resultado.totalUnidades}">
+     </p>
+    </div>
+    <div class="nao-imprimir" th:if="${impressao}">
+     <p class="nota">
+      Na janela de impressão, escolha “Salvar como PDF”. O navegador confirma o salvamento.
+     </p>
+     <button class="btn btn-primario" data-imprimir="" type="button">
+      Imprimir / Salvar como PDF
+     </button>
+    </div>
+    <th:block th:if="${resultado.tipo.movimentacoes}">
+     <div th:replace="~{fragments/tabelas :: movimentacoes(${resultado.movimentacoes})}">
+     </div>
+    </th:block>
+    <th:block th:if="${!resultado.tipo.movimentacoes}">
+     <div th:replace="~{fragments/tabelas :: produtos(${resultado.produtos})}">
+     </div>
+    </th:block>
+   </section>
+  </th:block>
+ </body>
 </html>

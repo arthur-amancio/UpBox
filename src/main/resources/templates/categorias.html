@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" xmlns:th="http://www.thymeleaf.org">
+ <head th:replace="~{fragments/layout :: cabecalho('Categorias')}">
+ </head>
+ <body>
+  <th:block th:replace="~{fragments/layout :: estrutura(~{::section})}">
+   <section>
+    <div class="pagina-cabecalho">
+     <h2>
+      Categorias
+     </h2>
+    </div>
+    <div class="acoes-cabecalho">
+     <a class="btn btn-primario" th:href="@{/categorias/nova}">
+      Nova categoria
+     </a>
+     <a class="btn btn-secundario" th:href="@{/estoque}">
+      Voltar ao estoque
+     </a>
+    </div>
+    <div aria-label="Tabela de categorias" class="tabela-wrapper" role="region" tabindex="0">
+     <table class="tabela">
+      <thead>
+       <tr>
+        <th>
+         Nome
+        </th>
+        <th>
+         Descrição
+        </th>
+        <th>
+         Situação
+        </th>
+        <th>
+         Ações
+        </th>
+       </tr>
+      </thead>
+      <tbody>
+       <tr th:each="c : ${categorias}">
+        <td th:text="${c.nome}">
+        </td>
+        <td th:text="${c.descricao}">
+        </td>
+        <td th:text="${c.ativa ? 'Ativa' : 'Inativa'}">
+        </td>
+        <td>
+         <div class="acoes-tabela">
+          <a class="btn btn-secundario btn-sm" th:href="@{/categorias/{id}/editar(id=${c.id})}">
+           Editar
+          </a>
+          <form method="post" th:action="@{/categorias/{id}/status(id=${c.id})}" th:attr="data-confirmar=${c.ativa ? 'Desativar a categoria ' + c.nome + '? Os produtos e o histórico serão preservados.' : 'Ativar a categoria ' + c.nome + '?'}">
+           <button class="btn btn-secundario btn-sm" th:text="${c.ativa ? 'Desativar' : 'Ativar'}">
+           </button>
+          </form>
+         </div>
+        </td>
+       </tr>
+       <tr th:if="${#lists.isEmpty(categorias)}">
+        <td colspan="4">
+         Nenhuma categoria cadastrada.
+        </td>
+       </tr>
+      </tbody>
+     </table>
+    </div>
+   </section>
+  </th:block>
+ </body>
+</html>

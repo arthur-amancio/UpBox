@@ -1,8 +1,67 @@
 <!DOCTYPE html>
-<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/layout :: cabecalho('Home')}"></head>
-<!-- O conteúdo desta tela é montado por static/js/pages/home.js com dados demonstrativos -->
-<body data-pagina="home" data-titulo="Home">
-<th:block th:replace="~{fragments/layout :: scripts('home')}"></th:block>
-</body>
+<html lang="pt-br" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" xmlns:th="http://www.thymeleaf.org">
+ <head th:replace="~{fragments/layout :: cabecalho('Bem-vindo ao UpBox')}">
+ </head>
+ <body>
+  <th:block th:replace="~{fragments/layout :: estrutura(~{::section})}">
+   <section>
+    <div class="pagina-cabecalho">
+     <h2>
+      Bem-vindo ao UpBox
+     </h2>
+    </div>
+    <div class="home-hero">
+     <h1>
+      Seu estoque em um só lugar
+     </h1>
+     <p>
+      Cadastre produtos, registre entradas e saídas e acompanhe o estoque.
+     </p>
+     <a class="btn btn-primario" th:href="@{/dashboard}">
+      Abrir dashboard
+     </a>
+    </div>
+    <div class="home-bloco">
+     <h2>
+      Como começar
+     </h2>
+     <div class="home-grid">
+      <div class="home-passo">
+       <div class="numero">
+        1
+       </div>
+       <h3>
+        Organize os produtos
+       </h3>
+       <p>
+        O administrador cadastra categorias e produtos.
+       </p>
+      </div>
+      <div class="home-passo">
+       <div class="numero">
+        2
+       </div>
+       <h3>
+        Registre movimentações
+       </h3>
+       <p>
+        Entradas e saídas atualizam saldo e histórico juntos.
+       </p>
+      </div>
+      <div class="home-passo">
+       <div class="numero">
+        3
+       </div>
+       <h3>
+        Acompanhe o estoque
+       </h3>
+       <p>
+        Consulte alertas e relatórios para planejar a reposição.
+       </p>
+      </div>
+     </div>
+    </div>
+   </section>
+  </th:block>
+ </body>
 </html>

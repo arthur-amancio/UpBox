@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" xmlns:th="http://www.thymeleaf.org">
+ <head th:replace="~{fragments/layout :: cabecalho('Registros de operações')}">
+ </head>
+ <body>
+  <th:block th:replace="~{fragments/layout :: estrutura(~{::section})}">
+   <section>
+    <div class="pagina-cabecalho">
+     <h2>
+      Registros de operações
+     </h2>
+    </div>
+    <p class="nota">
+     As 80 operações mais recentes. Dados sensíveis não são registrados.
+    </p>
+    <div aria-label="Tabela de operações" class="tabela-wrapper" role="region" tabindex="0">
+     <table class="tabela">
+      <thead>
+       <tr>
+        <th>
+         Data/hora
+        </th>
+        <th>
+         Responsável
+        </th>
+        <th>
+         Ação
+        </th>
+        <th>
+         Detalhe
+        </th>
+       </tr>
+      </thead>
+      <tbody>
+       <tr th:each="r : ${registros}">
+        <td th:text="${#temporals.format(r.dataHora, 'dd/MM/yyyy HH:mm:ss')}">
+        </td>
+        <td th:text="${r.responsavel}">
+        </td>
+        <td th:text="${r.acao}">
+        </td>
+        <td th:text="${r.detalhe}">
+        </td>
+       </tr>
+       <tr th:if="${#lists.isEmpty(registros)}">
+        <td colspan="4">
+         Nenhuma operação registrada.
+        </td>
+       </tr>
+      </tbody>
+     </table>
+    </div>
+   </section>
+  </th:block>
+ </body>
+</html>

@@ -1,22 +1,118 @@
 <!DOCTYPE html>
-<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
-<body>
-
-<!-- Cabeçalho comum a todas as páginas: título, CSS e dados demonstrativos -->
-<head th:fragment="cabecalho(titulo)">
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title th:text="${titulo} + ' - UpBox'">UpBox</title>
-    <link rel="icon" th:href="@{/images/upbox-logo.png}">
-    <link rel="stylesheet" th:href="@{/css/style.css}">
-    <script th:src="@{/js/dados.js}"></script>
-</head>
-
-<!-- Scripts do final da página: app.js monta menu lateral e cabeçalho; o segundo script é o da própria tela -->
-<th:block th:fragment="scripts(pagina)">
-    <script th:src="@{/js/app.js}"></script>
-    <script th:src="@{'/js/pages/' + ${pagina} + '.js'}"></script>
-</th:block>
-
-</body>
+<html lang="pt-br" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" xmlns:th="http://www.thymeleaf.org">
+ <head th:fragment="cabecalho(titulo)">
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title th:text="${titulo} + ' - UpBox'">
+   UpBox
+  </title>
+  <link rel="icon" th:href="@{/images/upbox-logo.png}"/>
+  <link rel="stylesheet" th:href="@{/css/style.css}"/>
+  <script defer="" th:src="@{/js/interface.js}">
+  </script>
+ </head>
+ <body>
+  <th:block th:fragment="estrutura(conteudo)">
+   <a class="atalho-conteudo" href="#conteudo-principal">
+    Pular para o conteúdo
+   </a>
+   <div class="app-shell">
+    <aside aria-label="Menu lateral" class="sidebar" id="sidebar">
+     <button aria-label="Fechar menu" class="fechar-menu" id="fecharMenu" type="button">
+      ✕
+     </button>
+     <div class="sidebar-logo">
+      <img alt="Logo UpBox" th:src="@{/images/upbox-logo.png}"/>
+      <span class="marca-nome">
+       <b>
+        Up
+       </b>
+       Box
+      </span>
+     </div>
+     <nav aria-label="Menu principal">
+      <ul class="sidebar-menu">
+       <li>
+        <a th:href="@{/home}">
+         ⌂ Home
+        </a>
+       </li>
+       <li>
+        <a th:href="@{/dashboard}">
+         ▦ Dashboard
+        </a>
+       </li>
+       <li>
+        <a th:href="@{/estoque}">
+         ▣ Estoque
+        </a>
+       </li>
+       <li>
+        <a th:href="@{/movimentacoes}">
+         ⇄ Movimentações
+        </a>
+       </li>
+       <li>
+        <a th:href="@{/relatorios}">
+         ▤ Relatórios
+        </a>
+       </li>
+      </ul>
+     </nav>
+     <div class="sidebar-config">
+      <a th:href="@{/configuracoes}">
+       ⚙ Configurações
+      </a>
+      <a sec:authorize="hasRole('ADMINISTRADOR')" th:href="@{/usuarios}">
+       Usuários
+      </a>
+      <a sec:authorize="hasRole('ADMINISTRADOR')" th:href="@{/registros}">
+       Registros de operações
+      </a>
+      <form method="post" th:action="@{/logout}">
+       <button class="btn btn-secundario btn-bloco" type="submit">
+        Sair
+       </button>
+      </form>
+     </div>
+    </aside>
+    <div class="overlay-sidebar" id="overlaySidebar">
+    </div>
+    <div class="conteudo">
+     <header class="header">
+      <div class="header-titulo">
+       <button aria-controls="sidebar" aria-expanded="false" aria-label="Abrir menu" class="hamburguer" id="btnHamburguer" type="button">
+        ☰
+       </button>
+       <h1>
+        UpBox
+       </h1>
+      </div>
+      <div class="header-usuario">
+       <div>
+        <div class="nome-usuario" th:text="${nomeAtual}" th:title="${nomeAtual}">
+        </div>
+        <div class="cargo-usuario" th:text="${perfilAtual}">
+        </div>
+       </div>
+      </div>
+     </header>
+     <main class="pagina" id="conteudo-principal" tabindex="-1">
+      <div class="alerta alerta-sucesso" role="status" th:if="${sucesso}" th:text="${sucesso}">
+      </div>
+      <div class="alerta alerta-erro" role="alert" th:if="${erro}" th:text="${erro}">
+      </div>
+      <th:block th:replace="${conteudo}">
+      </th:block>
+     </main>
+    </div>
+   </div>
+  </th:block>
+  <div class="alerta alerta-erro" role="alert" th:fragment="erros" th:if="${#fields.hasAnyErrors()}">
+   <ul>
+    <li th:each="e : ${#fields.allErrors()}" th:text="${e}">
+    </li>
+   </ul>
+  </div>
+ </body>
 </html>

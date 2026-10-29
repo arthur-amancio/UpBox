@@ -2,3 +2,12 @@ target/
 .idea/
 *.iml
 .vscode/
+*.log
+
+# Arquivos locais: nunca enviar senhas ou configurações privadas ao Git.
+.env
+.env.*
+!.env.example
+application-local.properties
+src/main/resources/application-local.properties
+src/main/resources/application-prod.properties

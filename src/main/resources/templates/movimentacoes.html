@@ -1,8 +1,146 @@
 <!DOCTYPE html>
-<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/layout :: cabecalho('Movimentações')}"></head>
-<!-- O conteúdo desta tela é montado por static/js/pages/movimentacoes.js com dados demonstrativos -->
-<body data-pagina="movimentacoes" data-titulo="Movimentações">
-<th:block th:replace="~{fragments/layout :: scripts('movimentacoes')}"></th:block>
-</body>
+<html lang="pt-br" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" xmlns:th="http://www.thymeleaf.org">
+ <head th:replace="~{fragments/layout :: cabecalho('Movimentações')}">
+ </head>
+ <body>
+  <th:block th:replace="~{fragments/layout :: estrutura(~{::section})}">
+   <section>
+    <div class="pagina-cabecalho">
+     <h2>
+      Movimentações
+     </h2>
+    </div>
+    <form class="form-card" data-confirmar="Confirma esta movimentação? Confira produto, tipo e quantidade." id="registrar-movimentacao" method="post" th:action="@{/movimentacoes}" th:object="${form}">
+     <h3>
+      Registrar entrada ou saída
+     </h3>
+     <p class="alerta alerta-info" th:if="${#lists.isEmpty(produtosAtivos)}">
+      Não há produtos ativos disponíveis para movimentação. Consulte o estoque.
+     </p>
+     <div th:replace="~{fragments/layout :: erros}">
+     </div>
+     <div class="form-grid">
+      <div class="campo">
+       <label for="produtoId">
+        Produto ativo
+       </label>
+       <select aria-describedby="previaEstoque" required="" th:field="*{produtoId}">
+        <option value="">
+         Selecione
+        </option>
+        <option th:attr="data-saldo=${p.quantidade}" th:each="p : ${produtosAtivos}" th:text="${p.codigo + ' — ' + p.nome + ' (saldo: ' + p.quantidade + ')'}" th:value="${p.id}">
+        </option>
+       </select>
+       <small class="erro-campo" th:errors="*{produtoId}">
+       </small>
+      </div>
+      <div class="campo">
+       <label for="tipo">
+        Tipo
+       </label>
+       <select aria-describedby="previaEstoque" required="" th:field="*{tipo}">
+        <option value="ENTRADA">
+         Entrada
+        </option>
+        <option value="SAIDA">
+         Saída
+        </option>
+       </select>
+      </div>
+      <div class="campo">
+       <label for="quantidade">
+        Quantidade
+       </label>
+       <input aria-describedby="previaEstoque" max="2147483647" min="1" required="" step="1" th:field="*{quantidade}" type="number"/>
+       <small class="erro-campo" th:errors="*{quantidade}">
+       </small>
+      </div>
+      <div class="campo largura-total">
+       <label for="observacao">
+        Observação (opcional)
+       </label>
+       <textarea maxlength="500" th:field="*{observacao}"></textarea>
+      </div>
+     </div>
+     <p class="nota">
+      O responsável é o usuário autenticado. A saída exige saldo suficiente.
+     </p>
+     <p aria-live="polite" class="previa" id="previaEstoque" role="status">
+      Selecione um produto para consultar o saldo disponível.
+     </p>
+     <p class="nota">
+      A prévia é informativa. O servidor confere o saldo atualizado antes de salvar.
+     </p>
+     <button class="btn btn-primario">
+      Registrar movimentação
+     </button>
+    </form>
+    <h3 id="historico">
+     Histórico
+    </h3>
+    <form class="barra-filtros" method="get" th:action="@{/movimentacoes}" th:object="${filtro}">
+     <div class="campo">
+      <label for="produto">
+       Produto
+      </label>
+      <select th:field="*{produto}">
+       <option value="">
+        Todos, incluindo inativos
+       </option>
+       <option th:each="p : ${todosProdutos}" th:text="${p.codigo + ' — ' + p.nome}" th:value="${p.id}">
+       </option>
+      </select>
+     </div>
+     <div class="campo">
+      <label for="usuario">
+       Responsável
+      </label>
+      <select th:field="*{usuario}">
+       <option value="">
+        Todos
+       </option>
+       <option th:each="u : ${responsaveis}" th:text="${u.nome}" th:value="${u.id}">
+       </option>
+      </select>
+     </div>
+     <div class="campo">
+      <label for="tipoFiltro">
+       Tipo
+      </label>
+      <select id="tipoFiltro" name="tipo">
+       <option value="">
+        Todos
+       </option>
+       <option th:selected="${filtro.tipo != null and filtro.tipo.name() == 'ENTRADA'}" value="ENTRADA">
+        Entrada
+       </option>
+       <option th:selected="${filtro.tipo != null and filtro.tipo.name() == 'SAIDA'}" value="SAIDA">
+        Saída
+       </option>
+      </select>
+     </div>
+     <div class="campo">
+      <label for="inicio">
+       Data inicial
+      </label>
+      <input max="9999-12-31" min="0001-01-01" th:field="*{inicio}" type="date"/>
+     </div>
+     <div class="campo">
+      <label for="fim">
+       Data final
+      </label>
+      <input max="9999-12-31" min="0001-01-01" th:field="*{fim}" type="date"/>
+     </div>
+     <button class="btn btn-primario">
+      Filtrar histórico
+     </button>
+     <a class="btn btn-secundario" th:href="@{/movimentacoes}">
+      Limpar
+     </a>
+    </form>
+    <div class="tabela-wrapper" th:replace="~{fragments/tabelas :: movimentacoes(${movimentacoes})}">
+    </div>
+   </section>
+  </th:block>
+ </body>
 </html>

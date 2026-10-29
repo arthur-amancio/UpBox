@@ -1,17 +1,55 @@
 <!DOCTYPE html>
 <html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/layout :: cabecalho('Entrar')}"></head>
-<body data-auth="login">
-<div class="pagina-auth"><div class="auth-card"><div class="auth-logo"><img th:src="@{/images/upbox-logo.png}" alt="Logo UpBox"><span class="marca-nome"><b>Up</b>Box</span></div>
-<p class="auth-subtitulo">Sistema gerenciador de estoque</p><div id="alvo"></div>
-<!-- Formulário demonstrativo: a conferência de senha é feita no JavaScript, sem autenticação real -->
-<form id="form" novalidate>
-<div class="campo"><label for="usuario">Nome de usuário ou e-mail</label><input id="usuario" placeholder="Digite seu usuário ou e-mail" autofocus></div>
-<div class="campo"><label for="senha">Senha</label><input type="password" id="senha" placeholder="Digite sua senha"></div>
-<button class="btn btn-primario btn-bloco" type="submit">Entrar</button></form>
-<p class="auth-rodape">Ainda não tem conta? <a th:href="@{/cadastro}">Criar uma conta</a></p>
-<div class="demo-acesso"><strong>Acesso de demonstração</strong>Senha das contas: demo123<br><button type="button" class="btn btn-secundario btn-sm" data-u="administrador.demo">Administrador</button><button type="button" class="btn btn-secundario btn-sm" data-u="funcionario.demo">Funcionário</button></div>
-<p class="auth-rodape"><a th:href="@{/}">Voltar ao início</a></p></div></div>
-<th:block th:replace="~{fragments/layout :: scripts('auth')}"></th:block>
-</body>
+ <head th:replace="~{fragments/layout :: cabecalho('Entrar')}">
+ </head>
+ <body>
+  <div class="pagina-auth">
+   <div class="auth-card">
+    <div class="auth-logo">
+     <img alt="Logo UpBox" th:src="@{/images/upbox-logo.png}"/>
+     <span class="marca-nome">
+      <b>
+       Up
+      </b>
+      Box
+     </span>
+    </div>
+    <p class="auth-subtitulo">
+     Sistema gerenciador de estoque
+    </p>
+    <p class="alerta alerta-erro" role="alert" th:if="${param.erro}">
+     Usuário ou senha inválidos, ou conta inativa.
+    </p>
+    <p class="alerta alerta-sucesso" th:if="${param.logout}">
+     Sessão encerrada.
+    </p>
+    <p class="alerta alerta-info" th:if="${param.expirada}">
+     Sua sessão expirou. Faça login novamente.
+    </p>
+    <p class="alerta alerta-sucesso" th:if="${param.senhaAlterada}">
+     Senha alterada. Entre com a nova senha.
+    </p>
+    <form method="post" th:action="@{/login}">
+     <div class="campo">
+      <label for="username">
+       Nome de usuário ou e-mail
+      </label>
+      <input autocomplete="username" autofocus="" id="username" name="username" required=""/>
+     </div>
+     <div class="campo">
+      <label for="password">
+       Senha
+      </label>
+      <input autocomplete="current-password" id="password" name="password" required="" type="password"/>
+     </div>
+     <button class="btn btn-primario btn-bloco" type="submit">
+      Entrar
+     </button>
+    </form>
+    <p class="auth-rodape">
+     Solicite sua conta ao administrador.
+    </p>
+   </div>
+  </div>
+ </body>
 </html>

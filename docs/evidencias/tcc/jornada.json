@@ -1,0 +1,132 @@
+{
+  "ambiente": "Java 17.0.17, PostgreSQL 16.4 e Chromium, banco isolado de demonstração",
+  "dados": "Sintéticos, cadastrados pelos formulários reais; nenhuma credencial é incluída",
+  "cenarios": [
+    {
+      "cenario": "Acesso sem autenticação",
+      "resultado": "Aprovado",
+      "detalhe": "Estoque redirecionou para login, sem apresentar dados internos.",
+      "horarioUTC": "2026-10-29T23:15:29.720185+00:00"
+    },
+    {
+      "cenario": "Login incorreto",
+      "resultado": "Aprovado",
+      "detalhe": "Credenciais incorretas recusadas com mensagem em português.",
+      "horarioUTC": "2026-10-29T23:15:30.162871+00:00"
+    },
+    {
+      "cenario": "Login administrador",
+      "resultado": "Aprovado",
+      "detalhe": "Administrador inicial entrou com a conta local, sem cadastro público.",
+      "horarioUTC": "2026-10-29T23:15:30.648920+00:00"
+    },
+    {
+      "cenario": "Estado vazio",
+      "resultado": "Aprovado",
+      "detalhe": "Dashboard zerado e ausência de produtos ativos apresentada sem dados demonstrativos.",
+      "horarioUTC": "2026-10-29T23:15:31.193169+00:00"
+    },
+    {
+      "cenario": "Cadastrar categoria",
+      "resultado": "Aprovado",
+      "detalhe": "Papelaria cadastrada pelo formulário e listada no banco.",
+      "horarioUTC": "2026-10-29T23:15:31.571709+00:00"
+    },
+    {
+      "cenario": "Cadastrar produto",
+      "resultado": "Aprovado",
+      "detalhe": "Código TCC-001, preço 12,50, mínimo 3 e saldo inicial zero persistidos.",
+      "horarioUTC": "2026-10-29T23:15:32.113993+00:00"
+    },
+    {
+      "cenario": "Código duplicado",
+      "resultado": "Aprovado",
+      "detalhe": "Cadastro duplicado recusado; permaneceu somente um produto.",
+      "horarioUTC": "2026-10-29T23:15:32.501562+00:00"
+    },
+    {
+      "cenario": "Entrada e estoque normal",
+      "resultado": "Aprovado",
+      "detalhe": "Entrada 10 persistida; dashboard com 10 unidades e nenhum alerta de mínimo.",
+      "horarioUTC": "2026-10-29T23:15:33.059973+00:00"
+    },
+    {
+      "cenario": "Saída normal",
+      "resultado": "Aprovado",
+      "detalhe": "Saída 7 persistida; saldo final 3.",
+      "horarioUTC": "2026-10-29T23:15:33.450409+00:00"
+    },
+    {
+      "cenario": "Saída acima do saldo",
+      "resultado": "Aprovado",
+      "detalhe": "Saída 4 recusada; saldo 3 e exatamente duas movimentações preservados.",
+      "horarioUTC": "2026-10-29T23:15:33.714813+00:00"
+    },
+    {
+      "cenario": "Histórico",
+      "resultado": "Aprovado",
+      "detalhe": "Entrada/saída, data/hora, responsável e observação conferidos no HTML e no PostgreSQL.",
+      "horarioUTC": "2026-10-29T23:15:34.053924+00:00"
+    },
+    {
+      "cenario": "Dashboard com estoque baixo",
+      "resultado": "Aprovado",
+      "detalhe": "Total 1 produto, 3 unidades, 1 alerta, entradas 10 e saídas 7.",
+      "horarioUTC": "2026-10-29T23:15:34.310664+00:00"
+    },
+    {
+      "cenario": "Seis relatórios",
+      "resultado": "Aprovado",
+      "detalhe": "Produtos, estoque, baixo, entradas, saídas e histórico consultados com produto/categoria filtrados.",
+      "horarioUTC": "2026-10-29T23:15:35.287472+00:00"
+    },
+    {
+      "cenario": "Impressão",
+      "resultado": "Aprovado",
+      "detalhe": "Botão solicitou window.print; CSS de impressão aplicado e PDF de verificação gerado pelo Chromium.",
+      "horarioUTC": "2026-10-29T23:15:35.652321+00:00"
+    },
+    {
+      "cenario": "Categoria inativa",
+      "resultado": "Aprovado",
+      "detalhe": "Categoria saiu das novas associações sem apagar produto; reativada ao final.",
+      "horarioUTC": "2026-10-29T23:15:36.324886+00:00"
+    },
+    {
+      "cenario": "Produto inativo",
+      "resultado": "Aprovado",
+      "detalhe": "Sem botão Movimentar; saldo/alerta excluídos do dashboard; histórico mantido. Produto reativado para apresentação.",
+      "horarioUTC": "2026-10-29T23:15:37.232438+00:00"
+    },
+    {
+      "cenario": "Cadastrar funcionário",
+      "resultado": "Aprovado",
+      "detalhe": "Conta FUNCIONARIO criada pelo administrador, com senha protegida no banco.",
+      "horarioUTC": "2026-10-29T23:15:37.566696+00:00"
+    },
+    {
+      "cenario": "Permissões do funcionário",
+      "resultado": "Aprovado",
+      "detalhe": "Consultas e formulário de movimentação permitidos; cinco rotas administrativas responderam HTTP 403.",
+      "horarioUTC": "2026-10-29T23:15:39.209114+00:00"
+    },
+    {
+      "cenario": "Usuário inativo",
+      "resultado": "Aprovado",
+      "detalhe": "Sessão existente revogada e novo login recusado; conta reativada pelo administrador.",
+      "horarioUTC": "2026-10-29T23:15:41.393756+00:00"
+    },
+    {
+      "cenario": "Responsividade e JavaScript",
+      "resultado": "Aprovado",
+      "detalhe": "Captura móvel de 390×844 e páginas desktop sem erros JavaScript observados.",
+      "horarioUTC": "2026-10-29T23:15:41.656636+00:00"
+    },
+    {
+      "cenario": "Persistência após reinício",
+      "resultado": "Aprovado",
+      "detalhe": "Saldo 3, duas movimentações e dois usuários preservados; administrador inicial não foi duplicado. Interface e SQL conferidos.",
+      "horarioUTC": "2026-10-29T23:18:36.222239+00:00"
+    }
+  ]
+}
