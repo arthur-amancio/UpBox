@@ -4,7 +4,7 @@ Projeto acadêmico com **Java 17, Spring Boot e Thymeleaf**.
 
 ## Estado atual
 
-O UpBox possui um **protótipo visual navegável**. Login, usuários, produtos, categorias e movimentações ainda usam dados demonstrativos salvos no navegador (\`localStorage\`). **Não existe autenticação real nem banco de dados nesta versão. Não utilize dados reais.**
+O UpBox possui um **protótipo visual navegável**. Login, usuários, produtos, categorias e movimentações ainda usam dados demonstrativos salvos no navegador (`localStorage`). **Não existe autenticação real nem banco de dados nesta versão. Não utilize dados reais.**
 
 A evolução para um sistema funcional será feita em etapas, com testes, revisão e comentários em português para apoiar os estudos do grupo.
 
@@ -12,17 +12,17 @@ A evolução para um sistema funcional será feita em etapas, com testes, revis�
 
 Requisitos: Java 17 e Maven.
 
-\`\`\`sh
+```sh
 mvn spring-boot:run
-\`\`\`
+```
 
-Abra http://localhost:8080. Contas *apenas demonstrativas*: \`administrador.demo\` e \`funcionario.demo\`, senha \`demo123\`.
+Abra http://localhost:8080. Contas *apenas demonstrativas*: `administrador.demo` e `funcionario.demo`, senha `demo123`.
 
 Para rodar os testes:
 
-\`\`\`sh
+```sh
 mvn test
-\`\`\`
+```
 
 ## Documentação para a equipe
 
@@ -31,8 +31,8 @@ mvn test
 
 ## Organização
 
-- \`src/main/java/com/upbox/controller\`: rotas web.
-- \`src/main/java/com/upbox/model\`: regras de domínio, iniciadas pela classe didática \`Produto\` (ainda não conectada às telas).
-- \`src/main/resources/templates\`: páginas Thymeleaf.
-- \`src/main/resources/static\`: CSS, JavaScript e imagens do protótipo.
-- \`src/test\`: testes automatizados.
+- `src/main/java/com/upbox/controller`: rotas web.
+- `src/main/java/com/upbox/model`: regras de domínio, iniciadas pela classe didática `Produto` (ainda não conectada às telas).
+- `src/main/resources/templates`: páginas Thymeleaf.
+- `src/main/resources/static`: CSS, JavaScript e imagens do protótipo.
+- `src/test`: testes automatizados.
