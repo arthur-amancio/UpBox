@@ -13,20 +13,30 @@ mvn -version
 
 Ambos devem indicar Java 17. Se algum comando não existir, revise a instalação/PATH e abra outro terminal. As extensões Java do VS Code ajudam na edição, mas os comandos Maven continuam suficientes para executar.
 
-Atualize o repositório e selecione a versão mais recente indicada no README. Não altere a main nem faça merges para apenas demonstrar o sistema.
+Use a branch `main` atualizada: `git switch main` e `git pull origin main`. Para uma instalacao nova, clone o repositorio e abra a pasta criada.
 
 ## 2. Criar o banco no pgAdmin
 
 1. Confirme que o serviço PostgreSQL está em execução.
 2. Abra pgAdmin e conecte ao servidor local, normalmente `localhost`, porta `5432`, usuário `postgres`.
-3. Use a senha do servidor PostgreSQL definida na instalação. A senha principal do pgAdmin, quando solicitada para abrir o programa, é outra configuração.
+3. Use a senha padrao do servidor PostgreSQL da escola, se ela for a mesma informada pelo responsavel. A senha principal do pgAdmin, quando solicitada para abrir o programa, e outra configuracao.
 4. Em Databases, clique com o botão direito → Create → Database.
 5. Nome: `upbox`. Owner: o usuário PostgreSQL da escola, normalmente `postgres`.
 6. Salve. O JPA cria/atualiza as tabelas ao iniciar o UpBox; não é necessário desenhar as tabelas manualmente nesta etapa.
 
-## 3. Salvar a conexão no arquivo local
+## 3. Conexao pronta no computador da escola
 
-Na raiz do projeto, crie a cópia **somente se ela ainda não existir**:
+O arquivo versionado `src/main/resources/application.properties` usa por padrao:
+- `jdbc:postgresql://localhost:5432/upbox`
+- usuario `postgres`
+- senha escolar padrao informada pelo responsavel
+
+**A senha do banco ja esta configurada; nao e necessario criar arquivo local apenas para a conexao.**
+O banco `upbox` precisa existir antes da primeira inicializacao. O banco `postgres` e o banco administrativo padrao do servidor, nao o banco do UpBox.
+
+Por solicitacao expressa do responsavel, a senha compartilhada da escola foi incluida na configuracao versionada do repositorio privado; todos os colaboradores com acesso ao codigo poderao ve-la. **Nao reutilize esta senha fora do ambiente escolar** e use uma credencial diferente para outros computadores/ambientes.
+
+Se a instalacao do PostgreSQL usar outro usuario, porta ou senha, crie o arquivo local apenas se ainda nao existir:
 
 ```powershell
 if (!(Test-Path application-local.properties)) {
@@ -34,19 +44,11 @@ if (!(Test-Path application-local.properties)) {
 }
 ```
 
-Se já existir uma configuração funcional, preserve-a. Abra o arquivo local e ajuste:
-
-```properties
-spring.datasource.url=jdbc:postgresql://localhost:5432/upbox
-spring.datasource.username=postgres
-spring.datasource.password=SUA_SENHA_LOCAL
-```
-
-Substitua o texto de exemplo apenas nesse arquivo. A senha permanece salva no computador e é carregada automaticamente a cada execução. O arquivo continua no `.gitignore`; não o envie ao GitHub nem coloque a senha no `application.properties` versionado. Não é preciso digitar a senha no terminal toda vez.
+Descomente e personalize os campos `spring.datasource.*` do arquivo local. Ele e carregado automaticamente e permanece no `.gitignore`. **Nunca sobrescreva um arquivo local funcional.**
 
 ## 4. Criar o primeiro administrador
 
-No mesmo arquivo local, configure:
+Para criar o login inicial **do UpBox** (diferente do usuario `postgres`), copie o exemplo para `application-local.properties` na raiz, somente se ele ainda nao existir, e configure:
 
 ```properties
 upbox.admin-inicial.habilitado=true
@@ -56,7 +58,7 @@ upbox.admin-inicial.email=admin@example.com
 upbox.admin-inicial.senha=DEFINA_UMA_SENHA_SOMENTE_NESTE_ARQUIVO_LOCAL
 ```
 
-A senha escolhida deve ter pelo menos 8 caracteres, não ser em branco e respeitar o limite de 72 bytes do BCrypt. Não use o texto de exemplo como senha da equipe.
+A senha escolhida deve ter pelo menos 8 caracteres, nao ser em branco e respeitar o limite de 72 bytes do BCrypt. Use uma senha propria para o administrador, diferente da senha do PostgreSQL. Não use o texto de exemplo como senha da equipe.
 
 Execute:
 
