@@ -21,10 +21,13 @@ jobs:
         run: mvn -B clean test
 
   postgres:
+    strategy:
+      matrix:
+        postgres: ["9.6.24", "16.4"]
     runs-on: ubuntu-latest
     services:
       postgres:
-        image: postgres:16
+        image: postgres:${{ matrix.postgres }}
         env:
           POSTGRES_DB: upbox_test
           POSTGRES_USER: upbox_test
