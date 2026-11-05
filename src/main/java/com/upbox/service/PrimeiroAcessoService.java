@@ -1,5 +1,7 @@
 package com.upbox.service;
 
+import com.upbox.form.UsuarioForm;
+
 import com.upbox.model.*;
 import com.upbox.repository.UsuarioRepository;
 

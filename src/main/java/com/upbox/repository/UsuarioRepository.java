@@ -1,5 +1,7 @@
 package com.upbox.repository;
 
+import com.upbox.entity.Usuario;
+
 import com.upbox.model.*;
 
 import jakarta.persistence.LockModeType;

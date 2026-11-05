@@ -1,5 +1,8 @@
 package com.upbox.integration;
 
+import com.upbox.entity.Categoria;
+import com.upbox.form.UsuarioForm;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.upbox.UpboxApplication;

@@ -1,6 +1,6 @@
 package com.upbox.controller;
 
-import com.upbox.model.UsuarioForm;
+import com.upbox.form.UsuarioForm;
 import com.upbox.service.PrimeiroAcessoService;
 
 import jakarta.servlet.http.HttpServletRequest;

@@ -1,4 +1,6 @@
-package com.upbox.model;
+package com.upbox.entity;
+
+import com.upbox.model.TipoMovimentacao;
 
 import jakarta.persistence.*;
 
@@ -44,6 +46,7 @@ public class MovimentacaoEstoque {
     @Column(length = 500)
     private String observacao;
 
+    /** Valida o registro antes da gravação; o serviço salva este histórico junto com o saldo. */
     public MovimentacaoEstoque(
             Produto produto,
             Usuario usuario,
@@ -66,7 +69,4 @@ public class MovimentacaoEstoque {
         this.observacao = observacao == null ? "" : observacao.trim();
     }
 
-    public String getObservacao() {
-        return observacao;
-    }
 }

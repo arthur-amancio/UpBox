@@ -1,4 +1,4 @@
-package com.upbox.model;
+package com.upbox.entity;
 
 import jakarta.persistence.*;
 

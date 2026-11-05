@@ -1,4 +1,4 @@
-package com.upbox.model;
+package com.upbox.form;
 
 import jakarta.validation.constraints.NotBlank;
 

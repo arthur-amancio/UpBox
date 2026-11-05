@@ -4,6 +4,8 @@
 
 Navegador → Controller → Service → Repository → PostgreSQL. O resultado volta como HTML Thymeleaf. O JavaScript não autentica pessoas nem calcula saldos.
 
+Os pacotes seguem essa separação: `entity` contém somente Usuario, Categoria, Produto, MovimentacaoEstoque e RegistroOperacao; `form` contém os dados recebidos pelos formulários e filtros; `model` guarda enums e resumos de consulta. `repository`, `service`, `controller` e `config` mantêm as responsabilidades descritas abaixo. Mudar um pacote Java não renomeia tabelas: os nomes continuam declarados em `@Table` e `@Column`.
+
 - **Entity:** classe persistida em uma tabela, marcada com `@Entity`. Exemplo: `Produto` representa `produtos`.
 - **Repository:** interface do Spring Data que consulta e salva entidades, como `findById`. Não decide se uma saída é permitida.
 - **Service:** aplica as regras. `MovimentacaoEstoqueService` verifica produto ativo, quantidade e usuário, altera saldo e grava histórico.

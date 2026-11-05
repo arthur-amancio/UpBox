@@ -1,5 +1,7 @@
 package com.upbox.model;
 
+import com.upbox.entity.Produto;
+
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

@@ -1,6 +1,6 @@
 package com.upbox.repository;
 
-import com.upbox.model.RegistroOperacao;
+import com.upbox.entity.RegistroOperacao;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

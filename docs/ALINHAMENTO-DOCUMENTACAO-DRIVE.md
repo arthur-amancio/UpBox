@@ -51,7 +51,7 @@ Este conjunto é a **referência funcional preferencial**, sem tornar o conteúd
 - `Produto`: id, codigo, nome, descricao, categoria, quantidadeEstoque, estoqueMinimo, ativo; **preco apenas se confirmado**.
 - `MovimentacaoEstoque`: id, produto, usuario, tipo (ENTRADA/SAIDA), quantidade, dataHora, observacao.
 
-O domínio atual `model/Produto.java` no PR #1 é somente um exercício inicial de regras de quantidade, **não o modelo JPA final**. Não adicionar JPA, tipos extras nem campos especulativos antes da decisão sobre o banco.
+O domínio atual `entity/Produto.java` no PR #1 é somente um exercício inicial de regras de quantidade, **não o modelo JPA final**. Não adicionar JPA, tipos extras nem campos especulativos antes da decisão sobre o banco.
 
 ## 4. Prazo e prioridade
 

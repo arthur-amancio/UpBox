@@ -66,7 +66,7 @@ Esse perfil recria as tabelas do banco de teste e verifica concorrência, rollba
 
 ## Organização e guias
 
-`model` contém entidades/formulários; `repository` acessa o banco; `service` aplica regras; `controller` atende rotas MVC; `config` configura segurança; `templates` apresenta HTML; `static` contém CSS, logo e interações visuais.
+`entity` contém somente as cinco entidades JPA; `form` recebe formulários/filtros; `model` guarda enums e resumos simples; `repository` acessa o banco; `service` aplica regras; `controller` atende rotas MVC; `config` configura segurança; `templates` apresenta HTML; `static` contém CSS, logo e interações visuais.
 
 - [Guia de estudos e roteiro da apresentação](docs/GUIA-DE-ESTUDOS.md)
 - [PostgreSQL e pgAdmin](docs/GUIA-POSTGRESQL-PGADMIN.md)
