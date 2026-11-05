@@ -48,6 +48,7 @@ public class SegurancaConfig {
                                                 "/login",
                                                 "/primeiro-acesso",
                                                 "/css/**",
+                                                "/fonts/**",
                                                 "/images/**",
                                                 "/js/interface.js",
                                                 "/error")

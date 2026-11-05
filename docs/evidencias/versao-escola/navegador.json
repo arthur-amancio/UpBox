@@ -1,0 +1,28 @@
+{
+  "resultado": "aprovado",
+  "erros": [],
+  "overflow": [],
+  "externos": [],
+  "fontesLocais": [
+    "Plus Jakarta Sans",
+    "Plus Jakarta Sans",
+    "Plus Jakarta Sans",
+    "Plus Jakarta Sans",
+    "Poppins"
+  ],
+  "teclado": {
+    "menuEnterEscape": true,
+    "tabelaSetas": true
+  },
+  "impressao": "A4 paisagem",
+  "perfis": [
+    "ADMINISTRADOR",
+    "FUNCIONARIO"
+  ],
+  "persistenciaDaJornadaAnterior": true,
+  "resolucoes": [
+    "1366x768",
+    "1024x768",
+    "390x844"
+  ]
+}

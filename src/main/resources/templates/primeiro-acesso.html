@@ -3,13 +3,13 @@
 <head th:replace="~{fragments/layout :: cabecalho('Primeiro acesso')}"></head>
 <body>
 <main class="pagina-auth">
- <section class="auth-card" aria-labelledby="titulo-instalacao">
+ <section class="auth-card instalacao-card" aria-labelledby="titulo-instalacao">
   <div class="auth-logo"><img alt="Logo UpBox" th:src="@{/images/upbox-logo.png}"><span class="marca-nome"><b>Up</b>Box</span></div>
   <h1 id="titulo-instalacao">Bem-vindo ao UpBox</h1>
   <p class="auth-subtitulo">Crie o primeiro administrador neste computador. Depois, somente ele poderá cadastrar usuários.</p>
   <form method="post" th:action="@{/primeiro-acesso}" th:object="${form}">
    <div class="alerta alerta-erro" role="alert" th:if="${#fields.hasAnyErrors()}"><p th:each="erro : ${#fields.allErrors()}" th:text="${erro}"></p></div>
-   <div class="campo"><label for="nome">Nome completo</label><input id="nome" th:field="*{nome}" autocomplete="name" maxlength="120" required autofocus></div>
+   <div class="campo largura-total"><label for="nome">Nome completo</label><input id="nome" th:field="*{nome}" autocomplete="name" maxlength="120" required autofocus></div>
    <div class="campo"><label for="usuario">Nome de usuário</label><input id="usuario" th:field="*{usuario}" autocomplete="username" maxlength="80" pattern="[A-Za-z0-9._-]+" required><small>Use letras, números, ponto, hífen ou sublinhado.</small></div>
    <div class="campo"><label for="email">E-mail</label><input id="email" th:field="*{email}" type="email" autocomplete="email" maxlength="150" required></div>
    <div class="campo"><label for="senha">Senha do UpBox</label><input id="senha" name="senha" type="password" autocomplete="new-password" minlength="8" required><small>Pelo menos 8 caracteres e no máximo 72 bytes. Use uma senha diferente da senha do banco.</small></div>

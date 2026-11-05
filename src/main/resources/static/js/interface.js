@@ -98,6 +98,19 @@ document.addEventListener('DOMContentLoaded', function () {
     document.querySelectorAll('[data-imprimir]').forEach(function (b) {
         b.addEventListener('click', function () { window.print(); });
     });
+
+    // Tabelas continuam tabelas: o aviso ensina a rolar e a região recebe foco pelo teclado.
+    document.querySelectorAll('.tabela-wrapper').forEach(function (tabela, indice) {
+        var dica = document.createElement('p');
+        dica.className = 'dica-tabela';
+        dica.id = 'dica-tabela-' + indice;
+        dica.textContent = 'Mais colunas à direita: deslize a tabela ou use as setas com ela selecionada.';
+        tabela.before(dica);
+        tabela.setAttribute('aria-describedby', dica.id);
+        function indicarRolagem() { dica.hidden = tabela.scrollWidth <= tabela.clientWidth; }
+        indicarRolagem();
+        window.addEventListener('resize', indicarRolagem);
+    });
     try {
         document.documentElement.dataset.tema = localStorage.getItem('upbox-tema') || 'claro';
         var tema = document.getElementById('alternarTema');
