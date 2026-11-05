@@ -46,7 +46,15 @@ A senha escolar foi retirada da configuração atual. [O histórico ainda exige 
 
 Leia [Instalação Windows](docs/INSTALACAO-ESCOLA.md) para erros comuns, pgAdmin e backup.
 
-## Testes
+## Pacote Windows sem Maven
+
+`mvn clean package` gera **target/upbox-sistema-1.0.0-escola.zip**. Extraia o ZIP, preencha a senha em application.properties ao lado de upbox.jar e execute iniciar-upbox.bat. O pacote exige apenas Java 17 e PostgreSQL; não precisa de Maven para usar. O cadastro do administrador ocorre no navegador local.
+
+A CI oferece o artefato **UpBox-escola** depois de executar o pacote no Windows. A homologação extrai para pasta com espaços, cria um PostgreSQL descartável, abre o JAR pelo .bat, cadastra o administrador com CSRF, reinicia, confere persistência e exercita mensagens de erro. O resultado está no artefato homologacao-windows. Veja [pacote e homologação](docs/PACOTE-E-HOMOLOGACAO.md).
+
+Para impedir distribuição acidental de uma senha preenchida, a fase de empacotamento exige a configuração fonte sem senha; preencha apenas a cópia externa de uso. Esse bloqueio não interfere em `mvn clean test` ou `mvn spring-boot:run`.
+
+## Testes automatizados
 
 ```powershell
 mvn clean test

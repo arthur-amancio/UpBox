@@ -1,0 +1,32 @@
+UPBOX — PACOTE PARA A ESCOLA
+
+1. Extraia TODO o ZIP para uma pasta. Não execute diretamente dentro do ZIP.
+2. Instale Java 17 e o servidor PostgreSQL. Maven não é necessário neste pacote.
+3. No pgAdmin, confirme o serviço e crie o banco upbox somente se ele não existir.
+   Não apague dados de uma instalação existente. Faça backup antes de atualizar.
+4. Edite application.properties AO LADO de upbox.jar:
+   host localhost, porta 5432, banco upbox, usuário postgres (ou root, se existir).
+   Na linha spring.datasource.password=${DB_PASSWORD:}, preencha sua senha depois
+   dos dois-pontos e antes da chave final, ou substitua o valor inteiro pela senha.
+   Não envie essa configuração preenchida ao GitHub nem para outras pessoas.
+5. Clique em iniciar-upbox.bat. Mantenha a janela aberta.
+6. Aguarde alguns segundos e abra http://localhost:8080 no próprio computador.
+7. Crie o primeiro administrador pelo navegador. Escolha uma senha de login
+   diferente da senha do banco. Depois da criação, esse cadastro inicial fecha.
+8. Entre, cadastre categoria/produto e registre movimentações.
+
+Para parar, use Ctrl+C na janela. Reiniciar mantém os dados no PostgreSQL.
+Detalhes técnicos ficam em logs/upbox.log. Se não iniciar, confira Java 17,
+serviço PostgreSQL, usuário/senha, existência de upbox e porta 8080 livre.
+O script não apaga nem recria bancos. Não use ddl-auto=create ou create-drop.
+Um application-local.properties existente continua opcional: preserve-o e
+confira se ele contém valores que substituem o arquivo principal.
+
+PostgreSQL homologado: 9.6.24 e 16.4. Outras versões 9.x exigem teste adicional.
+Use SELECT version(); no pgAdmin para identificar o servidor real.
+As fontes são locais e a interface funciona sem internet.
+Na impressão, selecione A4/paisagem ou Salvar como PDF.
+
+Os guias detalhados estão em guias/. Suporte e código:
+https://github.com/arthur-amancio/UpBox (acesso da equipe ao repositório privado).
+Não existe senha padrão de login nem credencial escolar neste pacote.

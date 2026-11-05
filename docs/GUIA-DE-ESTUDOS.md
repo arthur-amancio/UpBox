@@ -50,7 +50,7 @@ O funcionário não ganha acesso administrativo ao esconder/mostrar um botão: a
 
 ## VS Code e pgAdmin
 
-Abra a raiz do projeto, confira `java -version` e `mvn -version`, configure o arquivo local e execute `mvn clean test` e `mvn spring-boot:run`. Consulte o [guia PostgreSQL](GUIA-POSTGRESQL-PGADMIN.md).
+Abra a raiz do projeto, confira `java -version` e `mvn -version`, preencha a conexão em application.properties (arquivo local é apenas opcional) e execute `mvn clean test` e `mvn spring-boot:run`. Consulte o [guia PostgreSQL](GUIA-POSTGRESQL-PGADMIN.md).
 
 No pgAdmin, abra o banco `upbox` → Schemas → public → Tables. Veja `categorias`, `produtos`, `usuarios`, `movimentacoes_estoque` e `registros_operacoes`. Explique as chaves `categoria_id`, `produto_id` e `usuario_id`. Não exponha `senha_hash` em apresentações e não edite saldo manualmente para simular o sistema.
 

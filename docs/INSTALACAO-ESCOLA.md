@@ -2,6 +2,10 @@
 
 ## 1. Preparar
 
+**Pacote pronto:** extraia o ZIP inteiro, instale Java 17 e PostgreSQL, edite application.properties ao lado do JAR e execute iniciar-upbox.bat. Não precisa de Maven, Git ou VS Code para somente utilizar esse pacote. Ele registra detalhes em logs/upbox.log e não apaga bancos. `iniciar-upbox.bat --verificar` confere Java/JAR/arquivo; não testa a conexão. Para mudar a porta, ajuste server.port e abra o endereço correspondente.
+
+**Código-fonte:** siga os passos Maven/VS Code abaixo. Gerar o pacote é uma tarefa diferente de executar o sistema; o empacotamento bloqueia senha preenchida no fonte para não enviá-la a terceiros.
+
 Instale JDK **17**, Maven, PostgreSQL e pgAdmin. No VS Code abra a pasta do pom.xml. `java -version` e `mvn -version` devem apontar Java 17. Os integrantes precisam de acesso ao repositório privado. Clone a main ou, durante a revisão desta entrega, a branch informada no PR final; não faça merges para instalar.
 
 ## 2. Banco

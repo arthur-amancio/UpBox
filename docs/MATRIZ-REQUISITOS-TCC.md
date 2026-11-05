@@ -17,6 +17,8 @@ Os caminhos Java abaixo são relativos a `src/main/java/com/upbox`; testes ficam
 
 ## Casos de uso e requisitos funcionais
 
+A versão escolar também foi homologada em PostgreSQL 9.6.24 e 16.4. O cadastro inicial pelo navegador local foi autorizado pelo responsável para a instalação: fecha após o primeiro administrador, mantém BCrypt/CSRF e não altera o cadastro administrativo dos demais usuários. Veja COMPATIBILIDADE-POSTGRESQL.md, INSTALACAO-ESCOLA.md e PACOTE-E-HOMOLOGACAO.md. Documentos originais do Drive não foram modificados.
+
 | Requisito | Implementado? | Arquivo responsável | Evidência | Pendência |
 | --- | --- | --- | --- | --- |
 | UC01 — Login por usuário ou e-mail | Sim | config/SegurancaConfig.java; repository/UsuarioRepository.java | PaginaControllerTest: login por nome/e-mail, senha incorreta e conta inativa; jornada real | Nenhuma de código |

@@ -50,3 +50,31 @@ jobs:
           cache: maven
       - name: Verificar integração real e concorrência
         run: mvn -B -Ppostgres-it verify
+
+  distribuicao-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+      - name: Testar e empacotar
+        run: mvn -B clean package
+      - name: Executar ZIP e script no Windows com PostgreSQL descartável
+        shell: pwsh
+        run: ./scripts/testar-pacote-windows.ps1 -Pacote target/upbox-sistema-1.0.0-escola.zip
+      - name: Publicar pacote homologado
+        uses: actions/upload-artifact@v4
+        with:
+          name: UpBox-escola
+          path: target/upbox-sistema-1.0.0-escola.zip
+      - name: Guardar evidências Windows
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: homologacao-windows
+          path: |
+            target/homologacao-windows.json
+            target/windows-upbox.log
