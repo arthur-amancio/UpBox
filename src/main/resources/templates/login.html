@@ -30,6 +30,7 @@
      Senha alterada. Entre com a nova senha.
     </p>
     <form method="post" th:action="@{/login}">
+     <p class="alerta alerta-sucesso" role="status" th:if="${param.configurado}">Administrador criado. Entre com sua conta.</p>
      <div class="campo">
       <label for="username">
        Nome de usuário ou e-mail

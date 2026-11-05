@@ -1,3 +1,5 @@
+> Registro histórico das entregas anteriores. Para instalar a versão atual, siga [INSTALACAO-ESCOLA.md](INSTALACAO-ESCOLA.md): configuração em application.properties e primeiro administrador pelo navegador.
+
 # Relatório final — MVP funcional do UpBox (entregas 1–4)
 
 > Registro histórico do MVP. A revisão posterior, seus resultados e a versão mais recente estão em [Relatório de revisão para o TCC](RELATORIO-REVISAO-TCC.md).

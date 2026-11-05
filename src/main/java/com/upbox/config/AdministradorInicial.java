@@ -2,7 +2,7 @@ package com.upbox.config;
 
 import com.upbox.model.*;
 import com.upbox.repository.UsuarioRepository;
-import com.upbox.service.UsuarioService;
+import com.upbox.service.PrimeiroAcessoService;
 
 import jakarta.validation.Validator;
 
@@ -13,13 +13,13 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
-/** Criação optativa por arquivo local; nunca substitui administrador existente. */
+/** Alternativa por configuração externa; o caminho recomendado é o navegador local. */
 @Component
 @RequiredArgsConstructor
 public class AdministradorInicial implements ApplicationRunner {
     private final Environment env;
     private final UsuarioRepository usuarios;
-    private final UsuarioService service;
+    private final PrimeiroAcessoService primeiroAcesso;
     private final Validator validator;
 
     @Override
@@ -34,6 +34,6 @@ public class AdministradorInicial implements ApplicationRunner {
         f.setPerfil(PerfilAcesso.ADMINISTRADOR);
         if (!validator.validate(f).isEmpty())
             throw new IllegalArgumentException("Revise os dados locais do administrador inicial.");
-        service.salvar(null, f);
+        primeiroAcesso.cadastrar(f);
     }
 }

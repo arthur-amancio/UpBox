@@ -1,3 +1,5 @@
+> Registro histórico das entregas anteriores. Para instalar a versão atual, siga [INSTALACAO-ESCOLA.md](INSTALACAO-ESCOLA.md): configuração em application.properties e primeiro administrador pelo navegador.
+
 # Relatório — revisão, interface e preparação do TCC
 
 ## 1. Base e análise
