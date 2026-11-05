@@ -89,8 +89,11 @@ try {
             if ($LASTEXITCODE -ne 1 -or $mensagemJava -notmatch 'Java 17 nao encontrado') { throw 'Mensagem de Java ausente não foi apresentada.' }
         } finally { $env:JAVA_HOME = $javaAnterior }
     } finally { Pop-Location }
-    @{resultado='aprovado'; commit=$env:GITHUB_SHA; postgres=$versao; sistema='Windows'; java=17; pacoteExtraido=$true; caminhoComEspacos=$true; primeiroAcessoCsrf=$true; reinicioSemDuplicacao=$true; mensagemConexao=$true; mensagemJava=$true} |
-        ConvertTo-Json | Set-Content (Join-Path $env:GITHUB_WORKSPACE 'target\homologacao-windows.json')
+    $resultado = @{resultado='aprovado'; commit=$env:GITHUB_SHA; postgres=$versao; sistema='Windows'; java=17; pacoteExtraido=$true; caminhoComEspacos=$true; primeiroAcessoCsrf=$true; reinicioSemDuplicacao=$true; mensagemConexao=$true; mensagemJava=$true}
+    $json = $resultado | ConvertTo-Json
+    $json | Set-Content (Join-Path $env:GITHUB_WORKSPACE 'target\homologacao-windows.json')
+    # A evidência também fica legível no log, sem depender do download do artefato.
+    Write-Host $json
 } finally {
     Parar-UpBox
     if (Test-Path (Join-Path $pasta 'logs\upbox.log')) {

@@ -17,10 +17,10 @@ Não há contas demo ou cadastro público. Produtos começam com saldo zero; o s
 
 Instale **Java 17, Maven e PostgreSQL**; Git é necessário para clonar o repositório privado. Use pgAdmin para administrar o banco. Não precisa de Docker, Node ou arquivo local adicional.
 
-1. Clone e abra a pasta do pom.xml no VS Code:
+1. Enquanto os PRs da versão escolar estiverem em revisão, clone a branch completa abaixo e abra a pasta do pom.xml no VS Code. Após a integração aprovada, use main:
 
    ```powershell
-   git clone https://github.com/arthur-amancio/UpBox.git
+   git clone --branch build/pacote-final-escola https://github.com/arthur-amancio/UpBox.git
    cd UpBox
    ```
 
@@ -85,7 +85,7 @@ Esse perfil recria as tabelas do banco de teste e verifica concorrência, rollba
 - [Relatório final e inventário das mudanças](docs/RELATORIO-FINAL-MVP.md)
 - [Alinhamento com a documentação oficial](docs/ALINHAMENTO-DOCUMENTACAO-DRIVE.md)
 
-A versao integrada e distribuida pela branch **main**. Os PRs de desenvolvimento continuam disponiveis como historico no GitHub.
+O MVP anterior está integrado na **main**. Enquanto os PRs da versão escolar estiverem abertos, a entrega completa está em **build/pacote-final-escola**. Depois da integração aprovada, a equipe pode acompanhar a main. Não é necessário fazer merges para apenas executar.
 
 ## Revisão e apresentação do TCC
 
@@ -99,4 +99,4 @@ A revisão técnica corrigiu a disputa entre troca de senha e desativação, tra
 - [Matriz com o TCC oficial](docs/MATRIZ-REQUISITOS-TCC.md)
 - [Relatório desta revisão](docs/RELATORIO-REVISAO-TCC.md)
 
-Para receber a versao mais recente, use `git switch main` e `git pull origin main`.
+Para atualizar uma cópia, primeiro preserve alterações locais e use a branch correspondente à versão escolhida. Não troque uma instalação em uso sem backup do banco.
