@@ -1,5 +1,11 @@
 package com.upbox.integration;
 
+import com.upbox.entity.Categoria;
+import com.upbox.entity.Produto;
+import com.upbox.entity.Usuario;
+import com.upbox.form.SenhaForm;
+import com.upbox.form.UsuarioForm;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.upbox.model.*;
@@ -48,8 +54,44 @@ class PostgresIT {
     @Autowired ProdutoService produtoService;
     @Autowired MovimentacaoEstoqueService service;
     @Autowired JdbcTemplate jdbc;
+    @Autowired PrimeiroAcessoService primeiroAcesso;
     Produto produto;
     Usuario usuario;
+
+    @Test
+    void primeirasInstalacoesConcorrentesCriamSomenteUmAdministrador() throws Exception {
+        var pool = Executors.newFixedThreadPool(2);
+        var iniciar = new CountDownLatch(1);
+        Callable<Boolean> cadastro =
+                () -> {
+                    iniciar.await();
+                    UsuarioForm f = new UsuarioForm();
+                    f.setNome("Equipe");
+                    f.setUsuario("admin");
+                    f.setEmail("admin@example.com");
+                    f.setSenha("senha-teste-123");
+                    try {
+                        primeiroAcesso.cadastrar(f);
+                        return true;
+                    } catch (IllegalArgumentException ex) {
+                        return false;
+                    }
+                };
+        try {
+            var a = pool.submit(cadastro);
+            var b = pool.submit(cadastro);
+            iniciar.countDown();
+            assertNotEquals(a.get(15, TimeUnit.SECONDS), b.get(15, TimeUnit.SECONDS));
+            assertEquals(
+                    1,
+                    usuarios.findAll().stream()
+                            .filter(u -> u.getPerfil() == PerfilAcesso.ADMINISTRADOR)
+                            .count());
+            assertFalse(primeiroAcesso.disponivel());
+        } finally {
+            pool.shutdownNow();
+        }
+    }
 
     @BeforeEach
     void preparar() {

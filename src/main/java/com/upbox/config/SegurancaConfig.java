@@ -46,7 +46,9 @@ public class SegurancaConfig {
                                 a.requestMatchers(
                                                 "/",
                                                 "/login",
+                                                "/primeiro-acesso",
                                                 "/css/**",
+                                                "/fonts/**",
                                                 "/images/**",
                                                 "/js/interface.js",
                                                 "/error")

@@ -4,6 +4,8 @@
 
 Navegador → Controller → Service → Repository → PostgreSQL. O resultado volta como HTML Thymeleaf. O JavaScript não autentica pessoas nem calcula saldos.
 
+Os pacotes seguem essa separação: `entity` contém somente Usuario, Categoria, Produto, MovimentacaoEstoque e RegistroOperacao; `form` contém os dados recebidos pelos formulários e filtros; `model` guarda enums e resumos de consulta. `repository`, `service`, `controller` e `config` mantêm as responsabilidades descritas abaixo. Mudar um pacote Java não renomeia tabelas: os nomes continuam declarados em `@Table` e `@Column`.
+
 - **Entity:** classe persistida em uma tabela, marcada com `@Entity`. Exemplo: `Produto` representa `produtos`.
 - **Repository:** interface do Spring Data que consulta e salva entidades, como `findById`. Não decide se uma saída é permitida.
 - **Service:** aplica as regras. `MovimentacaoEstoqueService` verifica produto ativo, quantidade e usuário, altera saldo e grava histórico.
@@ -48,7 +50,7 @@ O funcionário não ganha acesso administrativo ao esconder/mostrar um botão: a
 
 ## VS Code e pgAdmin
 
-Abra a raiz do projeto, confira `java -version` e `mvn -version`, configure o arquivo local e execute `mvn clean test` e `mvn spring-boot:run`. Consulte o [guia PostgreSQL](GUIA-POSTGRESQL-PGADMIN.md).
+Abra a raiz do projeto, confira `java -version` e `mvn -version`, preencha a conexão em application.properties (arquivo local é apenas opcional) e execute `mvn clean test` e `mvn spring-boot:run`. Consulte o [guia PostgreSQL](GUIA-POSTGRESQL-PGADMIN.md).
 
 No pgAdmin, abra o banco `upbox` → Schemas → public → Tables. Veja `categorias`, `produtos`, `usuarios`, `movimentacoes_estoque` e `registros_operacoes`. Explique as chaves `categoria_id`, `produto_id` e `usuario_id`. Não exponha `senha_hash` em apresentações e não edite saldo manualmente para simular o sistema.
 

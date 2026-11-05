@@ -1,3 +1,5 @@
+> Instalação atual: siga [INSTALACAO-ESCOLA.md](INSTALACAO-ESCOLA.md). A conexão é preenchida em application.properties; a senha escolar antiga foi removida. Arquivo local é opcional.
+
 # UpBox — PostgreSQL e pgAdmin na escola
 
 ## 1. O que cada programa faz?
@@ -20,15 +22,11 @@ Se preferir usar o Query Tool conectado ao banco `postgres`, execute:
 CREATE DATABASE upbox;
 ```
 
-## 3. Configuracao pronta para o PostgreSQL da escola
+## 3. Preencher a conexão
 
-Nesta versao, `src/main/resources/application.properties` ja usa por padrao o banco `upbox`, o usuario PostgreSQL `postgres` e a senha escolar informada pelo responsavel. Portanto, **na escola nao precisa copiar nem editar outro arquivo para conectar ao banco**, caso o servidor use essas credenciais e a porta 5432.
+Edite `src/main/resources/application.properties`: localhost:5432/upbox, usuário postgres (ou root se existente) e senha preenchida somente neste computador. Nenhuma senha escolar é distribuída. O arquivo local é apenas alternativa opcional e não deve sobrescrever uma configuração funcional.
 
-A senha escolar foi mantida na configuracao versionada por pedido do responsavel, embora isso seja menos seguro: todos que possuem acesso ao repositorio privado podem le-la. Nao utilize essas credenciais em servidores acessiveis pela internet.
-
-Em computadores com outra configuracao, crie `application-local.properties` na raiz usando o exemplo `application-local.example.properties`, descomente os campos do banco e ajuste usuario/senha/porta. O arquivo local fica ignorado pelo Git.
-
-O **login do UpBox** e independente da senha de PostgreSQL. Para criar o primeiro administrador do sistema, siga o [guia de instalacao](INSTALACAO-ESCOLA.md).
+A senha do PostgreSQL não é a senha de login. Crie o administrador pelo navegador local na primeira execução, seguindo [Instalação](INSTALACAO-ESCOLA.md). O histórico da antiga credencial deve ser tratado antes de tornar o repositório público; veja [Credenciais](CREDENCIAIS-E-HISTORICO.md).
 
 ## 4. Executar
 
@@ -43,7 +41,7 @@ Ao iniciar pela primeira vez, o JPA pode criar as tabelas `categorias`, `produto
 
 ## 5. Usar e conferir os registros
 
-O backend e os formulários estão conectados: login, usuários, categorias, produtos, movimentações, dashboard e relatórios. Crie o primeiro administrador conforme [Entrega 1](ENTREGA-1-AUTENTICACAO.md).
+O backend e os formulários estão conectados: login, usuários, categorias, produtos, movimentações, dashboard e relatórios. Crie o primeiro administrador pelo navegador local conforme [Instalação](INSTALACAO-ESCOLA.md).
 
 No pgAdmin, abra `upbox > Schemas > public > Tables`, atualize a lista e use **View/Edit Data > All Rows**. Existem `categorias`, `produtos`, `usuarios`, `movimentacoes_estoque` e `registros_operacoes`. Confira o saldo em `produtos.quantidade_estoque`; cada movimentação aponta para produto e usuário pelas chaves estrangeiras.
 
@@ -55,7 +53,7 @@ Para uma demonstração, cadastre pela interface, registre uma entrada de 10 e u
 
 Para integração real, crie outro banco **exclusivo e descartável chamado `upbox_test`**. O perfil `mvn -Ppostgres-it verify` recria/apaga suas tabelas; a URL é verificada antes de iniciar o JPA. Configure as variáveis locais conforme [Entrega 3](ENTREGA-3-MOVIMENTACOES.md). Nunca aponte testes para o banco de uso da escola.
 
-O PostgreSQL 16.4 foi utilizado nesta entrega para verificar a aplicação, persistência após reinício, índices de unicidade, duas saídas simultâneas e rollback por falhas no histórico/auditoria. A CI também executa integração PostgreSQL.
+Os PostgreSQL 9.6.24 e 16.4 foram utilizados na homologação atual para verificar a aplicação, persistência após reinício, índices de unicidade, duas saídas simultâneas e rollback por falhas no histórico/auditoria. A CI também executa integração PostgreSQL.
 
 ## 7. Instalação e solução de problemas na escola
 

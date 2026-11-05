@@ -1,3 +1,5 @@
+> Registro histórico das entregas anteriores. Para instalar a versão atual, siga [INSTALACAO-ESCOLA.md](INSTALACAO-ESCOLA.md): configuração em application.properties e primeiro administrador pelo navegador.
+
 # Relatório final — MVP funcional do UpBox (entregas 1–4)
 
 > Registro histórico do MVP. A revisão posterior, seus resultados e a versão mais recente estão em [Relatório de revisão para o TCC](RELATORIO-REVISAO-TCC.md).
@@ -119,21 +121,21 @@ Comparação com a base que já havia recebido o PR #3. As remoções são dos s
 | Alterado | `src/main/java/com/upbox/controller/PaginaController.java` |
 | Criado | `src/main/java/com/upbox/controller/RelatorioController.java` |
 | Criado | `src/main/java/com/upbox/controller/UsuarioController.java` |
-| Alterado | `src/main/java/com/upbox/model/Categoria.java` |
-| Criado | `src/main/java/com/upbox/model/CategoriaForm.java` |
-| Criado | `src/main/java/com/upbox/model/FiltroMovimentacao.java` |
-| Alterado | `src/main/java/com/upbox/model/MovimentacaoEstoque.java` |
-| Criado | `src/main/java/com/upbox/model/MovimentacaoForm.java` |
-| Criado | `src/main/java/com/upbox/model/PerfilForm.java` |
-| Alterado | `src/main/java/com/upbox/model/Produto.java` |
-| Criado | `src/main/java/com/upbox/model/ProdutoForm.java` |
-| Criado | `src/main/java/com/upbox/model/RegistroOperacao.java` |
+| Alterado | `src/main/java/com/upbox/entity/Categoria.java` |
+| Criado | `src/main/java/com/upbox/form/CategoriaForm.java` |
+| Criado | `src/main/java/com/upbox/form/FiltroMovimentacao.java` |
+| Alterado | `src/main/java/com/upbox/entity/MovimentacaoEstoque.java` |
+| Criado | `src/main/java/com/upbox/form/MovimentacaoForm.java` |
+| Criado | `src/main/java/com/upbox/form/PerfilForm.java` |
+| Alterado | `src/main/java/com/upbox/entity/Produto.java` |
+| Criado | `src/main/java/com/upbox/form/ProdutoForm.java` |
+| Criado | `src/main/java/com/upbox/entity/RegistroOperacao.java` |
 | Criado | `src/main/java/com/upbox/model/ResultadoRelatorio.java` |
 | Criado | `src/main/java/com/upbox/model/ResumoDashboard.java` |
-| Criado | `src/main/java/com/upbox/model/SenhaForm.java` |
+| Criado | `src/main/java/com/upbox/form/SenhaForm.java` |
 | Criado | `src/main/java/com/upbox/model/TipoRelatorio.java` |
-| Alterado | `src/main/java/com/upbox/model/Usuario.java` |
-| Criado | `src/main/java/com/upbox/model/UsuarioForm.java` |
+| Alterado | `src/main/java/com/upbox/entity/Usuario.java` |
+| Criado | `src/main/java/com/upbox/form/UsuarioForm.java` |
 | Alterado | `src/main/java/com/upbox/repository/CategoriaRepository.java` |
 | Alterado | `src/main/java/com/upbox/repository/MovimentacaoEstoqueRepository.java` |
 | Alterado | `src/main/java/com/upbox/repository/ProdutoRepository.java` |

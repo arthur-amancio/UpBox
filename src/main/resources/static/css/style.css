@@ -1,9 +1,65 @@
 /* ==========================================================
    UPBOX - Sistema Gerenciador de Estoque
-   Folha de estilos principal (v2 - identidade visual âmbar)
+   Folha de estilos principal - identidade visual âmbar
    ========================================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Poppins:wght@600;700&display=swap');
+/* Fontes da identidade visual incluídas no projeto para uso sem internet. */
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(../fonts/plus-jakarta-sans-400.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(../fonts/plus-jakarta-sans-400.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url(../fonts/plus-jakarta-sans-400.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(../fonts/plus-jakarta-sans-400.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url(../fonts/plus-jakarta-sans-400.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url(../fonts/poppins-600.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(../fonts/poppins-700.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
 
 :root {
     /* ---- Marca (baseado na logo UpBox) ---- */
@@ -1508,4 +1564,65 @@ a:focus-visible,button:focus-visible,.campo input:focus-visible,.campo select:fo
 .sidebar > nav {flex:1;}
 @media print {
  html[data-tema="escuro"] {color-scheme:light;--cor-texto:#241A10;--cor-texto-suave:#4A3B2C;--cor-secundaria:#241A10;--cor-fundo:#fff;--cor-superficie:#fff;--cor-borda:#ddd;--th-fundo:#fff;}
+}
+
+/* Acabamento da versão escolar: os mesmos componentes funcionam em todos os módulos. */
+:root { --cor-texto-suave:#6E604F; --cor-texto-fraco:#756957; }
+.pagina { max-width:1600px; width:100%; margin-inline:auto; }
+.pagina-cabecalho { margin-bottom:18px; }
+.pagina-cabecalho h2 { font-size:clamp(1.35rem, 2vw, 1.8rem); line-height:1.25; }
+.btn { min-height:44px; line-height:1.3; box-shadow:none; }
+.btn:hover { box-shadow:var(--sombra-sm); }
+.btn:disabled { opacity:.6; cursor:not-allowed; }
+input, select, textarea { min-height:44px; }
+.campo label { line-height:1.4; }
+.campo small { display:block; margin-top:6px; line-height:1.5; color:var(--cor-texto-suave); }
+.barra-filtros { display:grid; grid-template-columns:repeat(auto-fit,minmax(165px,1fr)); gap:12px; padding:18px; }
+.barra-filtros .campo { min-width:0; }
+.barra-filtros input, .barra-filtros select { width:100%; }
+.form-card { border-top:3px solid var(--cor-primaria); }
+.grid-cards { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:14px; }
+.card-stat { min-width:0; min-height:120px; padding:20px 16px; gap:14px; }
+.card-stat .valor { font-variant-numeric:tabular-nums; line-height:1.2; }
+.card-stat .rotulo { line-height:1.4; }
+.tabela th { position:relative; }
+.tabela td { line-height:1.5; }
+.tabela td:has(.badge), .tabela td:has(.acoes-tabela) { white-space:nowrap; }
+.tabela td .acoes-tabela { gap:8px; }
+.dica-tabela { margin:16px 0 8px; font-size:.8rem; line-height:1.5; color:var(--cor-texto-suave); }
+.dica-tabela[hidden] { display:none; }
+.alerta { line-height:1.6; overflow-wrap:anywhere; border-left-width:4px; }
+.auth-card h1 { margin:22px 0 8px; text-align:center; font-size:1.5rem; line-height:1.3; }
+.auth-card .auth-subtitulo { line-height:1.6; }
+.instalacao-card { max-width:600px; }
+.instalacao-card form { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+.instalacao-card .campo { margin:0; min-width:0; }
+.instalacao-card .largura-total, .instalacao-card .alerta, .instalacao-card button { grid-column:1/-1; }
+.pagina-auth { min-height:100svh; padding:32px 20px; }
+.sidebar-menu li a, .sidebar-config a { min-height:44px; }
+html[data-tema="escuro"] { --cor-texto-suave:#C8BCA9; --cor-texto-fraco:#BEAF99; }
+@media(max-width:1280px) { .grid-cards { grid-template-columns:repeat(3,minmax(0,1fr)); } }
+@media(max-width:680px) {
+ .pagina { padding:22px 16px; }
+ .grid-cards { grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+ .card-stat { padding:14px 12px; gap:10px; }
+ .card-stat .icone { width:34px; height:34px; flex-shrink:0; border-radius:10px; }
+ .card-stat .valor { font-size:1.55rem; }
+ .card-stat .rotulo { font-size:.75rem; }
+ .barra-filtros { grid-template-columns:repeat(2,minmax(0,1fr)); padding:16px; }
+ .barra-filtros > .campo:first-child { grid-column:1/-1; }
+ .acoes-cabecalho .btn { flex:1 1 140px; padding:10px 12px; font-size:.85rem; }
+ .tabela th, .tabela td { padding:12px; }
+ .auth-card { padding:28px 22px; }
+ .instalacao-card form { grid-template-columns:1fr; }
+ .auth-card h1 { font-size:1.3rem; }
+}
+@media(prefers-reduced-motion:reduce) {
+ *, *::before, *::after { scroll-behavior:auto!important; transition:none!important; animation:none!important; }
+}
+@media print {
+ .dica-tabela, .acoes-cabecalho, button, .btn { display:none!important; }
+ .pagina { max-width:none; width:auto; margin:0; }
+ .tabela th { position:static; }
+ a { text-decoration:none; }
 }

@@ -1,5 +1,8 @@
 package com.upbox.model;
 
+import com.upbox.entity.MovimentacaoEstoque;
+import com.upbox.entity.Produto;
+
 import lombok.Data;
 
 import java.util.List;

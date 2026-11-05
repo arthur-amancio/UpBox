@@ -1,6 +1,6 @@
 package com.upbox.repository;
 
-import com.upbox.model.Categoria;
+import com.upbox.entity.Categoria;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

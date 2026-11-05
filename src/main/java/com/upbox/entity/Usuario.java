@@ -1,4 +1,6 @@
-package com.upbox.model;
+package com.upbox.entity;
+
+import com.upbox.model.PerfilAcesso;
 
 import jakarta.persistence.*;
 

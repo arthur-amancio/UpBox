@@ -1,6 +1,6 @@
 package com.upbox.service;
 
-import com.upbox.model.RegistroOperacao;
+import com.upbox.entity.RegistroOperacao;
 import com.upbox.repository.*;
 
 import lombok.RequiredArgsConstructor;

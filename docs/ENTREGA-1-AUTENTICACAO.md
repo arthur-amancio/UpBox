@@ -1,3 +1,5 @@
+> Registro histórico das entregas anteriores. Para instalar a versão atual, siga [INSTALACAO-ESCOLA.md](INSTALACAO-ESCOLA.md): configuração em application.properties e primeiro administrador pelo navegador.
+
 # Entrega 1 — autenticação e usuários
 
 O login agora é feito pelo servidor, com Spring Security e sessão HTTP. O navegador envia usuário/e-mail e senha por formulário com token CSRF; o BCrypt compara a senha ao hash salvo. O principal da sessão contém o ID estável do usuário. Cada requisição verifica se conta, perfil e senha continuam válidos. Logout é POST, não um link GET.

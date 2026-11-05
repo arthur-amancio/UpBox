@@ -1,141 +1,70 @@
-# Instalar e executar o UpBox na escola
+# Instalação Windows — UpBox
 
-## 1. Preparar o computador
+## 1. Preparar
 
-Instale JDK 17, Maven, PostgreSQL e pgAdmin. O PostgreSQL é o servidor; pgAdmin é o programa para administrar o servidor. Docker não é necessário. No VS Code, abra a pasta do UpBox que contém `pom.xml`, não apenas `src/`.
+**Pacote pronto:** extraia o ZIP inteiro, instale Java 17 e PostgreSQL, edite application.properties ao lado do JAR e execute iniciar-upbox.bat. Não precisa de Maven, Git ou VS Code para somente utilizar esse pacote. Ele registra detalhes em logs/upbox.log e não apaga bancos. `iniciar-upbox.bat --verificar` confere Java/JAR/arquivo; não testa a conexão. Para mudar a porta, ajuste server.port e abra o endereço correspondente.
 
-Abra Terminal → New Terminal e confira:
+**Código-fonte:** siga os passos Maven/VS Code abaixo. Gerar o pacote é uma tarefa diferente de executar o sistema; o empacotamento bloqueia senha preenchida no fonte para não enviá-la a terceiros.
 
-```powershell
-java -version
-mvn -version
-```
+Instale JDK **17**, Maven, PostgreSQL e pgAdmin. No VS Code abra a pasta do pom.xml. `java -version` e `mvn -version` devem apontar Java 17. Os integrantes precisam de acesso ao repositório privado. Clone a main ou, durante a revisão desta entrega, a branch informada no PR final; não faça merges para instalar.
 
-Ambos devem indicar Java 17. Se algum comando não existir, revise a instalação/PATH e abra outro terminal. As extensões Java do VS Code ajudam na edição, mas os comandos Maven continuam suficientes para executar.
+## 2. Banco
 
-Use a branch `main` atualizada: `git switch main` e `git pull origin main`. Para uma instalacao nova, clone o repositorio e abra a pasta criada.
+Inicie o serviço PostgreSQL. No pgAdmin conecte ao servidor localhost, porta 5432, usuário postgres. O pgAdmin não substitui o servidor. Confirme `SELECT version();`: homologamos **9.6.24 e 16.4**; outra versão exige teste adicional.
 
-## 2. Criar o banco no pgAdmin
+Crie o banco upbox **somente se ausente**. Não apague nem recrie um banco existente. Faça backup antes de atualizar uma instalação utilizada.
 
-1. Confirme que o serviço PostgreSQL está em execução.
-2. Abra pgAdmin e conecte ao servidor local, normalmente `localhost`, porta `5432`, usuário `postgres`.
-3. Use a senha padrao do servidor PostgreSQL da escola, se ela for a mesma informada pelo responsavel. A senha principal do pgAdmin, quando solicitada para abrir o programa, e outra configuracao.
-4. Em Databases, clique com o botão direito → Create → Database.
-5. Nome: `upbox`. Owner: o usuário PostgreSQL da escola, normalmente `postgres`.
-6. Salve. O JPA cria/atualiza as tabelas ao iniciar o UpBox; não é necessário desenhar as tabelas manualmente nesta etapa.
+## 3. Um único arquivo de configuração
 
-## 3. Conexao pronta no computador da escola
-
-O arquivo versionado `src/main/resources/application.properties` usa por padrao:
-- `jdbc:postgresql://localhost:5432/upbox`
-- usuario `postgres`
-- senha escolar padrao informada pelo responsavel
-
-**A senha do banco ja esta configurada; nao e necessario criar arquivo local apenas para a conexao.**
-O banco `upbox` precisa existir antes da primeira inicializacao. O banco `postgres` e o banco administrativo padrao do servidor, nao o banco do UpBox.
-
-Por solicitacao expressa do responsavel, a senha compartilhada da escola foi incluida na configuracao versionada do repositorio privado; todos os colaboradores com acesso ao codigo poderao ve-la. **Nao reutilize esta senha fora do ambiente escolar** e use uma credencial diferente para outros computadores/ambientes.
-
-Se a instalacao do PostgreSQL usar outro usuario, porta ou senha, crie o arquivo local apenas se ainda nao existir:
-
-```powershell
-if (!(Test-Path application-local.properties)) {
-    Copy-Item application-local.example.properties application-local.properties
-}
-```
-
-Descomente e personalize os campos `spring.datasource.*` do arquivo local. Ele e carregado automaticamente e permanece no `.gitignore`. **Nunca sobrescreva um arquivo local funcional.**
-
-## 4. Criar o primeiro administrador
-
-Para criar o login inicial **do UpBox** (diferente do usuario `postgres`), copie o exemplo para `application-local.properties` na raiz, somente se ele ainda nao existir, e configure:
+Edite `src/main/resources/application.properties` ao executar pelo Maven. Na distribuição JAR, edite `application.properties` ao lado do JAR. Exemplo de conexão, sem senha real:
 
 ```properties
-upbox.admin-inicial.habilitado=true
-upbox.admin-inicial.nome=Administrador da equipe
-upbox.admin-inicial.usuario=administrador
-upbox.admin-inicial.email=admin@example.com
-upbox.admin-inicial.senha=DEFINA_UMA_SENHA_SOMENTE_NESTE_ARQUIVO_LOCAL
+spring.datasource.url=jdbc:postgresql://localhost:5432/upbox
+spring.datasource.username=postgres
+spring.datasource.password=PREENCHA_SOMENTE_NESTE_COMPUTADOR
 ```
 
-A senha escolhida deve ter pelo menos 8 caracteres, nao ser em branco e respeitar o limite de 72 bytes do BCrypt. Use uma senha propria para o administrador, diferente da senha do PostgreSQL. Não use o texto de exemplo como senha da equipe.
+Substitua o texto da senha, não o use literalmente. O arquivo do projeto também aceita `${DB_PASSWORD:}`: pode escrever a senha depois dos dois-pontos ou substituir o valor inteiro. O usuário pode ser root se essa conta existir no servidor; não confunda conta do Windows com conta do PostgreSQL.
 
-Execute:
+Não precisa criar application-local.properties. Um arquivo local funcional já existente continua sendo carregado opcionalmente; preserve-o e lembre que seus campos substituem os padrões. Variáveis de ambiente continuam opcionais. Não envie senha preenchida ao GitHub.
 
-```powershell
-mvn clean test
-mvn spring-boot:run
-```
+## 4. Primeiro administrador pelo navegador
 
-Abra http://localhost:8080 e entre com usuário/e-mail e senha que configurou. Depois da primeira criação, remova a linha da senha inicial e altere:
+Execute `mvn clean test` e `mvn spring-boot:run`. Abra http://localhost:8080 no computador em que a aplicação está rodando. O primeiro acesso permite criar nome, usuário, e-mail e senha de login. Não reutilize a senha do banco.
 
-```properties
-upbox.admin-inicial.habilitado=false
-```
+A senha deve ter ao menos oito caracteres e no máximo 72 bytes. CSRF permanece ativo; a senha é gravada com BCrypt. O backend impede dois administradores iniciais concorrentes no PostgreSQL. Após a primeira conta, o cadastro inicial fecha, inclusive se o administrador for desativado. Não apague usuários para tentar reabri-lo. Não existe cadastro público permanente.
 
-A criação inicial não substitui administrador existente, inclusive inativo. O administrador cadastra os demais integrantes em Usuários. Não existe conta demo nem cadastro público.
+A configuração antiga `upbox.admin-inicial.*` continua somente como alternativa optativa para quem já a utiliza; nunca substitui uma conta existente.
 
-## 5. Usar, parar e reiniciar
+## 5. Demonstração e reinício
 
-Cadastre categoria e produto; registre uma entrada e uma saída. Use Logout/Sair ao encerrar sua sessão. Para parar o servidor, pressione Ctrl+C no terminal que executa Spring Boot. Inicie novamente com `mvn spring-boot:run`: os dados continuam no PostgreSQL.
+Cadastre categoria, produto e funcionário. Registre entrada 10 e saída 7; recuse saída 4. O saldo é 3, com duas movimentações. Confira dashboard, seis relatórios, permissões e impressão. Não edite saldo pelo pgAdmin.
 
-O programa escuta somente em `127.0.0.1` por padrão. Abra a apresentação nesse computador. Os testes de integração não usam o banco de uso `upbox`.
+Pare com Ctrl+C e inicie novamente. Os registros devem permanecer. A aplicação usa somente 127.0.0.1 por padrão; não é preciso abrir firewall para demonstrar nesse computador.
 
-## 6. Consultar os registros no pgAdmin
+## 6. Conferir no pgAdmin
 
-Abra `upbox → Schemas → public → Tables` e atualize a lista. As tabelas principais são `usuarios`, `categorias`, `produtos`, `movimentacoes_estoque` e `registros_operacoes`.
+Atualize upbox → Schemas → public → Tables. Consulte usuarios, categorias, produtos, movimentacoes_estoque e registros_operacoes. Selecione campos como nome, código, quantidade e data; não projete senha_hash.
 
-No Query Tool, execute exemplos com os campos que deseja apresentar:
+## 7. Testes
 
-```sql
-SELECT id, nome, usuario, email, perfil, ativo FROM usuarios ORDER BY id;
-SELECT codigo, nome, quantidade_estoque, estoque_minimo, preco, ativo
-FROM produtos ORDER BY nome;
-SELECT m.data_hora, p.codigo, p.nome AS produto, u.nome AS responsavel,
-       m.tipo, m.quantidade, m.observacao
-FROM movimentacoes_estoque m
-JOIN produtos p ON p.id = m.produto_id
-JOIN usuarios u ON u.id = m.usuario_id
-ORDER BY m.data_hora DESC, m.id DESC;
-```
-
-Não projete `senha_hash`. Evite mudar saldo diretamente no pgAdmin: isso pula validações, histórico e auditoria. Use os formulários do sistema para demonstrar as regras.
-
-## 7. Executar os testes
-
-```powershell
-mvn clean test
-```
-
-Os testes rápidos usam H2 apenas no ambiente de testes. Para testar PostgreSQL real, crie **outro banco exclusivo e descartável chamado `upbox_test`**. As tabelas desse banco serão recriadas/apagadas:
-
-```powershell
-$env:UPBOX_TEST_DB_URL = 'jdbc:postgresql://localhost:5432/upbox_test'
-$env:UPBOX_TEST_DB_USER = 'postgres'
-$env:UPBOX_TEST_DB_PASSWORD = 'SUA_SENHA_LOCAL'
-mvn -Ppostgres-it verify
-Remove-Item Env:UPBOX_TEST_DB_PASSWORD
-```
-
-O perfil rejeita outro nome de banco antes de iniciar o JPA. Não use `upbox` para testes destrutivos. As variáveis acima são exclusivas do banco de testes e não substituem a configuração local persistente da aplicação.
+`mvn clean test` usa H2 no perfil test. Integração PostgreSQL somente no banco **descartável upbox_test**: veja COMPATIBILIDADE-POSTGRESQL.md. Esse perfil apaga/recria tabelas e recusa outro nome de banco.
 
 ## 8. Problemas comuns
 
-| Sintoma | O que conferir |
+| Mensagem/sintoma | Solução |
 | --- | --- |
-| Connection refused | Serviço PostgreSQL iniciado; host/porta corretos no arquivo local |
-| Password authentication failed | Usuário e senha do servidor PostgreSQL no arquivo local; não confundir com a senha principal do pgAdmin |
-| Database upbox does not exist | Criar o banco no servidor/porta indicados na URL |
-| Senha local parece ignorada | Executar a partir da pasta do pom.xml; nome exato application-local.properties; conferir variáveis de ambiente que possam sobrescrever a configuração |
-| Porta 8080 ocupada | Encerrar outro UpBox ou adicionar `server.port=8081` ao arquivo local e acessar localhost:8081 |
-| Comando mvn/java não encontrado | Instalação e PATH; reabrir terminal após corrigir |
-| Versão do Java incorreta | Conferir java -version e mvn -version; ajustar JAVA_HOME/PATH para JDK 17 |
-| Erro ao criar índice único | Verificar duplicidades antigas de usuário/e-mail/categoria/código; não apagar tabelas para contornar |
-| Conta não entra | Conferir atividade, usuário/e-mail e senha; a criação inicial não redefine conta existente |
-| Sessão expirada ou formulário antigo | Fazer login novamente e reabrir o formulário, mantendo CSRF habilitado |
-| Não vejo tabelas/registros | Atualizar o pgAdmin e confirmar banco, servidor e porta; usar a mesma URL da aplicação |
+| Conexão recusada | Inicie PostgreSQL e confira host/porta |
+| Senha do banco inválida | Confira usuário e senha no application.properties; pgAdmin pode ter outra senha principal |
+| Banco upbox não existe | Crie apenas o banco ausente no servidor correto |
+| Porta 8080 ocupada | Encerre outra instância ou configure server.port=8081 e use esse endereço |
+| Java incorreto | Instale Java 17 e ajuste JAVA_HOME/PATH; reabra terminal |
+| Configuração parece ignorada | Confira arquivo local opcional antigo e variáveis de ambiente |
+| Falha em índice único | Analise duplicidades antigas em cópia; não apague tabelas |
+| Sessão/formulário expirado | Entre novamente e reabra formulário; não desative CSRF |
+| Primeiro acesso indisponível | Já existe administrador, ou o navegador não está no próprio computador |
 
-Leia os detalhes técnicos no terminal. Páginas comuns não devem mostrar SQL ou stack traces. `ddl-auto=update` é mantido somente para desenvolvimento/TCC; não apague tabelas para resolver erros de conexão.
+Os detalhes ficam nos logs. Não use create ou create-drop no banco upbox. Ddl-auto=update é somente para desenvolvimento/TCC.
 
 ## 9. Backup simples pelo pgAdmin
 

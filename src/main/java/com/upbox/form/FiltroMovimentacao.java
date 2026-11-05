@@ -1,4 +1,6 @@
-package com.upbox.model;
+package com.upbox.form;
+
+import com.upbox.model.TipoMovimentacao;
 
 import lombok.Data;
 

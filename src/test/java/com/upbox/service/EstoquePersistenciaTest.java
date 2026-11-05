@@ -1,5 +1,9 @@
 package com.upbox.service;
 
+import com.upbox.entity.Categoria;
+import com.upbox.entity.Produto;
+import com.upbox.entity.Usuario;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.upbox.model.*;

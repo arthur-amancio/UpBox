@@ -3,6 +3,8 @@ target/
 *.iml
 .vscode/
 *.log
+# Configuração externa do pacote JAR pode conter a senha preenchida no computador.
+/application.properties
 
 # Arquivos locais: nunca enviar senhas ou configurações privadas ao Git.
 .env

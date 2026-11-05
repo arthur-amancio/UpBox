@@ -1,5 +1,10 @@
 package com.upbox.service;
 
+import com.upbox.entity.MovimentacaoEstoque;
+import com.upbox.entity.Produto;
+import com.upbox.entity.Usuario;
+import com.upbox.form.FiltroMovimentacao;
+
 import com.upbox.model.*;
 import com.upbox.repository.MovimentacaoEstoqueRepository;
 import com.upbox.repository.ProdutoRepository;

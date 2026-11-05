@@ -1,5 +1,9 @@
 package com.upbox.service;
 
+import com.upbox.entity.Categoria;
+import com.upbox.entity.Produto;
+import com.upbox.form.ProdutoForm;
+
 import com.upbox.model.*;
 import com.upbox.repository.*;
 

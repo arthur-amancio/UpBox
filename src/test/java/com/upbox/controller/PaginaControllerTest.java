@@ -164,6 +164,9 @@ class PaginaControllerTest extends CenarioMvc {
 
     @org.springframework.beans.factory.annotation.Autowired jakarta.validation.Validator validator;
 
+    @org.springframework.beans.factory.annotation.Autowired
+    com.upbox.service.PrimeiroAcessoService primeiroAcesso;
+
     @Test
     void administradorInicialNaoPodeRecriarContaExistenteInativa() {
         admin.desativar();
@@ -175,7 +178,8 @@ class PaginaControllerTest extends CenarioMvc {
                         .withProperty("upbox.admin-inicial.usuario", "outro.admin")
                         .withProperty("upbox.admin-inicial.email", "outro@example.com")
                         .withProperty("upbox.admin-inicial.senha", "senha-ficticia-teste");
-        var inicial = new com.upbox.config.AdministradorInicial(env, usuarios, service, validator);
+        var inicial =
+                new com.upbox.config.AdministradorInicial(env, usuarios, primeiroAcesso, validator);
         inicial.run(new org.springframework.boot.DefaultApplicationArguments());
         assertEquals(2, usuarios.count());
         assertFalse(usuarios.findById(admin.getId()).orElseThrow().isAtivo());

@@ -22,6 +22,12 @@
     </properties>
 
     <dependencies>
+        <!-- Mesmo Hibernate gerenciado pelo Spring Boot; SQL legado sem trocar o framework. -->
+        <dependency>
+            <groupId>org.hibernate.orm</groupId>
+            <artifactId>hibernate-community-dialects</artifactId>
+            <version>${hibernate.version}</version>
+        </dependency>
         <!-- Segurança de formulário e validações no servidor. -->
         <dependency><groupId>org.springframework.boot</groupId><artifactId>spring-boot-starter-security</artifactId></dependency>
         <dependency><groupId>org.springframework.boot</groupId><artifactId>spring-boot-starter-validation</artifactId></dependency>
@@ -83,6 +89,34 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+            <!-- Impede distribuir sem querer uma senha preenchida no computador. -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions><execution><id>conferir-configuracao-distribuivel</id>
+                    <phase>prepare-package</phase><goals><goal>run</goal></goals>
+                    <configuration><target>
+                        <loadfile property="upbox.config.conteudo" srcFile="${project.basedir}/src/main/resources/application.properties" encoding="UTF-8"/>
+                        <condition property="upbox.config.tem-senha"><not>
+                            <matches string="${upbox.config.conteudo}" pattern="(?m)^spring[.]datasource[.]password=[$][{]DB_PASSWORD:[}]\r?$"/>
+                        </not></condition>
+                        <fail if="upbox.config.tem-senha" message="Pacote bloqueado: deixe a senha vazia no padrao do fonte. Preencha somente o application.properties externo do computador de uso."/>
+                        <condition property="upbox.config.tem-bootstrap"><matches string="${upbox.config.conteudo}" pattern="(?m)^\s*upbox[.]admin-inicial[.]senha\s*=\s*\S+"/></condition>
+                        <fail if="upbox.config.tem-bootstrap" message="Pacote bloqueado: remova a senha de administrador inicial do arquivo distribuível."/>
+                    </target></configuration>
+                </execution></executions>
+            </plugin>
+            <!-- ZIP convencional: JAR executável, configuração, script e instruções. -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.7.1</version>
+                <configuration><descriptors><descriptor>src/assembly/escola.xml</descriptor></descriptors></configuration>
+                <executions><execution><id>pacote-escola</id><phase>package</phase>
+                    <goals><goal>single</goal></goals>
+                </execution></executions>
             </plugin>
         </plugins>
     </build>

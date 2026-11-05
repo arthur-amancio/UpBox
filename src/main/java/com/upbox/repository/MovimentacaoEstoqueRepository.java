@@ -1,6 +1,6 @@
 package com.upbox.repository;
 
-import com.upbox.model.MovimentacaoEstoque;
+import com.upbox.entity.MovimentacaoEstoque;
 import com.upbox.model.TipoMovimentacao;
 
 import org.springframework.data.jpa.repository.*;
