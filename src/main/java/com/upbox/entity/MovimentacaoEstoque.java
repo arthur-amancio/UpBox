@@ -1,7 +1,5 @@
 package com.upbox.entity;
 
-import com.upbox.model.TipoMovimentacao;
-
 import jakarta.persistence.*;
 
 import lombok.AccessLevel;
@@ -68,5 +66,4 @@ public class MovimentacaoEstoque {
         this.dataHora = dataHora;
         this.observacao = observacao == null ? "" : observacao.trim();
     }
-
 }

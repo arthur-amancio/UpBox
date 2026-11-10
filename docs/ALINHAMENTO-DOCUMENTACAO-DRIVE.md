@@ -1,3 +1,5 @@
+> Material histórico da análise acadêmica. A decisão atual do responsável é MySQL e ativação local da conta automática administrador; para instalar use o README. Nenhum original do Drive foi alterado.
+
 # UpBox — alinhamento entre Drive, requisitos e código
 
 > Revisão documental em 29/10/2026. Fonte: [pasta do UpBox no Google Drive](https://drive.google.com/drive/folders/1HduDoOHXHC-WpA0TgFztmEgA7RVMQC1D). **Não altera os documentos do grupo.** As divergências do levantamento inicial estão preservadas abaixo; as decisões implementadas estão registradas na seção 8.

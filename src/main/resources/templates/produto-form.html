@@ -19,7 +19,7 @@
         Código único
        </label>
        <input maxlength="40" required="" th:field="*{codigo}"/>
-       <small class="erro-campo" th:errors="*{codigo}" th:if="${#fields.hasErrors('codigo')}">
+       <small class="erro-campo" th:text="'Revise este campo.'" th:if="${#fields.hasErrors('codigo')}">
        </small>
       </div>
       <div class="campo">
@@ -27,7 +27,7 @@
         Nome
        </label>
        <input maxlength="120" required="" th:field="*{nome}"/>
-       <small class="erro-campo" th:errors="*{nome}" th:if="${#fields.hasErrors('nome')}">
+       <small class="erro-campo" th:text="'Revise este campo.'" th:if="${#fields.hasErrors('nome')}">
        </small>
       </div>
       <div class="campo largura-total">
@@ -35,7 +35,7 @@
         Descrição
        </label>
        <textarea maxlength="500" th:field="*{descricao}"></textarea>
-       <small class="erro-campo" th:errors="*{descricao}" th:if="${#fields.hasErrors('descricao')}">
+       <small class="erro-campo" th:text="'Revise este campo.'" th:if="${#fields.hasErrors('descricao')}">
        </small>
       </div>
       <div class="campo">
@@ -49,7 +49,7 @@
         <option th:each="c : ${categorias}" th:text="${c.nome + (c.ativa ? '' : ' (inativa)')}" th:value="${c.id}">
         </option>
        </select>
-       <small class="erro-campo" th:errors="*{categoriaId}" th:if="${#fields.hasErrors('categoriaId')}">
+       <small class="erro-campo" th:text="'Revise este campo.'" th:if="${#fields.hasErrors('categoriaId')}">
        </small>
       </div>
       <div class="campo">
@@ -57,7 +57,7 @@
         Estoque mínimo
        </label>
        <input max="2147483647" min="0" required="" step="1" th:field="*{estoqueMinimo}" type="number"/>
-       <small class="erro-campo" th:errors="*{estoqueMinimo}" th:if="${#fields.hasErrors('estoqueMinimo')}">
+       <small class="erro-campo" th:text="'Revise este campo.'" th:if="${#fields.hasErrors('estoqueMinimo')}">
        </small>
       </div>
       <div class="campo">
@@ -65,7 +65,7 @@
         Preço unitário (R$)
        </label>
        <input max="9999999999.99" min="0" required="" step="0.01" th:field="*{preco}" type="number"/>
-       <small class="erro-campo" th:errors="*{preco}" th:if="${#fields.hasErrors('preco')}">
+       <small class="erro-campo" th:text="'Revise este campo.'" th:if="${#fields.hasErrors('preco')}">
        </small>
       </div>
      </div>

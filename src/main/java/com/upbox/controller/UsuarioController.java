@@ -1,11 +1,8 @@
 package com.upbox.controller;
 
-import com.upbox.form.PerfilForm;
-import com.upbox.form.SenhaForm;
-import com.upbox.form.UsuarioForm;
-
-import com.upbox.model.*;
+import com.upbox.entity.*;
 import com.upbox.repository.*;
+import com.upbox.service.*;
 import com.upbox.service.UsuarioService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -96,6 +93,7 @@ public class UsuarioController {
         f.setEmail(u.getEmail());
         m.addAttribute("perfilForm", f);
         m.addAttribute("senhaForm", new SenhaForm());
+        m.addAttribute("trocaObrigatoria", u.isTrocaSenhaObrigatoria());
         return "configuracoes";
     }
 

@@ -1,11 +1,10 @@
 package com.upbox.service;
 
+import com.upbox.controller.PerfilForm;
+import com.upbox.controller.SenhaForm;
+import com.upbox.controller.UsuarioForm;
+import com.upbox.entity.*;
 import com.upbox.entity.Usuario;
-import com.upbox.form.PerfilForm;
-import com.upbox.form.SenhaForm;
-import com.upbox.form.UsuarioForm;
-
-import com.upbox.model.*;
 import com.upbox.repository.UsuarioRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -86,6 +85,7 @@ public class UsuarioService {
             throw new IllegalArgumentException("As senhas informadas não coincidem.");
         validarSenha(f.getNova());
         u.alterarSenhaHash(encoder.encode(f.getNova()));
+        u.concluirTrocaSenha();
         auditoria.registrar("Senha alterada", "Usuário #" + id);
     }
 

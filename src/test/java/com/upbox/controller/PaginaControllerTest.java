@@ -5,8 +5,9 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import com.upbox.model.*;
+import com.upbox.entity.*;
 import com.upbox.repository.*;
+import com.upbox.service.*;
 
 import org.junit.jupiter.api.*;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -171,16 +172,7 @@ class PaginaControllerTest extends CenarioMvc {
     void administradorInicialNaoPodeRecriarContaExistenteInativa() {
         admin.desativar();
         usuarios.saveAndFlush(admin);
-        var env =
-                new org.springframework.mock.env.MockEnvironment()
-                        .withProperty("upbox.admin-inicial.habilitado", "true")
-                        .withProperty("upbox.admin-inicial.nome", "Outra conta")
-                        .withProperty("upbox.admin-inicial.usuario", "outro.admin")
-                        .withProperty("upbox.admin-inicial.email", "outro@example.com")
-                        .withProperty("upbox.admin-inicial.senha", "senha-ficticia-teste");
-        var inicial =
-                new com.upbox.config.AdministradorInicial(env, usuarios, primeiroAcesso, validator);
-        inicial.run(new org.springframework.boot.DefaultApplicationArguments());
+        primeiroAcesso.criarContaPadrao();
         assertEquals(2, usuarios.count());
         assertFalse(usuarios.findById(admin.getId()).orElseThrow().isAtivo());
     }

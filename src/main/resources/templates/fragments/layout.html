@@ -100,7 +100,7 @@
      <main class="pagina" id="conteudo-principal" tabindex="-1">
       <div class="alerta alerta-sucesso" role="status" th:if="${sucesso}" th:text="${sucesso}">
       </div>
-      <div class="alerta alerta-erro" role="alert" th:if="${erro}" th:text="${erro}">
+      <div class="alerta alerta-erro" role="alert" th:if="${erro}" th:text="${#strings.contains(erro, 'Failed to convert') ? 'Informe um valor no formato válido para este campo.' : erro}">
       </div>
       <th:block th:replace="${conteudo}">
       </th:block>

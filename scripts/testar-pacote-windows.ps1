@@ -1,26 +1,27 @@
 param([Parameter(Mandatory = $true)][string]$Pacote)
-
-# Homologação da CI: cluster e banco novos, nunca a instalação de uso da escola.
+# Banco novo e descartável da CI. Não acessa instalação escolar.
 $ErrorActionPreference = 'Stop'
 $raiz = Join-Path $env:RUNNER_TEMP ('upbox-' + [guid]::NewGuid())
 $extraido = Join-Path $raiz 'Pasta com espacos'
 New-Item -ItemType Directory -Path $raiz | Out-Null
 Expand-Archive -Path $Pacote -DestinationPath $extraido
 $pasta = Join-Path $extraido 'UpBox-escola'
-$pg = Get-ChildItem 'C:\Program Files\PostgreSQL\*\bin\pg_ctl.exe' -ErrorAction SilentlyContinue |
-    Sort-Object FullName -Descending | Select-Object -First 1
-if (!$pg) {
-    # Alternativa oficial caso a imagem Windows não traga PostgreSQL instalado.
-    $binarios = Join-Path $raiz 'postgres.zip'
-    Invoke-WebRequest 'https://get.enterprisedb.com/postgresql/postgresql-16.4-1-windows-x64-binaries.zip' -OutFile $binarios
-    Expand-Archive $binarios -DestinationPath (Join-Path $raiz 'pg')
-    $pg = Get-Item (Join-Path $raiz 'pg\pgsql\bin\pg_ctl.exe')
+$mysql = Get-Command mysqld.exe -ErrorAction SilentlyContinue
+if ($mysql) { $bin = Split-Path $mysql.Source }
+elseif (Test-Path 'C:\mysql\bin\mysqld.exe') { $bin = 'C:\mysql\bin' }
+else {
+    $download = Join-Path $raiz 'mysql.zip'
+    Invoke-WebRequest 'https://cdn.mysql.com/archives/mysql-8.0/mysql-8.0.44-winx64.zip' -OutFile $download
+    Expand-Archive $download -DestinationPath (Join-Path $raiz 'mysql')
+    $bin = (Get-ChildItem (Join-Path $raiz 'mysql') -Filter mysqld.exe -Recurse | Select-Object -First 1).DirectoryName
 }
-$pgBin = $pg.DirectoryName
 $dados = Join-Path $raiz 'dados-descartaveis'
 $script:processo = $null
-$iniciouBanco = $false
-
+$banco = $null
+function Sql($consulta) {
+    & "$bin\mysql.exe" --no-defaults --protocol=TCP "--host=127.0.0.1" "--port=53316" "--user=root" -N -e $consulta
+    if ($LASTEXITCODE -ne 0) { throw 'Falha no MySQL descartável.' }
+}
 function Parar-UpBox {
     if ($script:processo -and !$script:processo.HasExited) {
         Get-CimInstance Win32_Process -Filter "ParentProcessId = $($script:processo.Id)" |
@@ -43,61 +44,80 @@ function Iniciar-UpBox {
 }
 
 try {
-    & "$pgBin\initdb.exe" -D $dados -U upbox_test -A trust
-    if ($LASTEXITCODE -ne 0) { throw 'initdb falhou no cluster descartável.' }
-    & "$pgBin\pg_ctl.exe" -D $dados -l (Join-Path $raiz 'postgres.log') -o '-p 55439 -h 127.0.0.1' -w start
-    if ($LASTEXITCODE -ne 0) { throw 'PostgreSQL de testes não iniciou.' }
-    $iniciouBanco = $true
-    & "$pgBin\createdb.exe" -h 127.0.0.1 -p 55439 -U upbox_test upbox_test
-    if ($LASTEXITCODE -ne 0) { throw 'Não foi possível criar upbox_test.' }
-    $versao = & "$pgBin\psql.exe" -h 127.0.0.1 -p 55439 -U upbox_test -d upbox_test -Atc 'select version()'
-    $env:DB_URL = 'jdbc:postgresql://127.0.0.1:55439/upbox_test'
-    $env:DB_USER = 'upbox_test'
-    $env:DB_PASSWORD = ''
+    Write-Host "Inicializando cluster MySQL descartável em $dados"
+    & "$bin\mysqld.exe" --no-defaults --initialize-insecure "--basedir=$(Split-Path $bin)" "--datadir=$dados"
+    if ($LASTEXITCODE -ne 0) { throw 'Não inicializou o MySQL descartável.' }
+    Write-Host "MySQL de teste em $bin"
+    & "$bin\mysqld.exe" --no-defaults --version
+    $banco = Start-Process "$bin\mysqld.exe" -ArgumentList "--no-defaults --datadir=`"$dados`" --port=53316 --bind-address=127.0.0.1 --mysqlx=0 --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --console" -RedirectStandardOutput (Join-Path $raiz 'mysql-out.log') -RedirectStandardError (Join-Path $raiz 'mysql-err.log') -PassThru
+    Write-Host "Aguardando MySQL na porta 53316, PID $($banco.Id)"
+    $pronto = $false
+    for ($i=0; $i -lt 60; $i++) {
+        $banco.Refresh()
+        if ($banco.HasExited) { throw 'O processo MySQL encerrou; veja os logs de diagnóstico.' }
+        $socket = [System.Net.Sockets.TcpClient]::new()
+        try {
+            $tentativa = $socket.ConnectAsync('127.0.0.1', 53316)
+            if ($tentativa.Wait(1000) -and $socket.Connected) { $pronto=$true; break }
+        } catch { } finally { $socket.Dispose() }
+        Start-Sleep -Seconds 1
+    }
+    if (!$pronto) { throw 'MySQL descartável não ficou pronto.' }
+    Sql 'CREATE DATABASE upbox_test CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci'
+    $versao = Sql 'SELECT VERSION()'
+    $env:SPRING_DATASOURCE_URL = 'jdbc:mysql://127.0.0.1:53316/upbox_test'
+    $env:SPRING_DATASOURCE_USERNAME = 'root'
+    $env:SPRING_DATASOURCE_PASSWORD = ''
     $env:SERVER_PORT = '18082'
     Push-Location $pasta
     try {
         & $env:ComSpec /d /c 'iniciar-upbox.bat --verificar'
-        if ($LASTEXITCODE -ne 0) { throw 'Verificação Java 17/JAR/configuração falhou.' }
+        if ($LASTEXITCODE -ne 0) { throw 'Verificação Java/JAR/configuração falhou.' }
     } finally { Pop-Location }
     Iniciar-UpBox
-    $pagina = Invoke-WebRequest 'http://127.0.0.1:18082/primeiro-acesso' -SessionVariable sessao
+    $pagina = Invoke-WebRequest 'http://127.0.0.1:18082/login' -SessionVariable sessao
     $token = [regex]::Match($pagina.Content, 'name="_csrf"[^>]*value="([^"]+)"').Groups[1].Value
-    if (!$token) { throw 'Formulário inicial sem token CSRF.' }
-    Invoke-WebRequest 'http://127.0.0.1:18082/primeiro-acesso' -Method Post -WebSession $sessao -Body @{
-        _csrf = $token; nome = 'Equipe Windows'; usuario = 'admin'; email = 'admin@example.com'
-        senha = 'senha-teste-windows-123'; confirmacao = 'senha-teste-windows-123'
+    if ([int](Sql 'SELECT COUNT(*) FROM upbox_test.usuarios') -ne 1) { throw 'Conta automática ausente ou duplicada.' }
+    $pagina = Invoke-WebRequest 'http://127.0.0.1:18082/login' -Method Post -WebSession $sessao -Body @{_csrf=$token; username='administrador'; password='admin'}
+    if ($pagina.Content -notmatch 'Primeiro acesso:') { throw 'A senha inicial não exigiu troca.' }
+    $token = [regex]::Match($pagina.Content, 'name="_csrf"[^>]*value="([^"]+)"').Groups[1].Value
+    Invoke-WebRequest 'http://127.0.0.1:18082/configuracoes/senha' -Method Post -WebSession $sessao -Body @{
+        _csrf=$token; atual='admin'; nova='senha-teste-windows-123'; confirmacao='senha-teste-windows-123'
     } | Out-Null
     Parar-UpBox
     Iniciar-UpBox
-    $contas = & "$pgBin\psql.exe" -h 127.0.0.1 -p 55439 -U upbox_test -d upbox_test -Atc "select count(*) from usuarios where perfil='ADMINISTRADOR'"
-    if ([int]$contas -ne 1) { throw 'Conta não persistiu ou foi duplicada após reinício.' }
-    $pagina = Invoke-WebRequest 'http://127.0.0.1:18082/primeiro-acesso'
-    if ($pagina.Content -notmatch 'name="username"') { throw 'Cadastro inicial não fechou após reinício.' }
+    if ([int](Sql 'SELECT COUNT(*) FROM upbox_test.usuarios') -ne 1) { throw 'Duplicação após reinício.' }
+    $pagina = Invoke-WebRequest 'http://127.0.0.1:18082/login' -SessionVariable retorno
+    $token = [regex]::Match($pagina.Content, 'name="_csrf"[^>]*value="([^"]+)"').Groups[1].Value
+    $pagina = Invoke-WebRequest 'http://127.0.0.1:18082/login' -Method Post -WebSession $retorno -Body @{_csrf=$token; username='administrador'; password='senha-teste-windows-123'}
+    if ($pagina.Content -notmatch 'Bem-vindo') { throw 'Login após reinício não preservou a nova senha.' }
     Parar-UpBox
-
-    # Exercita mensagens do .bat sem expor stack trace na janela do aluno.
-    $env:DB_URL = 'jdbc:postgresql://127.0.0.1:1/upbox_test?connectTimeout=2'
+    $env:SPRING_DATASOURCE_URL = 'jdbc:mysql://127.0.0.1:1/upbox_test?connectTimeout=2000'
     Push-Location $pasta
     try {
         $mensagem = & $env:ComSpec /d /c 'iniciar-upbox.bat --sem-pausa' 2>&1 | Out-String
-        if ($LASTEXITCODE -ne 1 -or $mensagem -notmatch 'Confira o servico PostgreSQL') { throw 'Mensagem de conexão inválida não foi apresentada.' }
-        $javaAnterior = $env:JAVA_HOME
+        if ($LASTEXITCODE -ne 1 -or $mensagem -notmatch 'Confira o servico MySQL') { throw 'Mensagem de conexão inválida ausente.' }
+        $anterior = $env:JAVA_HOME
         try {
             $env:JAVA_HOME = Join-Path $raiz 'java-inexistente'
             $mensagemJava = & $env:ComSpec /d /c 'iniciar-upbox.bat --verificar' 2>&1 | Out-String
-            if ($LASTEXITCODE -ne 1 -or $mensagemJava -notmatch 'Java 17 nao encontrado') { throw 'Mensagem de Java ausente não foi apresentada.' }
-        } finally { $env:JAVA_HOME = $javaAnterior }
+            if ($LASTEXITCODE -ne 1 -or $mensagemJava -notmatch 'Java 17 nao encontrado') { throw 'Mensagem Java ausente.' }
+        } finally { $env:JAVA_HOME=$anterior }
     } finally { Pop-Location }
-    $resultado = @{resultado='aprovado'; commit=$env:GITHUB_SHA; postgres=$versao; sistema='Windows'; java=17; pacoteExtraido=$true; caminhoComEspacos=$true; primeiroAcessoCsrf=$true; reinicioSemDuplicacao=$true; mensagemConexao=$true; mensagemJava=$true}
-    $json = $resultado | ConvertTo-Json
-    $json | Set-Content (Join-Path $env:GITHUB_WORKSPACE 'target\homologacao-windows.json')
-    # A evidência também fica legível no log, sem depender do download do artefato.
+    $json = @{resultado='aprovado'; commit=$env:GITHUB_SHA; mysql=$versao; sistema='Windows'; java=17; contaAutomatica=$true; loginPadraoETrocaObrigatoria=$true; reinicioSemDuplicacao=$true; caminhoComEspacos=$true; mensagemConexao=$true; mensagemJava=$true} | ConvertTo-Json
+    $json | Set-Content (Join-Path $env:GITHUB_WORKSPACE 'target/homologacao-windows.json')
     Write-Host $json
 } finally {
     Parar-UpBox
-    if (Test-Path (Join-Path $pasta 'logs\upbox.log')) {
-        Copy-Item (Join-Path $pasta 'logs\upbox.log') (Join-Path $env:GITHUB_WORKSPACE 'target\windows-upbox.log')
+    if (Test-Path (Join-Path $pasta 'logs/upbox.log')) { Copy-Item (Join-Path $pasta 'logs/upbox.log') (Join-Path $env:GITHUB_WORKSPACE 'target/windows-upbox.log') }
+    foreach ($log in @((Join-Path $raiz 'mysql-out.log'), (Join-Path $raiz 'mysql-err.log'))) {
+        if (Test-Path $log) {
+            Get-Content $log | Write-Host
+            Get-Content $log | Add-Content (Join-Path $env:GITHUB_WORKSPACE 'target/windows-mysql.log')
+        }
     }
-    if ($iniciouBanco) { & "$pgBin\pg_ctl.exe" -D $dados -m fast -w stop }
+    Get-ChildItem $dados -Filter '*.err' -ErrorAction SilentlyContinue | ForEach-Object { Get-Content $_.FullName | Write-Host }
+    if ($banco -and !$banco.HasExited) { Stop-Process -Id $banco.Id -Force }
 }
+# Os testes de erro retornam 1 de propósito; chegando aqui, todas as verificações passaram.
+exit 0

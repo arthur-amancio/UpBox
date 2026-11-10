@@ -38,7 +38,7 @@ echo ERRO: application.properties nao encontrado ao lado do JAR.
 goto erro
 :falha
 echo ERRO: o UpBox nao conseguiu iniciar ou foi interrompido.
-echo Confira o servico PostgreSQL, banco upbox, usuario e senha em application.properties.
+echo Confira o servico MySQL, banco upbox, usuario e senha em application.properties.
 echo Confira tambem se a porta 8080 esta livre. Detalhes em logs\upbox.log.
 echo Este script nao apaga nem recria bancos de dados.
 :erro

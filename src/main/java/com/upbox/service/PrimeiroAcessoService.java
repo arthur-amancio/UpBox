@@ -1,41 +1,38 @@
 package com.upbox.service;
 
-import com.upbox.form.UsuarioForm;
-
-import com.upbox.model.*;
+import com.upbox.entity.*;
 import com.upbox.repository.UsuarioRepository;
 
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/** Abre a instalação uma única vez; até administrador inativo impede novo cadastro público. */
+/**
+ * Cria a conta padrão automaticamente; a senha inicial admin precisa ser trocada no primeiro login.
+ */
 @Service
 @RequiredArgsConstructor
 public class PrimeiroAcessoService {
     private final UsuarioRepository usuarios;
-    private final UsuarioService usuarioService;
-    private final JdbcTemplate jdbc;
+    private final PasswordEncoder encoder;
 
-    @Transactional(readOnly = true)
-    public boolean disponivel() {
-        return !usuarios.existsByPerfil(PerfilAcesso.ADMINISTRADOR);
-    }
-
+    /** A restrição UNIQUE do login decide qual instância pode criar a primeira conta. */
     @Transactional
-    public void cadastrar(UsuarioForm form) {
-        String banco =
-                jdbc.execute((java.sql.Connection c) -> c.getMetaData().getDatabaseProductName());
-        if ("PostgreSQL".equals(banco)) {
-            // Não existe usuário para bloquear no banco vazio. Esse bloqueio da transação
-            // serializa duas primeiras instalações, inclusive em processos diferentes.
-            jdbc.execute("select pg_advisory_xact_lock(80502026)");
-        }
-        if (!disponivel())
-            throw new IllegalArgumentException("A configuração inicial já foi concluída.");
-        form.setPerfil(PerfilAcesso.ADMINISTRADOR);
-        usuarioService.salvar(null, form);
+    public void criarContaPadrao() {
+        if (usuarios.existsByPerfil(PerfilAcesso.ADMINISTRADOR)) return;
+        if (usuarios.findByUsuarioIgnoreCase("administrador").isPresent())
+            throw new IllegalArgumentException(
+                    "O login administrador já existe. Revise a conta sem sobrescrevê-la.");
+        Usuario u =
+                new Usuario(
+                        "Administrador",
+                        "administrador",
+                        "administrador@upbox.local",
+                        encoder.encode("admin"),
+                        PerfilAcesso.ADMINISTRADOR);
+        u.exigirTrocaSenha();
+        usuarios.saveAndFlush(u);
     }
 }

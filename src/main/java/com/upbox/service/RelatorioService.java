@@ -1,8 +1,7 @@
 package com.upbox.service;
 
-import com.upbox.form.FiltroMovimentacao;
-
-import com.upbox.model.*;
+import com.upbox.controller.FiltroMovimentacao;
+import com.upbox.entity.*;
 
 import lombok.RequiredArgsConstructor;
 

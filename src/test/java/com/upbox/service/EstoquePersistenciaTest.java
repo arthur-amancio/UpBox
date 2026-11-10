@@ -1,12 +1,11 @@
 package com.upbox.service;
 
+import static org.junit.jupiter.api.Assertions.*;
+
+import com.upbox.entity.*;
 import com.upbox.entity.Categoria;
 import com.upbox.entity.Produto;
 import com.upbox.entity.Usuario;
-
-import static org.junit.jupiter.api.Assertions.*;
-
-import com.upbox.model.*;
 import com.upbox.repository.*;
 
 import org.junit.jupiter.api.Test;
@@ -19,7 +18,7 @@ import org.springframework.test.context.TestPropertySource;
 /**
  * Testa a gravação de produtos e movimentações.
  *
- * <p>H2 é usado só nestes testes; o programa utiliza PostgreSQL. Em cada teste, o Spring desfaz a
+ * <p>H2 é usado só nestes testes; o programa utiliza MySQL. Em cada teste, o Spring desfaz a
  * transação para manter os dados isolados.
  */
 @DataJpaTest

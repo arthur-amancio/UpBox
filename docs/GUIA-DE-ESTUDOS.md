@@ -2,9 +2,9 @@
 
 ## O caminho de um formulário
 
-Navegador → Controller → Service → Repository → PostgreSQL. O resultado volta como HTML Thymeleaf. O JavaScript não autentica pessoas nem calcula saldos.
+Navegador → Controller → Service → Repository → MySQL. O resultado volta como HTML Thymeleaf. O JavaScript não autentica pessoas nem calcula saldos.
 
-Os pacotes seguem essa separação: `entity` contém somente Usuario, Categoria, Produto, MovimentacaoEstoque e RegistroOperacao; `form` contém os dados recebidos pelos formulários e filtros; `model` guarda enums e resumos de consulta. `repository`, `service`, `controller` e `config` mantêm as responsabilidades descritas abaixo. Mudar um pacote Java não renomeia tabelas: os nomes continuam declarados em `@Table` e `@Column`.
+Os pacotes seguem as cinco responsabilidades: entity guarda entidades/enums; repository acessa o banco; service aplica regras e guarda resumos; controller recebe formulários e escolhe páginas; config configura segurança e inicialização. Mudar um pacote Java não renomeia tabelas: os nomes continuam declarados em `@Table` e `@Column`.
 
 - **Entity:** classe persistida em uma tabela, marcada com `@Entity`. Exemplo: `Produto` representa `produtos`.
 - **Repository:** interface do Spring Data que consulta e salva entidades, como `findById`. Não decide se uma saída é permitida.
@@ -31,9 +31,9 @@ Formulários simples usam `@Data`. Senhas não aparecem em `toString`. `@Require
 
 ## Como o login funciona
 
-O Spring Security recebe usuário/e-mail e senha. Busca a conta no PostgreSQL, compara a senha com BCrypt e recusa conta inativa. A sessão HTTP guarda um principal identificado pelo ID da conta. A cada requisição, o servidor verifica atividade, perfil e hash atual para revogar sessões desatualizadas.
+O Spring Security recebe usuário/e-mail e senha. Busca a conta no MySQL, compara a senha com BCrypt e recusa conta inativa. A sessão HTTP guarda um principal identificado pelo ID da conta. A cada requisição, o servidor verifica atividade, perfil e hash atual para revogar sessões desatualizadas.
 
-O funcionário não ganha acesso administrativo ao esconder/mostrar um botão: as rotas também são protegidas no servidor. O logout exige POST e CSRF. O administrador inicial é criado por configuração local, sem credenciais no Git.
+O funcionário não ganha acesso administrativo ao esconder/mostrar um botão: as rotas também são protegidas no servidor. O logout exige POST e CSRF. A conta administrador é criada automaticamente com senha inicial admin, protegida com BCrypt. O primeiro login exige trocar a senha em Configurações antes de acessar os módulos.
 
 ## Roteiro para demonstrar ao professor
 
@@ -45,17 +45,17 @@ O funcionário não ganha acesso administrativo ao esconder/mostrar um botão: a
 6. Tente saída de 4 e quantidade zero: a operação deve ser recusada, sem novo histórico.
 7. Mostre responsável/data no histórico e filtre pelo produto e pelo dia.
 8. Abra dashboard e relatórios. Prepare impressão e escolha Salvar como PDF no navegador.
-9. Reinicie o programa: dados permanecem no PostgreSQL.
+9. Reinicie o programa: dados permanecem no MySQL.
 10. Entre como funcionário; consulte estoque e tente uma rota administrativa para demonstrar o bloqueio.
 
-## VS Code e pgAdmin
+## VS Code e MySQL Workbench
 
-Abra a raiz do projeto, confira `java -version` e `mvn -version`, preencha a conexão em application.properties (arquivo local é apenas opcional) e execute `mvn clean test` e `mvn spring-boot:run`. Consulte o [guia PostgreSQL](GUIA-POSTGRESQL-PGADMIN.md).
+Abra a raiz do projeto, confira `java -version` e `mvn -version`, preencha src/main/resources/application.properties e execute `mvn clean test` e `mvn spring-boot:run`. Consulte o guia MySQL (consulte o README atual).
 
-No pgAdmin, abra o banco `upbox` → Schemas → public → Tables. Veja `categorias`, `produtos`, `usuarios`, `movimentacoes_estoque` e `registros_operacoes`. Explique as chaves `categoria_id`, `produto_id` e `usuario_id`. Não exponha `senha_hash` em apresentações e não edite saldo manualmente para simular o sistema.
+No MySQL Workbench, abra o banco SCHEMAS → upbox → Tables. Veja `categorias`, `produtos`, `usuarios`, `movimentacoes_estoque` e `registros_operacoes`. Explique as chaves `categoria_id`, `produto_id` e `usuario_id`. Não exponha `senha_hash` em apresentações e não edite saldo manualmente para simular o sistema.
 
-Cada integrante deve explicar uma regra, mostrar seu teste e percorrer a chamada do controller até o banco. Testes H2 verificam comportamentos rápidos; os testes PostgreSQL comprovam bloqueio e rollback com o banco real.
+Cada integrante deve explicar uma regra, mostrar seu teste e percorrer a chamada do controller até o banco. Testes H2 verificam comportamentos rápidos; os testes MySQL comprovam bloqueio e rollback com o banco real.
 
 ## Ensaio da apresentação
 
-Use o [roteiro de oito minutos](APRESENTACAO-TCC.md), o [guia da escola](INSTALACAO-ESCOLA.md) e a [matriz de requisitos](MATRIZ-REQUISITOS-TCC.md). A [jornada real com capturas](ENTREGA-7-PREPARACAO-TCC.md) mostra o fluxo verificado no navegador e a persistência após reiniciar.
+Use o [roteiro de oito minutos](APRESENTACAO-TCC.md), o guia da escola (consulte o README atual) e a [matriz de requisitos](MATRIZ-REQUISITOS-TCC.md). A jornada real com capturas (consulte o README atual) mostra o fluxo verificado no navegador e a persistência após reiniciar.

@@ -10,7 +10,8 @@
       Configurações
      </h2>
     </div>
-    <form class="form-card" method="post" th:action="@{/configuracoes/perfil}" th:object="${perfilForm}">
+    <p class="alerta alerta-info" role="status" th:if="${trocaObrigatoria}">Primeiro acesso: troque a senha inicial admin para continuar. Informe admin em Senha atual e escolha uma nova senha de pelo menos 8 caracteres.</p>
+    <form th:unless="${trocaObrigatoria}" class="form-card" method="post" th:action="@{/configuracoes/perfil}" th:object="${perfilForm}">
      <h3>
       Seu perfil
      </h3>
@@ -19,7 +20,7 @@
        Nome completo
       </label>
       <input maxlength="120" required="" th:field="*{nome}"/>
-      <small class="erro-campo" th:errors="*{nome}" th:if="${#fields.hasErrors('nome')}">
+      <small class="erro-campo" th:text="'Revise este campo.'" th:if="${#fields.hasErrors('nome')}">
       </small>
      </div>
      <div class="campo">
@@ -27,7 +28,7 @@
        E-mail
       </label>
       <input maxlength="150" required="" th:field="*{email}" type="email"/>
-      <small class="erro-campo" th:errors="*{email}" th:if="${#fields.hasErrors('email')}">
+      <small class="erro-campo" th:text="'Revise este campo.'" th:if="${#fields.hasErrors('email')}">
       </small>
      </div>
      <button class="btn btn-primario">

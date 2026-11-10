@@ -1,8 +1,8 @@
 package com.upbox.repository;
 
+import com.upbox.entity.*;
 import com.upbox.entity.Usuario;
-
-import com.upbox.model.*;
+import com.upbox.service.*;
 
 import jakarta.persistence.LockModeType;
 
@@ -12,6 +12,8 @@ import java.util.*;
 
 /** Identificação sem diferenciar maiúsculas; bloqueio protege o último administrador. */
 public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
+    Optional<Usuario> findByUsuarioIgnoreCase(String usuario);
+
     List<Usuario> findByUsuarioIgnoreCaseOrEmailIgnoreCase(String usuario, String email);
 
     boolean existsByPerfilAndAtivoTrue(PerfilAcesso perfil);

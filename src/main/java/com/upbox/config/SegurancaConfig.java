@@ -46,7 +46,6 @@ public class SegurancaConfig {
                                 a.requestMatchers(
                                                 "/",
                                                 "/login",
-                                                "/primeiro-acesso",
                                                 "/css/**",
                                                 "/fonts/**",
                                                 "/images/**",
@@ -71,7 +70,16 @@ public class SegurancaConfig {
                                                     auditoria.registrar(
                                                             "Login", "Acesso ao sistema");
                                                     res.sendRedirect(
-                                                            req.getContextPath() + "/home");
+                                                            req.getContextPath()
+                                                                    + (usuarios.findById(
+                                                                                            Long
+                                                                                                    .valueOf(
+                                                                                                            auth
+                                                                                                                    .getName()))
+                                                                                    .orElseThrow()
+                                                                                    .isTrocaSenhaObrigatoria()
+                                                                            ? "/configuracoes"
+                                                                            : "/home"));
                                                 })
                                         .failureUrl("/login?erro")
                                         .permitAll())

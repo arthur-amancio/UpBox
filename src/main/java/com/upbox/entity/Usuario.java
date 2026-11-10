@@ -1,7 +1,5 @@
 package com.upbox.entity;
 
-import com.upbox.model.PerfilAcesso;
-
 import jakarta.persistence.*;
 
 import lombok.AccessLevel;
@@ -42,6 +40,18 @@ public class Usuario {
 
     @Column(nullable = false)
     private boolean ativo = true;
+
+    // A senha inicial deve ser trocada antes de utilizar os outros módulos.
+    @Column(nullable = false, columnDefinition = "boolean default false")
+    private boolean trocaSenhaObrigatoria;
+
+    public void exigirTrocaSenha() {
+        this.trocaSenhaObrigatoria = true;
+    }
+
+    public void concluirTrocaSenha() {
+        this.trocaSenhaObrigatoria = false;
+    }
 
     /**
      * Recebe uma senha que JÁ foi transformada em hash. Nunca envie a senha digitada em texto puro

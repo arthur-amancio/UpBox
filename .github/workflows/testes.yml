@@ -20,27 +20,26 @@ jobs:
       - name: Executar testes
         run: mvn -B clean test
 
-  postgres:
+  mysql:
     strategy:
       matrix:
-        postgres: ["9.6.24", "16.4"]
+        versao: ["5.7.44", "8.0.44"]
     runs-on: ubuntu-latest
     services:
-      postgres:
-        image: postgres:${{ matrix.postgres }}
+      mysql:
+        image: mysql:${{ matrix.versao }}
         env:
-          POSTGRES_DB: upbox_test
-          POSTGRES_USER: upbox_test
-          POSTGRES_HOST_AUTH_METHOD: trust
-        ports: ['5432:5432']
+          MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+          MYSQL_DATABASE: upbox_test
+        ports: ['3306:3306']
         options: >-
-          --health-cmd "pg_isready -U upbox_test -d upbox_test"
+          --health-cmd "mysqladmin ping -h 127.0.0.1 -uroot"
           --health-interval 5s
           --health-timeout 5s
-          --health-retries 10
+          --health-retries 30
     env:
-      UPBOX_TEST_DB_URL: jdbc:postgresql://localhost:5432/upbox_test
-      UPBOX_TEST_DB_USER: upbox_test
+      UPBOX_TEST_DB_URL: jdbc:mysql://127.0.0.1:3306/upbox_test
+      UPBOX_TEST_DB_USER: root
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
@@ -48,10 +47,12 @@ jobs:
           distribution: temurin
           java-version: '17'
           cache: maven
-      - name: Verificar integração real e concorrência
-        run: mvn -B -Ppostgres-it verify
+      - name: Preparar charset do banco descartável
+        run: docker exec ${{ job.services.mysql.id }} mysql -uroot -e "ALTER DATABASE upbox_test CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+      - run: mvn -B -Pmysql-it verify
 
   distribuicao-windows:
+    timeout-minutes: 12
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
@@ -62,14 +63,17 @@ jobs:
           cache: maven
       - name: Testar e empacotar
         run: mvn -B clean package
-      - name: Executar ZIP e script no Windows com PostgreSQL descartável
+      - name: Gerar ZIP simples
         shell: pwsh
-        run: ./scripts/testar-pacote-windows.ps1 -Pacote target/upbox-sistema-1.0.0-escola.zip
+        run: ./scripts/gerar-pacote.ps1
+      - name: Executar ZIP e script no Windows com MySQL descartável
+        shell: pwsh
+        run: ./scripts/testar-pacote-windows.ps1 -Pacote target/UpBox-escola.zip
       - name: Publicar pacote homologado
         uses: actions/upload-artifact@v4
         with:
           name: UpBox-escola
-          path: target/upbox-sistema-1.0.0-escola.zip
+          path: target/UpBox-escola.zip
       - name: Guardar evidências Windows
         if: always()
         uses: actions/upload-artifact@v4
@@ -78,3 +82,4 @@ jobs:
           path: |
             target/homologacao-windows.json
             target/windows-upbox.log
+            target/windows-mysql.log
