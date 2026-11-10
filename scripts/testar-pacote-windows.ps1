@@ -104,10 +104,10 @@ try {
         try {
             $env:JAVA_HOME = Join-Path $raiz 'java-inexistente'
             $mensagemJava = & $env:ComSpec /d /c 'iniciar-upbox.bat --verificar' 2>&1 | Out-String
-            if ($LASTEXITCODE -ne 1 -or $mensagemJava -notmatch 'Java 17 nao encontrado') { throw 'Mensagem Java ausente.' }
+            if ($LASTEXITCODE -ne 1 -or $mensagemJava -notmatch 'Java nao encontrado') { throw 'Mensagem Java ausente.' }
         } finally { $env:JAVA_HOME=$anterior }
     } finally { Pop-Location }
-    $json = @{resultado='aprovado'; commit=$env:GITHUB_SHA; mysql=$versao; sistema='Windows'; java=17; contaAutomatica=$true; loginPadraoETrocaObrigatoria=$true; reinicioSemDuplicacao=$true; caminhoComEspacos=$true; mensagemConexao=$true; mensagemJava=$true} | ConvertTo-Json
+    $json = @{resultado='aprovado'; commit=$env:GITHUB_SHA; mysql=$versao; sistema='Windows'; java=21; contaAutomatica=$true; loginPadraoETrocaObrigatoria=$true; reinicioSemDuplicacao=$true; caminhoComEspacos=$true; mensagemConexao=$true; mensagemJava=$true} | ConvertTo-Json
     $json | Set-Content (Join-Path $env:GITHUB_WORKSPACE 'target/homologacao-windows.json')
     Write-Host $json
 } finally {
