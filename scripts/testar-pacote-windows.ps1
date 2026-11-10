@@ -96,7 +96,10 @@ try {
     Push-Location $pasta
     try {
         $mensagem = & $env:ComSpec /d /c 'iniciar-upbox.bat --sem-pausa' 2>&1 | Out-String
-        if ($LASTEXITCODE -ne 1 -or $mensagem -notmatch 'Confira o servico MySQL') { throw 'Mensagem de conexão inválida ausente.' }
+        # Confere os elementos essenciais do diagnostico, sem depender de uma frase exata.
+        if ($LASTEXITCODE -ne 1 -or $mensagem -notmatch 'MySQL' -or $mensagem -notmatch 'application[.]properties') {
+            throw 'Mensagem de conexao invalida ausente ou incompleta.'
+        }
         $anterior = $env:JAVA_HOME
         try {
             $env:JAVA_HOME = Join-Path $raiz 'java-inexistente'
