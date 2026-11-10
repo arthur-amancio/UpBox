@@ -12,7 +12,7 @@ CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 SELECT VERSION();
 ```
 
-Clone a main e abra a pasta do pom.xml no VS Code:
+Clone a `main` (nao precisa abrir VS Code para executar):
 
 ```powershell
 git clone https://github.com/arthur-amancio/UpBox.git
@@ -27,10 +27,9 @@ spring.datasource.username=root
 spring.datasource.password=
 ```
 
-```powershell
-mvn clean test
-mvn spring-boot:run
-```
+**Para iniciar apos o clone:** de dois cliques em `iniciar-upbox.bat`, na raiz do projeto. O script encontra `pom.xml` e executa `mvn spring-boot:run` automaticamente usando o Maven ja instalado. Na primeira execucao, o Maven pode precisar baixar dependencias da internet. Deixe a janela aberta e acompanhe as mensagens de inicializacao.
+
+Se preferir usar o terminal, o comando equivalente e `mvn spring-boot:run`. Para executar os testes rapidos separadamente, use `mvn clean test`.
 
 Abra **http://localhost:8080** no mesmo computador. Não precisa de arquivo local, .env, Docker, Node ou variáveis de ambiente. Configuração externa continua possível pelas opções padrão do Spring, mas não é necessária.
 
@@ -53,7 +52,7 @@ Reiniciar nunca redefine senhas nem duplica conta. Em banco já utilizado, a sen
 
 Baixe o artefato **UpBox-escola** na CI da main, extraia tudo e edite **application.properties ao lado de upbox.jar**. Execute **iniciar-upbox.bat** e abra localhost:8080. O pacote exige somente Java 17 e MySQL; não precisa de Maven.
 
-O script confere Java 17, JAR, configuração e orienta erros. Não apaga nem recria banco. Logs técnicos ficam em logs/upbox.log; a senha não é registrada em logs. Use Ctrl+C para parar; os dados permanecem no MySQL. Se mudar server.port, use a nova porta no navegador.
+No pacote ZIP, o mesmo script detecta o JAR pronto e **nao exige Maven**. No codigo clonado, detecta o `pom.xml` e inicia pelo Maven. O script confere Java 17 e os arquivos necessarios, orientando erros. Não apaga nem recria banco. Logs técnicos ficam em logs/upbox.log; a senha não é registrada em logs. Use Ctrl+C para parar; os dados permanecem no MySQL. Se mudar server.port, use a nova porta no navegador.
 
 Para gerar o pacote: `mvn clean package`, depois `powershell -File scripts/gerar-pacote.ps1`. O ZIP sai em **target/UpBox-escola.zip**. O script recusa JAR com senha de banco preenchida para impedir distribuição acidental. Não existe src/assembly.
 
