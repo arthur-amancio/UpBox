@@ -1,10 +1,10 @@
 # UpBox — estoque para o TCC
 
-Sistema integrado em **Java 17, Spring Boot, Spring MVC, JPA, Thymeleaf, Lombok e MySQL**. Login por usuário/e-mail, permissões, categorias, produtos, estoque, histórico, dashboard e seis relatórios. As fontes são locais; não precisa de internet para usar a interface.
+Sistema integrado em **Java (compilado para 17, compatível com JDK 17 e 21), Spring Boot, Spring MVC, JPA, Thymeleaf, Lombok e MySQL**. Login por usuário/e-mail, permissões, categorias, produtos, estoque, histórico, dashboard e seis relatórios. As fontes são locais; não precisa de internet para usar a interface.
 
 ## Executar pelo código
 
-Instale Java 17, Maven e MySQL. Use MySQL Workbench ou o cliente mysql para criar o banco **somente se ausente**:
+Instale Java **17 ou 21**, Maven e MySQL. Use MySQL Workbench ou o cliente mysql para criar o banco **somente se ausente**:
 
 ```sql
 CREATE DATABASE IF NOT EXISTS upbox
@@ -27,7 +27,7 @@ spring.datasource.username=root
 spring.datasource.password=
 ```
 
-**Para iniciar apos o clone:** de dois cliques em `iniciar-upbox.bat`, na raiz do projeto. O script encontra `pom.xml` e executa `mvn spring-boot:run` automaticamente usando o Maven ja instalado. Na primeira execucao, o Maven pode precisar baixar dependencias da internet. Deixe a janela aberta e acompanhe as mensagens de inicializacao.
+**Para iniciar apos o clone:** de dois cliques em `iniciar-upbox.bat`, na raiz do projeto. O script aceita **Java 17 ou 21**, encontra `pom.xml` e executa `mvn spring-boot:run` automaticamente usando o Maven ja instalado. Na primeira execucao, o Maven pode precisar baixar dependencias da internet. Deixe a janela aberta e acompanhe as mensagens de inicializacao.
 
 Se preferir usar o terminal, o comando equivalente e `mvn spring-boot:run`. Para executar os testes rapidos separadamente, use `mvn clean test`.
 
@@ -50,9 +50,9 @@ Reiniciar nunca redefine senhas nem duplica conta. Em banco já utilizado, a sen
 
 ## Windows com o pacote pronto
 
-Baixe o artefato **UpBox-escola** na CI da main, extraia tudo e edite **application.properties ao lado de upbox.jar**. Execute **iniciar-upbox.bat** e abra localhost:8080. O pacote exige somente Java 17 e MySQL; não precisa de Maven.
+Baixe o artefato **UpBox-escola** na CI da main, extraia tudo e edite **application.properties ao lado de upbox.jar**. Execute **iniciar-upbox.bat** e abra localhost:8080. O pacote exige somente Java 17 ou 21 e MySQL; não precisa de Maven.
 
-No pacote ZIP, o mesmo script detecta o JAR pronto e **nao exige Maven**. No codigo clonado, detecta o `pom.xml` e inicia pelo Maven. O script confere Java 17 e os arquivos necessarios, orientando erros. Não apaga nem recria banco. Logs técnicos ficam em logs/upbox.log; a senha não é registrada em logs. Use Ctrl+C para parar; os dados permanecem no MySQL. Se mudar server.port, use a nova porta no navegador.
+No pacote ZIP, o mesmo script detecta o JAR pronto e **nao exige Maven**. No codigo clonado, detecta o `pom.xml` e inicia pelo Maven. O script confere Java 17 ou 21 e os arquivos necessarios, orientando erros. Não apaga nem recria banco. Logs técnicos ficam em logs/upbox.log; a senha não é registrada em logs. Use Ctrl+C para parar; os dados permanecem no MySQL. Se mudar server.port, use a nova porta no navegador.
 
 Para gerar o pacote: `mvn clean package`, depois `powershell -File scripts/gerar-pacote.ps1`. O ZIP sai em **target/UpBox-escola.zip**. O script recusa JAR com senha de banco preenchida para impedir distribuição acidental. Não existe src/assembly.
 
@@ -107,7 +107,7 @@ A homologação inicial usa **MySQL 5.7.44 e 8.0.44**. Isso não promete funcion
 | Access denied | Usuário/senha do MySQL; não é a senha de login do UpBox |
 | Unknown database | Criar upbox somente se ausente no servidor correto |
 | Porta 8080 ocupada | Encerrar outra instância ou mudar server.port |
-| Java incorreto | java -version e mvn -version devem indicar Java 17 |
+| Java incorreto | Confira `java -version` e `mvn -version`: Java 17 ou 21 (Maven deve usar a versão instalada) |
 | Conta automática não entra | Em banco novo use administrador/admin; em banco existente a senha anterior é mantida |
 | Primeiro acesso não libera módulos | Troque a senha inicial em Configurações; reiniciar não redefine senha |
 | Falha de duplicidade | Conferir códigos, nomes e e-mails; não apagar tabelas |
