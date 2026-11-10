@@ -19,7 +19,7 @@ $dados = Join-Path $raiz 'dados-descartaveis'
 $script:processo = $null
 $banco = $null
 function Sql($consulta) {
-    & "$bin\mysql.exe" --protocol=TCP -h127.0.0.1 -P53316 -uroot -N -e $consulta
+    & "$bin\mysql.exe" --no-defaults --protocol=TCP -h127.0.0.1 -P53316 -uroot -N -e $consulta
     if ($LASTEXITCODE -ne 0) { throw 'Falha no MySQL descartável.' }
 }
 function Parar-UpBox {
@@ -46,10 +46,14 @@ function Iniciar-UpBox {
 try {
     & "$bin\mysqld.exe" --no-defaults --initialize-insecure "--basedir=$(Split-Path $bin)" "--datadir=$dados"
     if ($LASTEXITCODE -ne 0) { throw 'Não inicializou o MySQL descartável.' }
-    $banco = Start-Process "$bin\mysqld.exe" -ArgumentList "--no-defaults --datadir=`"$dados`" --port=53316 --bind-address=127.0.0.1 --mysqlx=0 --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci" -PassThru
+    Write-Host "MySQL de teste em $bin"
+    & "$bin\mysqld.exe" --no-defaults --version
+    $banco = Start-Process "$bin\mysqld.exe" -ArgumentList "--no-defaults --datadir=`"$dados`" --port=53316 --bind-address=127.0.0.1 --mysqlx=0 --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --console" -RedirectStandardOutput (Join-Path $raiz 'mysql-out.log') -RedirectStandardError (Join-Path $raiz 'mysql-err.log') -PassThru
     $pronto = $false
     for ($i=0; $i -lt 60; $i++) {
-        & "$bin\mysqladmin.exe" --protocol=TCP -h127.0.0.1 -P53316 -uroot ping 2>$null | Out-Null
+        $banco.Refresh()
+        if ($banco.HasExited) { throw 'O processo MySQL encerrou; veja os logs de diagnóstico.' }
+        & "$bin\mysqladmin.exe" --no-defaults --connect-timeout=2 --protocol=TCP -h127.0.0.1 -P53316 -uroot ping 2>$null | Out-Null
         if ($LASTEXITCODE -eq 0) { $pronto=$true; break }
         Start-Sleep -Seconds 1
     }
@@ -97,5 +101,12 @@ try {
 } finally {
     Parar-UpBox
     if (Test-Path (Join-Path $pasta 'logs/upbox.log')) { Copy-Item (Join-Path $pasta 'logs/upbox.log') (Join-Path $env:GITHUB_WORKSPACE 'target/windows-upbox.log') }
+    foreach ($log in @((Join-Path $raiz 'mysql-out.log'), (Join-Path $raiz 'mysql-err.log'))) {
+        if (Test-Path $log) {
+            Get-Content $log | Write-Host
+            Get-Content $log | Add-Content (Join-Path $env:GITHUB_WORKSPACE 'target/windows-mysql.log')
+        }
+    }
+    Get-ChildItem $dados -Filter '*.err' -ErrorAction SilentlyContinue | ForEach-Object { Get-Content $_.FullName | Write-Host }
     if ($banco -and !$banco.HasExited) { Stop-Process -Id $banco.Id -Force }
 }
