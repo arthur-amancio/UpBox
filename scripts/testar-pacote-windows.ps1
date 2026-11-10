@@ -119,3 +119,5 @@ try {
     Get-ChildItem $dados -Filter '*.err' -ErrorAction SilentlyContinue | ForEach-Object { Get-Content $_.FullName | Write-Host }
     if ($banco -and !$banco.HasExited) { Stop-Process -Id $banco.Id -Force }
 }
+# Os testes de erro retornam 1 de propósito; chegando aqui, todas as verificações passaram.
+exit 0
