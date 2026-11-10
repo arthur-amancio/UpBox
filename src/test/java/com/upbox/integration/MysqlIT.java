@@ -1,14 +1,12 @@
 package com.upbox.integration;
 
+import static org.junit.jupiter.api.Assertions.*;
+
+import com.upbox.controller.SenhaForm;
+import com.upbox.entity.*;
 import com.upbox.entity.Categoria;
 import com.upbox.entity.Produto;
 import com.upbox.entity.Usuario;
-import com.upbox.form.SenhaForm;
-import com.upbox.form.UsuarioForm;
-
-import static org.junit.jupiter.api.Assertions.*;
-
-import com.upbox.model.*;
 import com.upbox.repository.*;
 import com.upbox.service.*;
 
@@ -24,25 +22,25 @@ import java.util.concurrent.*;
 
 /** Integração real, optativa. Só aceita o banco exclusivo upbox_test, nunca o banco escolar. */
 @SpringBootTest
-class PostgresIT {
+class MysqlIT {
     @DynamicPropertySource
     static void banco(DynamicPropertyRegistry r) {
         String url =
                 System.getenv()
                         .getOrDefault(
-                                "UPBOX_TEST_DB_URL", "jdbc:postgresql://localhost:5432/upbox_test");
+                                "UPBOX_TEST_DB_URL", "jdbc:mysql://localhost:3306/upbox_test");
         // Executado antes da inicialização JPA e do create-drop.
-        if (!url.matches("jdbc:postgresql://[^/]+/upbox_test(\\?.*)?"))
+        if (!url.matches("jdbc:mysql://[^/]+/upbox_test(\\?.*)?"))
             throw new IllegalArgumentException(
                     "Integração exige banco exclusivo chamado upbox_test.");
         r.add("spring.datasource.url", () -> url);
         r.add(
                 "spring.datasource.username",
-                () -> System.getenv().getOrDefault("UPBOX_TEST_DB_USER", "postgres"));
+                () -> System.getenv().getOrDefault("UPBOX_TEST_DB_USER", "root"));
         r.add(
                 "spring.datasource.password",
                 () -> System.getenv().getOrDefault("UPBOX_TEST_DB_PASSWORD", ""));
-        r.add("spring.datasource.driver-class-name", () -> "org.postgresql.Driver");
+        r.add("spring.datasource.driver-class-name", () -> "com.mysql.cj.jdbc.Driver");
         r.add("spring.jpa.hibernate.ddl-auto", () -> "create-drop");
         r.add("upbox.admin-inicial.habilitado", () -> "false");
     }
@@ -59,34 +57,43 @@ class PostgresIT {
     Usuario usuario;
 
     @Test
-    void primeirasInstalacoesConcorrentesCriamSomenteUmAdministrador() throws Exception {
+    void primeirasInstalacoesConcorrentesCriamEAtivamSomenteUmaConta() throws Exception {
         var pool = Executors.newFixedThreadPool(2);
-        var iniciar = new CountDownLatch(1);
-        Callable<Boolean> cadastro =
+        var inicio = new CountDownLatch(1);
+        Callable<Void> criar =
                 () -> {
-                    iniciar.await();
-                    UsuarioForm f = new UsuarioForm();
-                    f.setNome("Equipe");
-                    f.setUsuario("admin");
-                    f.setEmail("admin@example.com");
-                    f.setSenha("senha-teste-123");
+                    inicio.await();
                     try {
-                        primeiroAcesso.cadastrar(f);
-                        return true;
-                    } catch (IllegalArgumentException ex) {
-                        return false;
+                        primeiroAcesso.criarContaPadrao();
+                    } catch (org.springframework.dao.DataIntegrityViolationException ex) {
+                        assertTrue(usuarios.existsByPerfil(PerfilAcesso.ADMINISTRADOR));
                     }
+                    return null;
                 };
         try {
-            var a = pool.submit(cadastro);
-            var b = pool.submit(cadastro);
-            iniciar.countDown();
-            assertNotEquals(a.get(15, TimeUnit.SECONDS), b.get(15, TimeUnit.SECONDS));
+            var a = pool.submit(criar);
+            var b = pool.submit(criar);
+            inicio.countDown();
+            a.get(15, TimeUnit.SECONDS);
+            b.get(15, TimeUnit.SECONDS);
             assertEquals(
                     1,
                     usuarios.findAll().stream()
                             .filter(u -> u.getPerfil() == PerfilAcesso.ADMINISTRADOR)
                             .count());
+            assertTrue(primeiroAcesso.disponivel());
+            Callable<Boolean> ativar =
+                    () -> {
+                        try {
+                            primeiroAcesso.ativar("senha-teste-123");
+                            return true;
+                        } catch (IllegalArgumentException ex) {
+                            return false;
+                        }
+                    };
+            var c = pool.submit(ativar);
+            var d = pool.submit(ativar);
+            assertNotEquals(c.get(15, TimeUnit.SECONDS), d.get(15, TimeUnit.SECONDS));
             assertFalse(primeiroAcesso.disponivel());
         } finally {
             pool.shutdownNow();
@@ -95,14 +102,11 @@ class PostgresIT {
 
     @BeforeEach
     void preparar() {
-        jdbc.execute(
-                "alter table movimentacoes_estoque drop constraint if exists"
-                        + " falha_historico_teste");
-        jdbc.execute(
-                "alter table registros_operacoes drop constraint if exists falha_auditoria_teste");
-        jdbc.execute(
-                "truncate table movimentacoes_estoque, produtos, categorias, usuarios,"
-                        + " registros_operacoes restart identity cascade");
+
+        jdbc.execute("delete from movimentacoes_estoque");
+        for (String tabela :
+                new String[] {"produtos", "categorias", "registros_operacoes", "usuarios"})
+            jdbc.execute("delete from " + tabela);
         var c = categorias.save(new Categoria("Papelaria", ""));
         produto =
                 produtoService.cadastrar(
@@ -153,11 +157,12 @@ class PostgresIT {
     @Test
     void deveDesfazerOperacaoSeHistoricoFalhar() {
         jdbc.execute(
-                "alter table movimentacoes_estoque add constraint falha_historico_teste check"
-                        + " (observacao <> 'FORCAR_FALHA')");
+                "create trigger falha_historico_teste before insert on movimentacoes_estoque for"
+                    + " each row signal sqlstate '45000' set message_text='Falha simulada no"
+                    + " historico'");
         try {
             assertThrows(
-                    org.springframework.dao.DataIntegrityViolationException.class,
+                    org.springframework.dao.DataAccessException.class,
                     () ->
                             service.registrar(
                                     produto.getId(),
@@ -168,18 +173,19 @@ class PostgresIT {
             assertEquals(5, produtos.findById(produto.getId()).orElseThrow().getQuantidade());
             assertEquals(0, movimentacoes.count());
         } finally {
-            jdbc.execute("alter table movimentacoes_estoque drop constraint falha_historico_teste");
+            jdbc.execute("drop trigger falha_historico_teste");
         }
     }
 
     @Test
     void deveDesfazerSaldoEHistoricoJaGravadosSeAuditoriaFalhar() {
         jdbc.execute(
-                "alter table registros_operacoes add constraint falha_auditoria_teste check (acao"
-                        + " not like 'Movimentação%')");
+                "create trigger falha_auditoria_teste before insert on registros_operacoes for each"
+                    + " row signal sqlstate '45000' set message_text='Falha simulada na"
+                    + " auditoria'");
         try {
             assertThrows(
-                    org.springframework.dao.DataIntegrityViolationException.class,
+                    org.springframework.dao.DataAccessException.class,
                     () ->
                             service.registrar(
                                     produto.getId(),
@@ -190,20 +196,20 @@ class PostgresIT {
             assertEquals(5, produtos.findById(produto.getId()).orElseThrow().getQuantidade());
             assertEquals(0, movimentacoes.count());
         } finally {
-            jdbc.execute("alter table registros_operacoes drop constraint falha_auditoria_teste");
+            jdbc.execute("drop trigger falha_auditoria_teste");
         }
     }
 
     @Test
-    void postgresDeveImpedirDuplicidadeSemDiferenciarCaixa() {
+    void mysqlDeveImpedirDuplicidadeSemDiferenciarCaixa() {
         assertThrows(
-                org.springframework.dao.DataIntegrityViolationException.class,
+                org.springframework.dao.DataAccessException.class,
                 () ->
                         jdbc.update(
                                 "insert into categorias (nome,descricao,ativa) values"
                                         + " ('PAPELARIA','',true)"));
         assertThrows(
-                org.springframework.dao.DataIntegrityViolationException.class,
+                org.springframework.dao.DataAccessException.class,
                 () ->
                         jdbc.update(
                                 "insert into produtos"
@@ -227,7 +233,7 @@ class PostgresIT {
         senha.setConfirmacao("nova-senha-teste");
         var senhaConferida = new CountDownLatch(1);
         var continuar = new CountDownLatch(1);
-        // Pausa somente a comparação de senha; transações e bloqueios usam PostgreSQL real.
+        // Pausa somente a comparação de senha; transações e bloqueios usam MySQL real.
         org.mockito.Mockito.doAnswer(
                         invocacao -> {
                             senhaConferida.countDown();

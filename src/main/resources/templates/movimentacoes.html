@@ -31,7 +31,7 @@
         <option th:attr="data-saldo=${p.quantidade}" th:each="p : ${produtosAtivos}" th:text="${p.codigo + ' — ' + p.nome + ' (saldo: ' + p.quantidade + ')'}" th:value="${p.id}">
         </option>
        </select>
-       <small class="erro-campo" th:errors="*{produtoId}">
+       <small class="erro-campo" th:text="'Revise este campo.'">
        </small>
       </div>
       <div class="campo">
@@ -52,7 +52,7 @@
         Quantidade
        </label>
        <input aria-describedby="previaEstoque" max="2147483647" min="1" required="" step="1" th:field="*{quantidade}" type="number"/>
-       <small class="erro-campo" th:errors="*{quantidade}">
+       <small class="erro-campo" th:text="'Revise este campo.'">
        </small>
       </div>
       <div class="campo largura-total">

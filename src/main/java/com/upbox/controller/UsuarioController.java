@@ -1,11 +1,9 @@
 package com.upbox.controller;
 
-import com.upbox.form.PerfilForm;
-import com.upbox.form.SenhaForm;
-import com.upbox.form.UsuarioForm;
 
-import com.upbox.model.*;
+import com.upbox.entity.*;
 import com.upbox.repository.*;
+import com.upbox.service.*;
 import com.upbox.service.UsuarioService;
 
 import jakarta.servlet.http.HttpServletRequest;

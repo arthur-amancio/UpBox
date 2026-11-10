@@ -1,6 +1,5 @@
 package com.upbox.controller;
 
-import com.upbox.form.UsuarioForm;
 import com.upbox.service.PrimeiroAcessoService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -35,26 +34,25 @@ public class PrimeiroAcessoController {
             return "acesso-negado";
         }
         if (!primeiroAcesso.disponivel()) return "redirect:/login";
-        m.addAttribute("form", new UsuarioForm());
+        m.addAttribute("form", new AtivacaoForm());
         return "primeiro-acesso";
     }
 
     @PostMapping("/primeiro-acesso")
     public String cadastrar(
-            @Valid @ModelAttribute("form") UsuarioForm form,
+            @Valid @ModelAttribute("form") AtivacaoForm form,
             BindingResult erros,
-            @RequestParam(defaultValue = "") String confirmacao,
             HttpServletRequest req,
             HttpServletResponse res) {
         if (!local(req) || !primeiroAcesso.disponivel()) {
             res.setStatus(403);
             return "acesso-negado";
         }
-        if (!Objects.equals(form.getSenha(), confirmacao))
+        if (!Objects.equals(form.getSenha(), form.getConfirmacao()))
             erros.reject("senha", "As senhas informadas não coincidem.");
         if (!erros.hasErrors()) {
             try {
-                primeiroAcesso.cadastrar(form);
+                primeiroAcesso.ativar(form.getSenha());
             } catch (IllegalArgumentException ex) {
                 erros.reject("dados", ex.getMessage());
             }

@@ -1,4 +1,4 @@
-package com.upbox.model;
+package com.upbox.service;
 
 import com.upbox.entity.MovimentacaoEstoque;
 import com.upbox.entity.Produto;

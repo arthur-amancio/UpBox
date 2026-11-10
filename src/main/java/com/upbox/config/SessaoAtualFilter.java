@@ -27,9 +27,11 @@ public class SessaoAtualFilter extends OncePerRequestFilter {
                 && req.getRequestedSessionId() != null
                 && !req.isRequestedSessionIdValid()
                 && !req.getServletPath().equals("/login")
+                && !req.getServletPath().equals("/primeiro-acesso")
                 && !req.getServletPath().startsWith("/css/")
                 && !req.getServletPath().startsWith("/images/")
-                && !req.getServletPath().startsWith("/js/")) {
+                && !req.getServletPath().startsWith("/js/")
+                && !req.getServletPath().startsWith("/fonts/")) {
             res.sendRedirect(req.getContextPath() + "/login?expirada");
             return;
         }
@@ -37,6 +39,7 @@ public class SessaoAtualFilter extends OncePerRequestFilter {
             var u = usuarios.findById(Long.valueOf(auth.getName())).orElse(null);
             if (u == null
                     || !u.isAtivo()
+                    || u.isAtivacaoPendente()
                     || !principal.getPassword().equals(u.getSenhaHash())
                     || auth.getAuthorities().stream()
                             .noneMatch(

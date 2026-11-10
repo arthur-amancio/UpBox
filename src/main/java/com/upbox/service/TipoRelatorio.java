@@ -1,4 +1,4 @@
-package com.upbox.model;
+package com.upbox.service;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

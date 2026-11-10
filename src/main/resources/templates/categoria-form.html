@@ -18,7 +18,7 @@
        Nome
       </label>
       <input maxlength="100" required="" th:field="*{nome}"/>
-      <small class="erro-campo" th:errors="*{nome}" th:if="${#fields.hasErrors('nome')}">
+      <small class="erro-campo" th:text="'Revise este campo.'" th:if="${#fields.hasErrors('nome')}">
       </small>
      </div>
      <div class="campo">
@@ -26,7 +26,7 @@
        Descrição
       </label>
       <textarea maxlength="300" th:field="*{descricao}"></textarea>
-      <small class="erro-campo" th:errors="*{descricao}" th:if="${#fields.hasErrors('descricao')}">
+      <small class="erro-campo" th:text="'Revise este campo.'" th:if="${#fields.hasErrors('descricao')}">
       </small>
      </div>
      <div class="form-acoes">

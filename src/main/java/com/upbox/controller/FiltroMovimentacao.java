@@ -1,6 +1,6 @@
-package com.upbox.form;
+package com.upbox.controller;
 
-import com.upbox.model.TipoMovimentacao;
+import com.upbox.entity.TipoMovimentacao;
 
 import lombok.Data;
 
@@ -23,18 +23,20 @@ public class FiltroMovimentacao {
     private LocalDate fim;
 
     public void validar() {
-        if ((inicio != null && (inicio.getYear() < 1 || inicio.getYear() > 9999))
-                || (fim != null && (fim.getYear() < 1 || fim.getYear() > 9999)))
-            throw new IllegalArgumentException("Informe datas entre os anos 0001 e 9999.");
+        if ((inicio != null && (inicio.getYear() < 1000 || inicio.getYear() > 9999))
+                || (fim != null && (fim.getYear() < 1000 || fim.getYear() > 9999)))
+            throw new IllegalArgumentException("Informe datas entre os anos 1000 e 9999.");
         if (inicio != null && fim != null && inicio.isAfter(fim))
             throw new IllegalArgumentException("A data inicial não pode ser posterior à final.");
     }
 
     public LocalDateTime inicioEfetivo() {
-        return inicio == null ? LocalDateTime.of(1, 1, 1, 0, 0) : inicio.atStartOfDay();
+        return inicio == null ? LocalDateTime.of(1000, 1, 1, 0, 0) : inicio.atStartOfDay();
     }
 
-    public LocalDateTime fimExclusivo() {
-        return fim == null ? LocalDateTime.of(10000, 1, 1, 0, 0) : fim.plusDays(1).atStartOfDay();
+    public LocalDateTime fimInclusivo() {
+        return fim == null
+                ? LocalDateTime.of(9999, 12, 31, 23, 59, 59, 999999000)
+                : fim.atTime(23, 59, 59, 999999000);
     }
 }

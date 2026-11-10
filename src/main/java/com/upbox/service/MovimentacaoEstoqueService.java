@@ -1,11 +1,10 @@
 package com.upbox.service;
 
+import com.upbox.controller.FiltroMovimentacao;
+import com.upbox.entity.*;
 import com.upbox.entity.MovimentacaoEstoque;
 import com.upbox.entity.Produto;
 import com.upbox.entity.Usuario;
-import com.upbox.form.FiltroMovimentacao;
-
-import com.upbox.model.*;
 import com.upbox.repository.MovimentacaoEstoqueRepository;
 import com.upbox.repository.ProdutoRepository;
 import com.upbox.repository.UsuarioRepository;
@@ -96,6 +95,6 @@ public class MovimentacaoEstoqueService {
                 filtro.getUsuario(),
                 filtro.getTipo(),
                 filtro.inicioEfetivo(),
-                filtro.fimExclusivo());
+                filtro.fimInclusivo());
     }
 }

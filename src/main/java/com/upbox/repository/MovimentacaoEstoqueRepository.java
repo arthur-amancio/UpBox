@@ -1,7 +1,7 @@
 package com.upbox.repository;
 
 import com.upbox.entity.MovimentacaoEstoque;
-import com.upbox.model.TipoMovimentacao;
+import com.upbox.entity.TipoMovimentacao;
 
 import org.springframework.data.jpa.repository.*;
 import org.springframework.data.repository.query.Param;
@@ -30,7 +30,7 @@ public interface MovimentacaoEstoqueRepository extends JpaRepository<Movimentaca
                 + " join fetch m.usuario u where (:produto is null or p.id = :produto) and"
                 + " (:categoria is null or c.id = :categoria) and (:usuario is null or u.id ="
                 + " :usuario) and (:tipo is null or m.tipo = :tipo) and m.dataHora >= :inicio and"
-                + " m.dataHora < :fim order by m.dataHora desc, m.id desc")
+                + " m.dataHora <= :fim order by m.dataHora desc, m.id desc")
     List<MovimentacaoEstoque> pesquisar(
             @Param("produto") Long produto,
             @Param("categoria") Long categoria,

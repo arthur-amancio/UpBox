@@ -1,14 +1,14 @@
-package com.upbox.model;
+package com.upbox.entity;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 import com.upbox.entity.Produto;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 /**
- * Cada teste descreve uma situação que pode acontecer no estoque.
- * Assim, o grupo pode demonstrar as regras sem depender do navegador.
+ * Cada teste descreve uma situação que pode acontecer no estoque. Assim, o grupo pode demonstrar as
+ * regras sem depender do navegador.
  */
 class ProdutoTest {
 

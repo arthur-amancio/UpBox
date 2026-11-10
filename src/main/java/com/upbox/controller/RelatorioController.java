@@ -1,8 +1,7 @@
 package com.upbox.controller;
 
-import com.upbox.form.FiltroMovimentacao;
 
-import com.upbox.model.*;
+import com.upbox.entity.*;
 import com.upbox.repository.CategoriaRepository;
 import com.upbox.service.*;
 

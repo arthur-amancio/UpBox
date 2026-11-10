@@ -35,7 +35,10 @@ public class SegurancaConfig {
             var u = encontrados.get(0);
             // O principal guarda o ID estável, não o nome enviado no formulário.
             return new UsuarioAutenticado(
-                    u.getId(), u.getSenhaHash(), u.getPerfil().name(), u.isAtivo());
+                    u.getId(),
+                    u.getSenhaHash(),
+                    u.getPerfil().name(),
+                    u.isAtivo() && !u.isAtivacaoPendente());
         };
     }
 

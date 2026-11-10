@@ -1,41 +1,64 @@
 package com.upbox.service;
 
-import com.upbox.form.UsuarioForm;
-
-import com.upbox.model.*;
+import com.upbox.entity.*;
 import com.upbox.repository.UsuarioRepository;
 
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/** Abre a instalação uma única vez; até administrador inativo impede novo cadastro público. */
+import java.util.UUID;
+
+/** Cria a conta padrão automaticamente; a senha de uso é escolhida na ativação local. */
 @Service
 @RequiredArgsConstructor
 public class PrimeiroAcessoService {
     private final UsuarioRepository usuarios;
-    private final UsuarioService usuarioService;
-    private final JdbcTemplate jdbc;
+    private final PasswordEncoder encoder;
+    private final AuditoriaService auditoria;
 
     @Transactional(readOnly = true)
     public boolean disponivel() {
-        return !usuarios.existsByPerfil(PerfilAcesso.ADMINISTRADOR);
+        return usuarios.findByUsuarioIgnoreCase("administrador")
+                .filter(u -> u.isAtivo() && u.isAtivacaoPendente())
+                .isPresent();
     }
 
+    /** A restrição UNIQUE do login decide qual instância pode criar a primeira conta. */
     @Transactional
-    public void cadastrar(UsuarioForm form) {
-        String banco =
-                jdbc.execute((java.sql.Connection c) -> c.getMetaData().getDatabaseProductName());
-        if ("PostgreSQL".equals(banco)) {
-            // Não existe usuário para bloquear no banco vazio. Esse bloqueio da transação
-            // serializa duas primeiras instalações, inclusive em processos diferentes.
-            jdbc.execute("select pg_advisory_xact_lock(80502026)");
-        }
-        if (!disponivel())
-            throw new IllegalArgumentException("A configuração inicial já foi concluída.");
-        form.setPerfil(PerfilAcesso.ADMINISTRADOR);
-        usuarioService.salvar(null, form);
+    public void criarContaPadrao() {
+        if (usuarios.existsByPerfil(PerfilAcesso.ADMINISTRADOR)) return;
+        if (usuarios.findByUsuarioIgnoreCase("administrador").isPresent())
+            throw new IllegalArgumentException(
+                    "O login administrador já existe. Revise a conta sem sobrescrevê-la.");
+        // Não existe senha pública: este valor aleatório não é exibido nem permite login pendente.
+        String segredo = UUID.randomUUID().toString() + UUID.randomUUID();
+        Usuario u =
+                new Usuario(
+                        "Administrador",
+                        "administrador",
+                        "administrador@upbox.local",
+                        encoder.encode(segredo),
+                        PerfilAcesso.ADMINISTRADOR);
+        u.exigirAtivacao();
+        usuarios.saveAndFlush(u);
+    }
+
+    /** O bloqueio da linha impede duas ativações de alterarem a mesma senha. */
+    @Transactional
+    public void ativar(String senha) {
+        var u =
+                usuarios.administradorComBloqueio()
+                        .filter(x -> x.isAtivo() && x.isAtivacaoPendente())
+                        .orElseThrow(
+                                () ->
+                                        new IllegalArgumentException(
+                                                "A ativação inicial já foi concluída."));
+        UsuarioService.validarSenha(senha);
+        u.alterarSenhaHash(encoder.encode(senha));
+        u.concluirAtivacao();
+        auditoria.registrar("Administrador ativado", "Senha definida no computador da instalação");
     }
 }

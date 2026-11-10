@@ -1,14 +1,14 @@
 package com.upbox.controller;
 
-import com.upbox.entity.Usuario;
-
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import com.upbox.model.*;
+import com.upbox.entity.*;
+import com.upbox.entity.Usuario;
 import com.upbox.repository.*;
+import com.upbox.service.*;
 import com.upbox.service.UsuarioService;
 
 import org.junit.jupiter.api.*;

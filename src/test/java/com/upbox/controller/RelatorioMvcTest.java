@@ -1,15 +1,13 @@
 package com.upbox.controller;
 
-import com.upbox.entity.Categoria;
-import com.upbox.entity.MovimentacaoEstoque;
-import com.upbox.entity.Produto;
-import com.upbox.form.FiltroMovimentacao;
-
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import com.upbox.model.*;
+import com.upbox.entity.*;
+import com.upbox.entity.Categoria;
+import com.upbox.entity.MovimentacaoEstoque;
+import com.upbox.entity.Produto;
 import com.upbox.service.*;
 
 import org.junit.jupiter.api.Test;

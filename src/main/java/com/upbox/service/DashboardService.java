@@ -1,6 +1,6 @@
 package com.upbox.service;
 
-import com.upbox.model.*;
+import com.upbox.entity.*;
 import com.upbox.repository.*;
 
 import lombok.RequiredArgsConstructor;

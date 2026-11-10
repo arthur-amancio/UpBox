@@ -1,6 +1,5 @@
 package com.upbox.controller;
 
-import com.upbox.entity.Produto;
 
 import org.springframework.dao.*;
 import org.springframework.ui.Model;
