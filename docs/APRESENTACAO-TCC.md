@@ -2,13 +2,13 @@
 
 ## Preparar antes da aula
 
-Use o [guia de instalação](INSTALACAO-ESCOLA.md). Confirme PostgreSQL e UpBox iniciados, contas de administrador/funcionário disponíveis, navegador aberto e terminal com os testes concluídos. Prepare um banco de demonstração, separado de dados de uso real. Não apague tabelas do banco da escola para ensaiar.
+Use o guia de instalação (consulte o README atual). Confirme MySQL e UpBox iniciados, contas de administrador/funcionário disponíveis, navegador aberto e terminal com os testes concluídos. Prepare um banco de demonstração, separado de dados de uso real. Não apague tabelas do banco da escola para ensaiar.
 
 O roteiro abaixo usa código `TCC-001`, categoria Papelaria, produto Caderno, preço `12.50` e mínimo `3`. Se esses registros já existirem, escolha outro código ou use os registros do ensaio; não tente cadastrar código duplicado como se fosse sucesso.
 
 ## Arquitetura que o grupo precisa explicar
 
-**Formulário no navegador → Controller → Service → Repository → PostgreSQL → página Thymeleaf.**
+**Formulário no navegador → Controller → Service → Repository → MySQL → página Thymeleaf.**
 
 | Parte | Explicação para a turma | Exemplo real |
 | --- | --- | --- |
@@ -42,7 +42,7 @@ O controller recebe produto, tipo, quantidade e observação. O usuário respons
 
 Com saldo 10, `registrarSaida(7)` resulta em 3. Uma saída de 4 é recusada, pois só existem 3. O saldo e o histórico continuam iguais após a recusa. O alerta aparece quando saldo **menor ou igual** ao mínimo; saldo 3 e mínimo 3 já significam estoque baixo.
 
-O bloqueio de registro impede duas retiradas de usarem ao mesmo tempo o mesmo saldo antigo. O teste PostgreSQL demonstra duas saídas de 4 sobre saldo 5: somente uma é aprovada.
+O bloqueio de registro impede duas retiradas de usarem ao mesmo tempo o mesmo saldo antigo. O teste MySQL demonstra duas saídas de 4 sobre saldo 5: somente uma é aprovada.
 
 ## Roteiro cronometrado
 
@@ -51,12 +51,12 @@ O bloqueio de registro impede duas retiradas de usarem ao mesmo tempo o mesmo sa
 | 0:00–0:45 | Home e objetivo | UpBox organiza estoque de microempresas com perfis administrador e funcionário. |
 | 0:45–1:30 | Login e menu | Senha comparada com BCrypt, sessão HTTP e permissões no servidor. A criação de contas é administrativa. |
 | 1:30–2:30 | Categoria e produto | Código único, categoria, preço e mínimo. Saldo começa em zero; edição não tem campo para alterá-lo. |
-| 2:30–3:30 | Entrada de 10 | Formulário → controller → service → repository → PostgreSQL; responsável vem da sessão. |
+| 2:30–3:30 | Entrada de 10 | Formulário → controller → service → repository → MySQL; responsável vem da sessão. |
 | 3:30–4:30 | Saída de 7 e tentativa de 4 | Saldo final 3, alerta de mínimo e recusa sem alteração do histórico. A prévia no navegador não autoriza a operação. |
 | 4:30–5:30 | Histórico e dashboard | Produto, quantidade, tipo, data/hora e responsável. Números correspondem ao banco. |
 | 5:30–6:15 | Relatório e impressão | Filtros de produto/categoria/período; administrador prepara impressão e usa Salvar como PDF no navegador. |
 | 6:15–7:00 | Funcionário | Consulta e movimentação permitidas; cadastros administrativos e preparação de impressão bloqueados. |
-| 7:00–8:00 | Testes e pgAdmin | Mostrar resultado dos testes e registros com join. Reiniciar e conferir persistência pode ser demonstrado aqui ou por evidência do ensaio. |
+| 7:00–8:00 | Testes e MySQL Workbench | Mostrar resultado dos testes e registros com join. Reiniciar e conferir persistência pode ser demonstrado aqui ou por evidência do ensaio. |
 
 Para quatro integrantes, uma divisão possível é: 1 explica objetivo/login/arquitetura; 2 faz cadastros; 3 demonstra movimentações/regras; 4 apresenta relatórios, testes e banco. Todos devem conhecer o fluxo completo.
 
@@ -68,11 +68,11 @@ Para quatro integrantes, uma divisão possível é: 1 explica objetivo/login/arq
 - O que acontece se duas pessoas retirarem o mesmo produto ao mesmo tempo?
 - O que `@Transactional` evita quando uma gravação falha?
 - Por que desativar em vez de apagar um produto com histórico?
-- Qual a diferença entre PostgreSQL e pgAdmin?
-- Por que testes H2 não comprovam concorrência no PostgreSQL?
+- Qual a diferença entre MySQL e MySQL Workbench?
+- Por que testes H2 não comprovam concorrência no MySQL?
 
 ## Evidências e pendências documentais
 
-Consulte [a jornada real](ENTREGA-7-PREPARACAO-TCC.md), [as capturas](evidencias/tcc/) e [a matriz com o TCC oficial](MATRIZ-REQUISITOS-TCC.md). Os dados das capturas são sintéticos, cadastrados pelos formulários e persistidos no PostgreSQL, não simulações do navegador.
+Consulte a jornada real (consulte o README atual), as capturas (consulte o README atual) e [a matriz com o TCC oficial](MATRIZ-REQUISITOS-TCC.md). Os dados das capturas são sintéticos, cadastrados pelos formulários e persistidos no MySQL, não simulações do navegador.
 
 Os documentos originais do Drive não foram alterados. O grupo ainda precisa alinhar nomes de perfis, campos adicionais e desativação lógica nos diagramas/dicionários formais antes da apresentação.

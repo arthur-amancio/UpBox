@@ -11,13 +11,13 @@
 - [Diagrama de classes — imagem de 28/10](https://drive.google.com/file/d/1MXLw9evsmIToHdghRNyuzbpQeujSclWe/view)
 - [Diagrama geral de casos de uso](https://drive.google.com/file/d/1hn_cQ4rRvO0UhI-h5Irx7IqqrBCDCj6f/view)
 
-As duas imagens foram inspecionadas, além dos textos. Nenhum original do Drive foi modificado. As decisões já confirmadas pelo responsável — PostgreSQL, nomes dos perfis, preço obrigatório, usuários internos, desativação lógica e impressão administrativa — foram preservadas.
+As duas imagens foram inspecionadas, além dos textos. Nenhum original do Drive foi modificado. As decisões já confirmadas pelo responsável — MySQL, nomes dos perfis, preço obrigatório, usuários internos, desativação lógica e impressão administrativa — foram preservadas.
 
 Os caminhos Java abaixo são relativos a `src/main/java/com/upbox`; testes ficam em `src/test/java/com/upbox`.
 
 ## Casos de uso e requisitos funcionais
 
-A versão escolar também foi homologada em PostgreSQL 9.6.24 e 16.4. O cadastro inicial pelo navegador local foi autorizado pelo responsável para a instalação: fecha após o primeiro administrador, mantém BCrypt/CSRF e não altera o cadastro administrativo dos demais usuários. Veja COMPATIBILIDADE-POSTGRESQL.md, INSTALACAO-ESCOLA.md e PACOTE-E-HOMOLOGACAO.md. Documentos originais do Drive não foram modificados.
+A decisão atual do responsável é MySQL. A conta administrador é criada automaticamente e exige ativação local com senha escolhida, sem senha pública. A homologação cobre os servidores registrados na CI; outras versões precisam de teste. Os documentos originais do Drive continuam inalterados.
 
 | Requisito | Implementado? | Arquivo responsável | Evidência | Pendência |
 | --- | --- | --- | --- | --- |
@@ -29,11 +29,11 @@ A versão escolar também foi homologada em PostgreSQL 9.6.24 e 16.4. O cadastro
 | UC06 — Registrar entrada | Sim | service/MovimentacaoEstoqueService.java; entity/Produto.java | MovimentacaoMvcTest; entrada 10 no navegador e SQL | Nenhuma de código |
 | UC07 — Registrar saída sem exceder saldo | Sim | service/MovimentacaoEstoqueService.java; entity/Produto.java | Saída 7 e recusa de 4 com saldo 3; testes normais/inválidos | Nenhuma de código |
 | UC08 — Histórico preservado | Sim | entity/MovimentacaoEstoque.java; repository/MovimentacaoEstoqueRepository.java | Teste após desativar produto/usuário e jornada com produto inativo | Nenhuma de código |
-| UC09 — Filtros de histórico | Sim | form/FiltroMovimentacao.java; controller/MovimentacaoController.java | Produto, usuário, tipo, período; teste de fração de segundo no fim do dia | Nenhuma de código |
+| UC09 — Filtros de histórico | Sim | controller/FiltroMovimentacao.java; controller/MovimentacaoController.java | Produto, usuário, tipo, período; teste de fração de segundo no fim do dia | Nenhuma de código |
 | UC10 — Alertas de mínimo | Sim | entity/Produto.java; service/DashboardService.java | Saldo 3/mínimo 3 gera alerta; inativos não geram alerta | Nenhuma de código |
 | UC11 — Consultar relatórios | Sim, ambos os perfis | service/RelatorioService.java; templates/relatorios.html | Seis relatórios e bloqueio da opção administrativa de impressão | Nenhuma de código |
 | UC12 — Gerenciar o próprio perfil | Sim | controller/UsuarioController.java; service/UsuarioService.java | Formulário usa ID da sessão; perfil longo validado no navegador | Nenhuma de código |
-| UC13 — Alterar senha | Sim | service/UsuarioService.java; repository/UsuarioRepository.java | Senha atual, confirmação, BCrypt, encerramento/revogação; disputa com desativação no PostgreSQL | Nenhuma de código |
+| UC13 — Alterar senha | Sim | service/UsuarioService.java; repository/UsuarioRepository.java | Senha atual, confirmação, BCrypt, encerramento/revogação; disputa com desativação no MySQL | Nenhuma de código |
 | UC14 — Gerenciar usuários | Sim, administrador | controller/UsuarioController.java; service/UsuarioService.java | Cadastro/edição/status; jornada cria funcionário e revoga sessão ao desativar | Nenhuma de código |
 | UC15 — Gerenciar permissões | Sim, administrador | config/SegurancaConfig.java; service/UsuarioService.java | Rotas HTTP 403 para funcionário e preservação do último administrador | Atualizar nomes de perfil nos documentos formais |
 | UC16 — Gerenciar categorias | Sim, com desativação lógica | controller/EstoqueController.java; service/CategoriaService.java | Cadastro, edição, duplicidade, status e categoria inativa nos testes | Alinhar o termo “excluir” com a decisão de desativar |
@@ -51,13 +51,13 @@ A versão escolar também foi homologada em PostgreSQL 9.6.24 e 16.4. O cadastro
 
 | Requisito | Implementado? | Arquivo responsável | Evidência | Pendência |
 | --- | --- | --- | --- | --- |
-| Usuario, Categoria, Produto e MovimentacaoEstoque | Sim | entity/Usuario.java; Categoria.java; Produto.java; MovimentacaoEstoque.java | Mapeamentos e metadados PostgreSQL conferidos | Nenhuma de código |
+| Usuario, Categoria, Produto e MovimentacaoEstoque | Sim | entity/Usuario.java; Categoria.java; Produto.java; MovimentacaoEstoque.java | Mapeamentos e metadados MySQL conferidos | Nenhuma de código |
 | Categoria 1 → muitos produtos | Sim, associação unidirecional ManyToOne | entity/Produto.java | FK categoria_id e consultas join fetch | O diagrama não exige listas bidirecionais no Java |
 | Produto/usuário 1 → muitas movimentações | Sim | entity/MovimentacaoEstoque.java | FKs produto_id/usuario_id obrigatórias; histórico preservado | Nenhuma de código |
 | Produto.preco BigDecimal | Sim, obrigatório no cadastro/edição | entity/Produto.java; ProdutoForm.java | numeric(12,2), validação e R$ 12,50 na interface | Preencher preços reais de eventuais registros antigos sem preço |
 | Produto.codigo | Sim | entity/Produto.java; repository/ProdutoRepository.java | Requisito formal de código e teste de unicidade | Incluir no diagrama/dicionário, que omitem esse campo |
 | Nome de usuário para login | Sim | entity/Usuario.java | usuario único e login por usuário/e-mail | Incluir usuario no diagrama/dicionário |
-| Perfis ADMIN/USUARIO no diagrama | Equivalência funcional, nomes diferentes | model/PerfilAcesso.java | Código usa ADMINISTRADOR/FUNCIONARIO, conforme decisão anterior do responsável | Atualizar enum nos documentos formais; não renomear o código sem necessidade |
+| Perfis ADMIN/USUARIO no diagrama | Equivalência funcional, nomes diferentes | entity/PerfilAcesso.java | Código usa ADMINISTRADOR/FUNCIONARIO, conforme decisão anterior do responsável | Atualizar enum nos documentos formais; não renomear o código sem necessidade |
 | Senha protegida | Sim, hash BCrypt | entity/Usuario.java; config/SegurancaConfig.java | senha_hash; login seguro; sem exposição em páginas | Usar o termo hash BCrypt no lugar de “senha criptografada” na documentação |
 | quantidadeEstoque no dicionário | Sim, nome Java abreviado | entity/Produto.java | Campo Java quantidade, coluna quantidade_estoque e getters usados nas telas | Registrar a equivalência no dicionário, sem migração desnecessária |
 | Registro de operações | Sim, entidade adicional necessária | entity/RegistroOperacao.java | UC20 exige registro das ações principais | Incluir RegistroOperacao no diagrama/dicionário formal |
