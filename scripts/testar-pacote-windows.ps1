@@ -19,7 +19,7 @@ $dados = Join-Path $raiz 'dados-descartaveis'
 $script:processo = $null
 $banco = $null
 function Sql($consulta) {
-    & "$bin\mysql.exe" --no-defaults --protocol=TCP -h127.0.0.1 -P53316 -uroot -N -e $consulta
+    & "$bin\mysql.exe" --no-defaults --protocol=TCP "--host=127.0.0.1" "--port=53316" "--user=root" -N -e $consulta
     if ($LASTEXITCODE -ne 0) { throw 'Falha no MySQL descartável.' }
 }
 function Parar-UpBox {
