@@ -14,10 +14,6 @@ import java.util.*;
 public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
     Optional<Usuario> findByUsuarioIgnoreCase(String usuario);
 
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @Query("select u from Usuario u where u.usuario = 'administrador'")
-    Optional<Usuario> administradorComBloqueio();
-
     List<Usuario> findByUsuarioIgnoreCaseOrEmailIgnoreCase(String usuario, String email);
 
     boolean existsByPerfilAndAtivoTrue(PerfilAcesso perfil);

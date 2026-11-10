@@ -1,6 +1,5 @@
 package com.upbox.entity;
 
-
 import jakarta.persistence.*;
 
 import lombok.AccessLevel;

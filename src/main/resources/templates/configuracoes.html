@@ -10,7 +10,8 @@
       Configurações
      </h2>
     </div>
-    <form class="form-card" method="post" th:action="@{/configuracoes/perfil}" th:object="${perfilForm}">
+    <p class="alerta alerta-info" role="status" th:if="${trocaObrigatoria}">Primeiro acesso: troque a senha inicial admin para continuar. Informe admin em Senha atual e escolha uma nova senha de pelo menos 8 caracteres.</p>
+    <form th:unless="${trocaObrigatoria}" class="form-card" method="post" th:action="@{/configuracoes/perfil}" th:object="${perfilForm}">
      <h3>
       Seu perfil
      </h3>

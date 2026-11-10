@@ -85,6 +85,7 @@ public class UsuarioService {
             throw new IllegalArgumentException("As senhas informadas não coincidem.");
         validarSenha(f.getNova());
         u.alterarSenhaHash(encoder.encode(f.getNova()));
+        u.concluirTrocaSenha();
         auditoria.registrar("Senha alterada", "Usuário #" + id);
     }
 

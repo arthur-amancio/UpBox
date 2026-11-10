@@ -35,10 +35,7 @@ public class SegurancaConfig {
             var u = encontrados.get(0);
             // O principal guarda o ID estável, não o nome enviado no formulário.
             return new UsuarioAutenticado(
-                    u.getId(),
-                    u.getSenhaHash(),
-                    u.getPerfil().name(),
-                    u.isAtivo() && !u.isAtivacaoPendente());
+                    u.getId(), u.getSenhaHash(), u.getPerfil().name(), u.isAtivo());
         };
     }
 
@@ -49,7 +46,6 @@ public class SegurancaConfig {
                                 a.requestMatchers(
                                                 "/",
                                                 "/login",
-                                                "/primeiro-acesso",
                                                 "/css/**",
                                                 "/fonts/**",
                                                 "/images/**",
@@ -74,7 +70,16 @@ public class SegurancaConfig {
                                                     auditoria.registrar(
                                                             "Login", "Acesso ao sistema");
                                                     res.sendRedirect(
-                                                            req.getContextPath() + "/home");
+                                                            req.getContextPath()
+                                                                    + (usuarios.findById(
+                                                                                            Long
+                                                                                                    .valueOf(
+                                                                                                            auth
+                                                                                                                    .getName()))
+                                                                                    .orElseThrow()
+                                                                                    .isTrocaSenhaObrigatoria()
+                                                                            ? "/configuracoes"
+                                                                            : "/home"));
                                                 })
                                         .failureUrl("/login?erro")
                                         .permitAll())

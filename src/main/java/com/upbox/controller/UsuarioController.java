@@ -1,6 +1,5 @@
 package com.upbox.controller;
 
-
 import com.upbox.entity.*;
 import com.upbox.repository.*;
 import com.upbox.service.*;
@@ -94,6 +93,7 @@ public class UsuarioController {
         f.setEmail(u.getEmail());
         m.addAttribute("perfilForm", f);
         m.addAttribute("senhaForm", new SenhaForm());
+        m.addAttribute("trocaObrigatoria", u.isTrocaSenhaObrigatoria());
         return "configuracoes";
     }
 

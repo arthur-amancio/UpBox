@@ -8,10 +8,15 @@ Edite application.properties ao lado de upbox.jar: localhost:3306/upbox,
 usuário root e sua senha do MySQL. Não envie configuração preenchida ao GitHub.
 Execute iniciar-upbox.bat. Mantenha a janela aberta e acesse localhost:8080.
 
-A conta administrador é criada automaticamente. No primeiro acesso local,
-escolha sua senha para ativá-la. Antes disso o login está bloqueado. Não existe
-senha universal. Após ativar, entre como administrador e cadastre funcionários.
-Reiniciar não muda senha nem duplica conta. Use Ctrl+C para parar.
+A conta é criada automaticamente em banco novo:
+LOGIN: administrador
+SENHA INICIAL: admin
+
+No primeiro login, troque a senha em Configurações para liberar o sistema.
+Informe admin em Senha atual e uma nova senha com pelo menos 8 caracteres.
+Reiniciar não redefine senhas nem duplica conta. Em banco existente, a senha
+anterior é preservada. A senha admin é inicial, exclusiva da demonstração local.
+Use Ctrl+C para parar.
 
 Não precisa de Maven, .env ou arquivo local adicional. O script não apaga bancos.
 Confira Java 17, serviço MySQL, usuário/senha, banco upbox e porta 8080 se falhar.

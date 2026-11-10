@@ -6,101 +6,82 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.mock.web.MockHttpSession;
 
-/** O cadastro inicial não é um cadastro público permanente de administradores. */
+/** A senha inicial funciona, mas não libera módulos antes de ser trocada. */
 class PrimeiroAcessoMvcTest extends CenarioMvc {
-    @Test
-    void devePermitirRetomarAtivacaoDepoisDeReiniciarServidor() throws Exception {
-        deixarBancoVazio();
-        mvc.perform(
-                        get("/primeiro-acesso")
-                                .servletPath("/primeiro-acesso")
-                                .with(
-                                        req -> {
-                                            req.setRequestedSessionId(
-                                                    "sessao-do-servidor-anterior");
-                                            req.setRequestedSessionIdValid(false);
-                                            return req;
-                                        }))
-                .andExpect(status().isOk());
-    }
-
-    @org.springframework.beans.factory.annotation.Autowired
-    org.springframework.security.core.userdetails.UserDetailsService autenticacao;
-
     @org.springframework.beans.factory.annotation.Autowired
     com.upbox.service.PrimeiroAcessoService primeiroAcesso;
 
-    private void deixarBancoVazio() {
+    private MockHttpSession entrarPrimeiraVez() throws Exception {
         usuarios.deleteAll();
         primeiroAcesso.criarContaPadrao();
+        assertTrue(encoder.matches("admin", usuarios.findAll().get(0).getSenhaHash()));
+        return (MockHttpSession)
+                mvc.perform(
+                                post("/login")
+                                        .with(csrf())
+                                        .param("username", "administrador")
+                                        .param("password", "admin"))
+                        .andExpect(redirectedUrl("/configuracoes"))
+                        .andReturn()
+                        .getRequest()
+                        .getSession(false);
     }
 
     @Test
-    void deveCriarAdministradorUmaVezComBcryptESemExibirSenha() throws Exception {
-        deixarBancoVazio();
-        assertFalse(autenticacao.loadUserByUsername("administrador").isEnabled());
-        var idInicial = usuarios.findAll().get(0).getId();
-        primeiroAcesso.criarContaPadrao();
-        assertEquals(idInicial, usuarios.findAll().get(0).getId());
-        mvc.perform(get("/login")).andExpect(redirectedUrl("/primeiro-acesso"));
-        mvc.perform(get("/primeiro-acesso")).andExpect(status().isOk());
+    void deveEntrarComPadraoExigirTrocaEPermitirNovoLogin() throws Exception {
+        var s = entrarPrimeiraVez();
+        mvc.perform(get("/estoque").session(s)).andExpect(redirectedUrl("/configuracoes"));
+        mvc.perform(get("/configuracoes").session(s)).andExpect(status().isOk());
         mvc.perform(
-                        post("/primeiro-acesso")
+                        post("/configuracoes/senha")
+                                .session(s)
                                 .with(csrf())
-                                .param("nome", "Equipe ETEC")
-                                .param("usuario", "equipe")
-                                .param("email", "equipe@example.com")
-                                .param("senha", "senha-teste-123")
-                                .param("confirmacao", "senha-teste-123")
-                                .param("perfil", "FUNCIONARIO"))
-                .andExpect(redirectedUrl("/login?configurado"));
-        var criado = usuarios.findAll().get(0);
-        assertEquals(com.upbox.entity.PerfilAcesso.ADMINISTRADOR, criado.getPerfil());
-        assertTrue(encoder.matches("senha-teste-123", criado.getSenhaHash()));
-        assertEquals("administrador", criado.getUsuario());
-        assertFalse(criado.isAtivacaoPendente());
-        assertTrue(autenticacao.loadUserByUsername("administrador").isEnabled());
-        mvc.perform(post("/primeiro-acesso").with(csrf())).andExpect(status().isForbidden());
-        criado.desativar();
-        usuarios.saveAndFlush(criado);
-        mvc.perform(get("/primeiro-acesso")).andExpect(redirectedUrl("/login"));
-        assertEquals(1, usuarios.count());
+                                .param("atual", "admin")
+                                .param("nova", "nova-senha-123")
+                                .param("confirmacao", "nova-senha-123"))
+                .andExpect(redirectedUrl("/login?senhaAlterada"));
+        var u = usuarios.findAll().get(0);
+        assertFalse(u.isTrocaSenhaObrigatoria());
+        assertTrue(encoder.matches("nova-senha-123", u.getSenhaHash()));
+        mvc.perform(
+                        post("/login")
+                                .with(csrf())
+                                .param("username", "administrador")
+                                .param("password", "nova-senha-123"))
+                .andExpect(redirectedUrl("/home"));
     }
 
     @Test
-    void deveRecusarAusenciaDeCsrfAcessoRemotoECamposInvalidos() throws Exception {
-        deixarBancoVazio();
-        mvc.perform(post("/primeiro-acesso")).andExpect(status().isForbidden());
+    void naoPodePularTrocaNemUsarSenhaInvalida() throws Exception {
+        var s = entrarPrimeiraVez();
+        mvc.perform(post("/configuracoes/perfil").session(s).with(csrf()))
+                .andExpect(redirectedUrl("/configuracoes"));
+        mvc.perform(post("/configuracoes/senha").session(s)).andExpect(status().isForbidden());
         mvc.perform(
-                        get("/primeiro-acesso")
-                                .with(
-                                        req -> {
-                                            req.setRemoteAddr("192.0.2.10");
-                                            return req;
-                                        }))
-                .andExpect(status().isForbidden());
-        mvc.perform(
-                        post("/primeiro-acesso")
+                        post("/configuracoes/senha")
+                                .session(s)
                                 .with(csrf())
-                                .with(
-                                        req -> {
-                                            req.setRemoteAddr("192.0.2.10");
-                                            return req;
-                                        })
-                                .header("X-Forwarded-For", "127.0.0.1"))
-                .andExpect(status().isForbidden());
-        mvc.perform(
-                        post("/primeiro-acesso")
-                                .with(csrf())
-                                .param("nome", "Equipe")
-                                .param("usuario", "equipe")
-                                .param("email", "equipe@example.com")
-                                .param("senha", "curta")
+                                .param("atual", "admin")
+                                .param("nova", "curta")
                                 .param("confirmacao", "curta"))
-                .andExpect(status().isOk())
-                .andExpect(model().hasErrors());
+                .andExpect(redirectedUrl("/configuracoes"));
+        assertTrue(usuarios.findAll().get(0).isTrocaSenhaObrigatoria());
+    }
+
+    @Test
+    void reiniciarNaoPodeRedefinirSenhaNemDuplicarConta() throws Exception {
+        entrarPrimeiraVez();
+        var u = usuarios.findAll().get(0);
+        String hash = u.getSenhaHash();
+        primeiroAcesso.criarContaPadrao();
         assertEquals(1, usuarios.count());
-        assertTrue(primeiroAcesso.disponivel());
+        assertEquals(hash, usuarios.findAll().get(0).getSenhaHash());
+        u.desativar();
+        usuarios.saveAndFlush(u);
+        primeiroAcesso.criarContaPadrao();
+        assertFalse(usuarios.findAll().get(0).isAtivo());
+        assertEquals(1, usuarios.count());
     }
 }

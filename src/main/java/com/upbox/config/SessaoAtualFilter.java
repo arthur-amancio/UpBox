@@ -22,16 +22,16 @@ public class SessaoAtualFilter extends OncePerRequestFilter {
     protected void doFilterInternal(
             HttpServletRequest req, HttpServletResponse res, FilterChain chain)
             throws ServletException, IOException {
+        String caminho = req.getRequestURI().substring(req.getContextPath().length());
         var auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth == null
                 && req.getRequestedSessionId() != null
                 && !req.isRequestedSessionIdValid()
-                && !req.getServletPath().equals("/login")
-                && !req.getServletPath().equals("/primeiro-acesso")
-                && !req.getServletPath().startsWith("/css/")
-                && !req.getServletPath().startsWith("/images/")
-                && !req.getServletPath().startsWith("/js/")
-                && !req.getServletPath().startsWith("/fonts/")) {
+                && !caminho.equals("/login")
+                && !caminho.startsWith("/css/")
+                && !caminho.startsWith("/images/")
+                && !caminho.startsWith("/js/")
+                && !caminho.startsWith("/fonts/")) {
             res.sendRedirect(req.getContextPath() + "/login?expirada");
             return;
         }
@@ -39,7 +39,6 @@ public class SessaoAtualFilter extends OncePerRequestFilter {
             var u = usuarios.findById(Long.valueOf(auth.getName())).orElse(null);
             if (u == null
                     || !u.isAtivo()
-                    || u.isAtivacaoPendente()
                     || !principal.getPassword().equals(u.getSenhaHash())
                     || auth.getAuthorities().stream()
                             .noneMatch(
@@ -47,6 +46,19 @@ public class SessaoAtualFilter extends OncePerRequestFilter {
                 if (req.getSession(false) != null) req.getSession(false).invalidate();
                 SecurityContextHolder.clearContext();
                 res.sendRedirect(req.getContextPath() + "/login?expirada");
+                return;
+            }
+            // Uma URL digitada manualmente também precisa respeitar a troca inicial.
+            boolean permitido =
+                    (caminho.equals("/configuracoes") && req.getMethod().equals("GET"))
+                            || caminho.equals("/configuracoes/senha")
+                            || caminho.equals("/logout")
+                            || caminho.startsWith("/css/")
+                            || caminho.startsWith("/images/")
+                            || caminho.startsWith("/fonts/")
+                            || caminho.startsWith("/js/");
+            if (u.isTrocaSenhaObrigatoria() && !permitido) {
+                res.sendRedirect(req.getContextPath() + "/configuracoes");
                 return;
             }
         }

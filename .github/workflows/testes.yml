@@ -52,6 +52,7 @@ jobs:
       - run: mvn -B -Pmysql-it verify
 
   distribuicao-windows:
+    timeout-minutes: 12
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4

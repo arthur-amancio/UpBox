@@ -33,7 +33,7 @@ Formulários simples usam `@Data`. Senhas não aparecem em `toString`. `@Require
 
 O Spring Security recebe usuário/e-mail e senha. Busca a conta no MySQL, compara a senha com BCrypt e recusa conta inativa. A sessão HTTP guarda um principal identificado pelo ID da conta. A cada requisição, o servidor verifica atividade, perfil e hash atual para revogar sessões desatualizadas.
 
-O funcionário não ganha acesso administrativo ao esconder/mostrar um botão: as rotas também são protegidas no servidor. O logout exige POST e CSRF. A conta administrador é criada automaticamente e começa bloqueada para login. Na ativação pelo navegador local o instalador escolhe a senha; o servidor protege com BCrypt e fecha a ativação.
+O funcionário não ganha acesso administrativo ao esconder/mostrar um botão: as rotas também são protegidas no servidor. O logout exige POST e CSRF. A conta administrador é criada automaticamente com senha inicial admin, protegida com BCrypt. O primeiro login exige trocar a senha em Configurações antes de acessar os módulos.
 
 ## Roteiro para demonstrar ao professor
 

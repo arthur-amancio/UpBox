@@ -8,7 +8,7 @@ Trocar a URL não converte dados. Nenhum banco da escola foi acessado ou apagado
 2. Trabalhe com cópia, nunca no banco principal. Confirme que tem autorização para transferir os dados.
 3. Crie um MySQL vazio com InnoDB/utf8mb4_unicode_ci. Para preparar o esquema sem criar a conta padrão, use temporariamente `upbox.admin-inicial.habilitado=false` no mesmo application.properties.
 4. Exporte **campos explícitos** das cinco tabelas: usuarios, categorias, produtos, movimentacoes_estoque e registros_operacoes. SQL de pg_dump não é executável diretamente no MySQL.
-5. Preserve IDs, hashes BCrypt (não é preciso conhecer senhas), nomes de usuário, perfis, situação, códigos, preços BigDecimal, quantidades, horários e observações. Para usuários antigos, a nova coluna ativacao_pendente deve ser false: não exigir nova ativação nem redefinir senhas existentes.
+5. Preserve IDs, hashes BCrypt (não é preciso conhecer senhas), nomes de usuário, perfis, situação, códigos, preços BigDecimal, quantidades, horários e observações. Para usuários antigos, a nova coluna troca_senha_obrigatoria deve ser false: não exigir nova troca nem redefinir senhas existentes.
 6. Importe em transação, na ordem usuarios/categorias, produtos, movimentacoes_estoque e registros_operacoes. Não desative chaves estrangeiras e não use comandos que ignorem registros duplicados.
 7. Confira contagens, IDs, chaves estrangeiras, unicidade com a collation nova, total de saldos, valores monetários e último horário. Duplicações antigas exigem decisão da equipe; não descarte registros silenciosamente.
 8. Confirme AUTO_INCREMENT acima do maior ID importado. Reative a inicialização normal: um administrador já existente, até inativo, impede criação/reset de outra conta.

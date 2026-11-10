@@ -17,7 +17,7 @@ Os caminhos Java abaixo são relativos a `src/main/java/com/upbox`; testes ficam
 
 ## Casos de uso e requisitos funcionais
 
-A decisão atual do responsável é MySQL. A conta administrador é criada automaticamente e exige ativação local com senha escolhida, sem senha pública. A homologação cobre os servidores registrados na CI; outras versões precisam de teste. Os documentos originais do Drive continuam inalterados.
+A decisão atual do responsável é MySQL. A conta administrador é criada automaticamente e recebe senha inicial admin por pedido expresso posterior do responsável, com troca obrigatória no primeiro login. A homologação cobre os servidores registrados na CI; outras versões precisam de teste. Os documentos originais do Drive continuam inalterados.
 
 | Requisito | Implementado? | Arquivo responsável | Evidência | Pendência |
 | --- | --- | --- | --- | --- |

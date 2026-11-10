@@ -2,8 +2,6 @@ package com.upbox.entity;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.upbox.entity.Produto;
-
 import org.junit.jupiter.api.Test;
 
 /**

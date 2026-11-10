@@ -72,7 +72,7 @@ class MysqlReinicioIT {
                     .registrar(produtoId, usuarioId, TipoMovimentacao.SAIDA, 7, "Reinício");
         }
         try (var app = iniciar("validate")) {
-            assertFalse(app.getBean(PrimeiroAcessoService.class).disponivel());
+            assertEquals(1, app.getBean(UsuarioRepository.class).count());
             var p = app.getBean(ProdutoRepository.class).findById(produtoId).orElseThrow();
             assertEquals(3, p.getQuantidade());
             assertEquals(1, app.getBean(UsuarioRepository.class).count());

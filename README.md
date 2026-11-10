@@ -34,19 +34,26 @@ mvn spring-boot:run
 
 Abra **http://localhost:8080** no mesmo computador. Não precisa de arquivo local, .env, Docker, Node ou variáveis de ambiente. Configuração externa continua possível pelas opções padrão do Spring, mas não é necessária.
 
-## Administrador automático, sem senha pública
+## Acesso inicial: administrador / admin
 
-Em um banco novo, o UpBox cria **Administrador**, login **administrador**, perfil **ADMINISTRADOR**, ativo. Essa conta começa com ativação pendente e não pode fazer login.
+Em um banco novo, o UpBox cria automaticamente:
 
-No primeiro acesso pelo navegador do próprio computador, escolha e confirme sua senha. Essa ativação é a alternativa à senha temporária do console: evita uma senha universal, vazamento em logs e problemas do .bat redirecionando a saída. A senha escolhida é protegida com BCrypt; CSRF permanece ativo.
+- Nome: **Administrador**
+- Login: **administrador**
+- Senha inicial: **admin**
+- Perfil: ADMINISTRADOR, ativo.
 
-Depois da ativação, entre como **administrador** com a senha escolhida. O administrador cadastra os funcionários. Reiniciar nunca redefine senha ou recria conta, inclusive administrador inativo. Duas inicializações usam a restrição única do login; duas ativações usam bloqueio da linha no InnoDB. A ativação não é um cadastro público permanente nem recuperação de senha.
+Entre com esses dados em http://localhost:8080. No primeiro login, a tela de configurações exige trocar a senha antes de liberar estoque, usuários e demais módulos. Informe **admin** em Senha atual e uma nova senha de pelo menos 8 caracteres. Depois, entre novamente com a senha escolhida.
+
+A senha inicial foi definida expressamente pelo responsável para o ambiente escolar. Ela é gravada com BCrypt. Não é senha de banco nem indicação para ambiente público. CSRF e permissões continuam ativos. A aplicação escuta somente 127.0.0.1 por padrão.
+
+Reiniciar nunca redefine senhas nem duplica conta. Em banco já utilizado, a senha existente é preservada: o padrão vale para a primeira criação. A restrição única protege duas criações simultâneas; a troca usa bloqueio da linha no InnoDB. Não existe cadastro público nem recuperação por reinício.
 
 ## Windows com o pacote pronto
 
 Baixe o artefato **UpBox-escola** na CI da main, extraia tudo e edite **application.properties ao lado de upbox.jar**. Execute **iniciar-upbox.bat** e abra localhost:8080. O pacote exige somente Java 17 e MySQL; não precisa de Maven.
 
-O script confere Java 17, JAR, configuração e orienta erros. Não apaga nem recria banco. Logs técnicos ficam em logs/upbox.log; nenhuma senha de ativação é impressa. Use Ctrl+C para parar; os dados permanecem no MySQL. Se mudar server.port, use a nova porta no navegador.
+O script confere Java 17, JAR, configuração e orienta erros. Não apaga nem recria banco. Logs técnicos ficam em logs/upbox.log; a senha não é registrada em logs. Use Ctrl+C para parar; os dados permanecem no MySQL. Se mudar server.port, use a nova porta no navegador.
 
 Para gerar o pacote: `mvn clean package`, depois `powershell -File scripts/gerar-pacote.ps1`. O ZIP sai em **target/UpBox-escola.zip**. O script recusa JAR com senha de banco preenchida para impedir distribuição acidental. Não existe src/assembly.
 
@@ -89,7 +96,7 @@ mvn -Pmysql-it verify
 Remove-Item Env:UPBOX_TEST_DB_PASSWORD
 ```
 
-As suítes recusam outro nome de banco antes de inicializar JPA. Testam autenticação/permissões, cadastros, estoque, rollback, concorrência, ativação e reinício. A CI também executa o ZIP/.bat em Windows com MySQL descartável.
+As suítes recusam outro nome de banco antes de inicializar JPA. Testam autenticação/permissões, cadastros, estoque, rollback, concorrência, troca inicial e reinício. A CI também executa o ZIP/.bat em Windows com MySQL descartável.
 
 A homologação inicial usa **MySQL 5.7.44 e 8.0.44**. Isso não promete funcionamento em toda versão antiga/futura nem em MariaDB. A versão exata da ETEC ainda precisa ser conferida com SELECT VERSION(); consulte o relatório da CI. MySQL 5.7 está fora de suporte; a compatibilidade da aplicação precisa ser verificada, mesmo quando o framework recomenda MySQL 8.
 
@@ -102,8 +109,8 @@ A homologação inicial usa **MySQL 5.7.44 e 8.0.44**. Isso não promete funcion
 | Unknown database | Criar upbox somente se ausente no servidor correto |
 | Porta 8080 ocupada | Encerrar outra instância ou mudar server.port |
 | Java incorreto | java -version e mvn -version devem indicar Java 17 |
-| Conta automática não entra | Concluir ativação no navegador local antes de fazer login |
-| Ativação fechada | Já foi concluída ou conta existente; reiniciar não redefine senha |
+| Conta automática não entra | Em banco novo use administrador/admin; em banco existente a senha anterior é mantida |
+| Primeiro acesso não libera módulos | Troque a senha inicial em Configurações; reiniciar não redefine senha |
 | Falha de duplicidade | Conferir códigos, nomes e e-mails; não apagar tabelas |
 | Tabelas/collation inválidas | Usar InnoDB e collation com _ci; não converter dados sem backup |
 

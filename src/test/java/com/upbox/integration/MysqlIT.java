@@ -57,7 +57,7 @@ class MysqlIT {
     Usuario usuario;
 
     @Test
-    void primeirasInstalacoesConcorrentesCriamEAtivamSomenteUmaConta() throws Exception {
+    void primeirasInstalacoesConcorrentesCriamETrocamSenhaDeSomenteUmaConta() throws Exception {
         var pool = Executors.newFixedThreadPool(2);
         var inicio = new CountDownLatch(1);
         Callable<Void> criar =
@@ -81,11 +81,22 @@ class MysqlIT {
                     usuarios.findAll().stream()
                             .filter(u -> u.getPerfil() == PerfilAcesso.ADMINISTRADOR)
                             .count());
-            assertTrue(primeiroAcesso.disponivel());
+            assertTrue(
+                    usuarios.findByUsuarioIgnoreCase("administrador")
+                            .orElseThrow()
+                            .isTrocaSenhaObrigatoria());
             Callable<Boolean> ativar =
                     () -> {
                         try {
-                            primeiroAcesso.ativar("senha-teste-123");
+                            var f = new SenhaForm();
+                            f.setAtual("admin");
+                            f.setNova("senha-teste-123");
+                            f.setConfirmacao("senha-teste-123");
+                            usuarioService.alterarSenha(
+                                    usuarios.findByUsuarioIgnoreCase("administrador")
+                                            .orElseThrow()
+                                            .getId(),
+                                    f);
                             return true;
                         } catch (IllegalArgumentException ex) {
                             return false;
@@ -94,7 +105,10 @@ class MysqlIT {
             var c = pool.submit(ativar);
             var d = pool.submit(ativar);
             assertNotEquals(c.get(15, TimeUnit.SECONDS), d.get(15, TimeUnit.SECONDS));
-            assertFalse(primeiroAcesso.disponivel());
+            assertFalse(
+                    usuarios.findByUsuarioIgnoreCase("administrador")
+                            .orElseThrow()
+                            .isTrocaSenhaObrigatoria());
         } finally {
             pool.shutdownNow();
         }
@@ -158,8 +172,8 @@ class MysqlIT {
     void deveDesfazerOperacaoSeHistoricoFalhar() {
         jdbc.execute(
                 "create trigger falha_historico_teste before insert on movimentacoes_estoque for"
-                    + " each row signal sqlstate '45000' set message_text='Falha simulada no"
-                    + " historico'");
+                        + " each row signal sqlstate '45000' set message_text='Falha simulada no"
+                        + " historico'");
         try {
             assertThrows(
                     org.springframework.dao.DataAccessException.class,
@@ -181,8 +195,8 @@ class MysqlIT {
     void deveDesfazerSaldoEHistoricoJaGravadosSeAuditoriaFalhar() {
         jdbc.execute(
                 "create trigger falha_auditoria_teste before insert on registros_operacoes for each"
-                    + " row signal sqlstate '45000' set message_text='Falha simulada na"
-                    + " auditoria'");
+                        + " row signal sqlstate '45000' set message_text='Falha simulada na"
+                        + " auditoria'");
         try {
             assertThrows(
                     org.springframework.dao.DataAccessException.class,

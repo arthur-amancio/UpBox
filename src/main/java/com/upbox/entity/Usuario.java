@@ -1,6 +1,5 @@
 package com.upbox.entity;
 
-
 import jakarta.persistence.*;
 
 import lombok.AccessLevel;
@@ -42,16 +41,16 @@ public class Usuario {
     @Column(nullable = false)
     private boolean ativo = true;
 
-    // A conta automática só pode entrar depois de o instalador escolher sua senha localmente.
+    // A senha inicial deve ser trocada antes de utilizar os outros módulos.
     @Column(nullable = false, columnDefinition = "boolean default false")
-    private boolean ativacaoPendente;
+    private boolean trocaSenhaObrigatoria;
 
-    public void exigirAtivacao() {
-        this.ativacaoPendente = true;
+    public void exigirTrocaSenha() {
+        this.trocaSenhaObrigatoria = true;
     }
 
-    public void concluirAtivacao() {
-        this.ativacaoPendente = false;
+    public void concluirTrocaSenha() {
+        this.trocaSenhaObrigatoria = false;
     }
 
     /**

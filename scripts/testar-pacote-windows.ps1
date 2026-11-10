@@ -44,17 +44,22 @@ function Iniciar-UpBox {
 }
 
 try {
+    Write-Host "Inicializando cluster MySQL descartável em $dados"
     & "$bin\mysqld.exe" --no-defaults --initialize-insecure "--basedir=$(Split-Path $bin)" "--datadir=$dados"
     if ($LASTEXITCODE -ne 0) { throw 'Não inicializou o MySQL descartável.' }
     Write-Host "MySQL de teste em $bin"
     & "$bin\mysqld.exe" --no-defaults --version
     $banco = Start-Process "$bin\mysqld.exe" -ArgumentList "--no-defaults --datadir=`"$dados`" --port=53316 --bind-address=127.0.0.1 --mysqlx=0 --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --console" -RedirectStandardOutput (Join-Path $raiz 'mysql-out.log') -RedirectStandardError (Join-Path $raiz 'mysql-err.log') -PassThru
+    Write-Host "Aguardando MySQL na porta 53316, PID $($banco.Id)"
     $pronto = $false
     for ($i=0; $i -lt 60; $i++) {
         $banco.Refresh()
         if ($banco.HasExited) { throw 'O processo MySQL encerrou; veja os logs de diagnóstico.' }
-        & "$bin\mysqladmin.exe" --no-defaults --connect-timeout=2 --protocol=TCP -h127.0.0.1 -P53316 -uroot ping 2>$null | Out-Null
-        if ($LASTEXITCODE -eq 0) { $pronto=$true; break }
+        $socket = [System.Net.Sockets.TcpClient]::new()
+        try {
+            $tentativa = $socket.ConnectAsync('127.0.0.1', 53316)
+            if ($tentativa.Wait(1000) -and $socket.Connected) { $pronto=$true; break }
+        } catch { } finally { $socket.Dispose() }
         Start-Sleep -Seconds 1
     }
     if (!$pronto) { throw 'MySQL descartável não ficou pronto.' }
@@ -70,18 +75,22 @@ try {
         if ($LASTEXITCODE -ne 0) { throw 'Verificação Java/JAR/configuração falhou.' }
     } finally { Pop-Location }
     Iniciar-UpBox
-    $pagina = Invoke-WebRequest 'http://127.0.0.1:18082/primeiro-acesso' -SessionVariable sessao
+    $pagina = Invoke-WebRequest 'http://127.0.0.1:18082/login' -SessionVariable sessao
     $token = [regex]::Match($pagina.Content, 'name="_csrf"[^>]*value="([^"]+)"').Groups[1].Value
-    if (!$token) { throw 'Ativação sem token CSRF.' }
     if ([int](Sql 'SELECT COUNT(*) FROM upbox_test.usuarios') -ne 1) { throw 'Conta automática ausente ou duplicada.' }
-    Invoke-WebRequest 'http://127.0.0.1:18082/primeiro-acesso' -Method Post -WebSession $sessao -Body @{
-        _csrf=$token; senha='senha-teste-windows-123'; confirmacao='senha-teste-windows-123'
+    $pagina = Invoke-WebRequest 'http://127.0.0.1:18082/login' -Method Post -WebSession $sessao -Body @{_csrf=$token; username='administrador'; password='admin'}
+    if ($pagina.Content -notmatch 'Primeiro acesso:') { throw 'A senha inicial não exigiu troca.' }
+    $token = [regex]::Match($pagina.Content, 'name="_csrf"[^>]*value="([^"]+)"').Groups[1].Value
+    Invoke-WebRequest 'http://127.0.0.1:18082/configuracoes/senha' -Method Post -WebSession $sessao -Body @{
+        _csrf=$token; atual='admin'; nova='senha-teste-windows-123'; confirmacao='senha-teste-windows-123'
     } | Out-Null
     Parar-UpBox
     Iniciar-UpBox
     if ([int](Sql 'SELECT COUNT(*) FROM upbox_test.usuarios') -ne 1) { throw 'Duplicação após reinício.' }
-    $pagina = Invoke-WebRequest 'http://127.0.0.1:18082/primeiro-acesso'
-    if ($pagina.Content -notmatch 'name="username"') { throw 'Ativação não fechou.' }
+    $pagina = Invoke-WebRequest 'http://127.0.0.1:18082/login' -SessionVariable retorno
+    $token = [regex]::Match($pagina.Content, 'name="_csrf"[^>]*value="([^"]+)"').Groups[1].Value
+    $pagina = Invoke-WebRequest 'http://127.0.0.1:18082/login' -Method Post -WebSession $retorno -Body @{_csrf=$token; username='administrador'; password='senha-teste-windows-123'}
+    if ($pagina.Content -notmatch 'Bem-vindo') { throw 'Login após reinício não preservou a nova senha.' }
     Parar-UpBox
     $env:SPRING_DATASOURCE_URL = 'jdbc:mysql://127.0.0.1:1/upbox_test?connectTimeout=2000'
     Push-Location $pasta
@@ -95,7 +104,7 @@ try {
             if ($LASTEXITCODE -ne 1 -or $mensagemJava -notmatch 'Java 17 nao encontrado') { throw 'Mensagem Java ausente.' }
         } finally { $env:JAVA_HOME=$anterior }
     } finally { Pop-Location }
-    $json = @{resultado='aprovado'; commit=$env:GITHUB_SHA; mysql=$versao; sistema='Windows'; java=17; contaAutomatica=$true; ativacaoLocalCsrf=$true; reinicioSemDuplicacao=$true; caminhoComEspacos=$true; mensagemConexao=$true; mensagemJava=$true} | ConvertTo-Json
+    $json = @{resultado='aprovado'; commit=$env:GITHUB_SHA; mysql=$versao; sistema='Windows'; java=17; contaAutomatica=$true; loginPadraoETrocaObrigatoria=$true; reinicioSemDuplicacao=$true; caminhoComEspacos=$true; mensagemConexao=$true; mensagemJava=$true} | ConvertTo-Json
     $json | Set-Content (Join-Path $env:GITHUB_WORKSPACE 'target/homologacao-windows.json')
     Write-Host $json
 } finally {

@@ -40,6 +40,6 @@ public class ConferirBanco implements ApplicationRunner {
         if (colunas != 0)
             throw new IllegalStateException(
                     "Use collation utf8mb4_unicode_ci para impedir duplicações por"
-                        + " maiúsculas/minúsculas.");
+                            + " maiúsculas/minúsculas.");
     }
 }
