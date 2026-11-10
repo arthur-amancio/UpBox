@@ -7,15 +7,19 @@ on:
 
 jobs:
   testes:
+    name: Testes Java ${{ matrix.java }}
+    strategy:
+      matrix:
+        java: ['17', '21']
     runs-on: ubuntu-latest
     steps:
       - name: Baixar código
         uses: actions/checkout@v4
-      - name: Preparar Java 17 e Maven
+      - name: Preparar Java e Maven
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '17'
+          java-version: ${{ matrix.java }}
           cache: maven
       - name: Executar testes
         run: mvn -B clean test
@@ -59,7 +63,7 @@ jobs:
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '17'
+          java-version: '21'
           cache: maven
       - name: Testar e empacotar
         run: mvn -B clean package
