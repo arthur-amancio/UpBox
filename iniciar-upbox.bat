@@ -11,7 +11,8 @@ if errorlevel 1 goto semjava
 set "UPBOX_VERSION="
 for /f "usebackq tokens=3" %%v in ("%UPBOX_VERSION_FILE%") do if not defined UPBOX_VERSION set "UPBOX_VERSION=%%~v"
 del "%UPBOX_VERSION_FILE%" >nul 2>&1
-for /f "tokens=1 delims=." %%v in ("%UPBOX_VERSION%") do if not "%%v"=="17" goto javaerrado
+rem O codigo e compilado para Java 17, mas tambem executa no Java 21.
+for /f "tokens=1 delims=." %%v in ("%UPBOX_VERSION%") do if not "%%v"=="17" if not "%%v"=="21" goto javaerrado
 
 rem Ao clonar, executa diretamente o codigo Java usando o Maven instalado.
 rem No pacote ZIP, executa o JAR pronto sem exigir Maven.
@@ -24,7 +25,7 @@ if not exist "src\main\resources\application.properties" goto semconfigfonte
 where mvn >nul 2>&1
 if errorlevel 1 goto semmaven
 if /i "%~1"=="--verificar" (
- echo Java 17, Maven e configuracao do projeto encontrados.
+ echo Java %UPBOX_VERSION%, Maven e configuracao do projeto encontrados.
  exit /b 0
 )
 echo Iniciando UpBox pelo Maven a partir do codigo clonado...
@@ -40,7 +41,7 @@ exit /b 0
 :pacote
 if not exist "application.properties" goto semconfigpacote
 if /i "%~1"=="--verificar" (
- echo Java 17, JAR e arquivo de configuracao encontrados.
+ echo Java %UPBOX_VERSION%, JAR e arquivo de configuracao encontrados.
  exit /b 0
 )
 if not exist "logs" mkdir logs
@@ -55,10 +56,10 @@ exit /b 0
 
 :semjava
 del "%UPBOX_VERSION_FILE%" >nul 2>&1
-echo ERRO: Java 17 nao encontrado. Instale o JDK 17 e confira JAVA_HOME e PATH.
+echo ERRO: Java nao encontrado. Instale Java 17 ou 21 e confira JAVA_HOME e PATH.
 goto erro
 :javaerrado
-echo ERRO: encontrado Java %UPBOX_VERSION%. Este projeto requer Java 17.
+echo ERRO: encontrado Java %UPBOX_VERSION%. Este projeto aceita Java 17 ou 21.
 goto erro
 :semmaven
 echo ERRO: Maven nao encontrado. Para executar o codigo clonado, instale o Maven e confira o PATH.
