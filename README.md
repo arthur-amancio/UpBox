@@ -1,6 +1,28 @@
-# UpBox — estoque para o TCC
+# UpBox — gestão de estoque
 
 Sistema integrado em **Java (compilado para 17, compatível com JDK 17 e 21), Spring Boot, Spring MVC, JPA, Thymeleaf, Lombok e MySQL**. Login por usuário/e-mail, permissões, categorias, produtos, estoque, histórico, dashboard e seis relatórios. As fontes são locais; não precisa de internet para usar a interface.
+
+## Visão geral
+
+O UpBox reúne a rotina de estoque em uma aplicação web local: cadastrar categorias e produtos, registrar movimentações, acompanhar saldos e consultar o histórico.
+
+| Recurso | Finalidade |
+|---|---|
+| Produtos e categorias | Organizar os itens controlados pelo sistema. |
+| Entradas e saídas | Atualizar o saldo por operações registradas no serviço. |
+| Histórico e auditoria | Consultar movimentações e operações preservadas no banco. |
+| Dashboard e relatórios | Acompanhar resumos e consultar os seis tipos de relatório. |
+| Usuários e permissões | Controlar o acesso e exigir a troca da senha inicial. |
+
+**Contexto:** projeto acadêmico para demonstração escolar. A configuração local e os limites de compatibilidade estão descritos abaixo.
+
+### Interface documentada
+
+![Dashboard do UpBox no ambiente MySQL documentado](docs/evidencias/mysql/dashboard-1366x768.png)
+
+*Captura existente nas evidências do projeto. Para reproduzir a aplicação, siga a instalação abaixo.*
+
+[Instalação pelo código](#executar-pelo-código) · [Pacote Windows](#windows-com-o-pacote-pronto) · [Testes](#testes) · [Material acadêmico](#material-acadêmico-e-histórico)
 
 ## Executar pelo código
 
